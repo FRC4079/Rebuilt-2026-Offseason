@@ -2,104 +2,97 @@ package frc.robot.subsystems.drive
 
 import frc.robot.utils.RobotParameters.SwerveParameters
 import org.littletonrobotics.junction.Logger
-import org.wpilib.driverstation.Alert
+import org.wpilib.driverstation.RobotState
 import org.wpilib.math.geometry.Rotation2d
 import org.wpilib.math.kinematics.SwerveModulePosition
-import org.wpilib.math.kinematics.SwerveModuleVelocity
+import org.wpilib.math.util.Units
+import org.wpilib.util.Alert
+import org.wpilib.util.Alert.Level
 
 class Module(
     private val io: ModuleIO,
     private val index: Int,
 ) {
-    private val driveEnergyKey = "FullDrive/Drive/$index"
-    private val turnEnergyKey = "FullDrive/Turn/$index"
     private val inputs = ModuleIOInputsAutoLogged()
-    private val outputs = ModuleIO.ModuleIOOutputs()
+
     private val ffModel = SwerveParameters.PIDParameters.DRIVE_FF
 
-    private val driveDisconnectedAlert =
+    private val driveDisconnectedAlert: Alert =
         Alert(
+            "Module Alerts",
             "Disconnected drive motor on module $index.",
-            Alert.Level.HIGH,
+            Level.HIGH,
         )
-
-    private val turnDisconnectedAlert =
+    private val turnDisconnectedAlert: Alert =
         Alert(
+            "Module Alerts",
             "Disconnected turn motor on module $index.",
-            Alert.Level.HIGH,
-        )
-
-    private val encoderDisconnectedAlert =
-        Alert(
-            "Disconnected encoder on module $index.",
-            Alert.Level.HIGH,
+            Level.HIGH,
         )
 
     fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Drive/Module$index", inputs)
+
+        // Update alerts
+        driveDisconnectedAlert.set(!inputs.driveConnected)
+        turnDisconnectedAlert.set(!inputs.turnConnected)
+
+        // Coast when disabled
+        if (RobotState.isDisabled()) {
+            io.coast()
+        }
     }
 
-    fun periodicAfterScheduler() {
-    }
-
-    /** Runs the module with the specified setpoint velocity. */
-    fun runSetpoint(state: SwerveModuleVelocity) {
-        // optimize() and cosineScale() return NEW objects in 2027 — capture them!
-        val optimized = state.optimize(getAngle())
-        val scaled = optimized.cosineScale(inputs.turnPositionRads)
+    /** Runs the module with the specified setpoint state. Mutates the state to optimize it.  */
+    fun runSetpoint(state: SwerveModuleState) {
+        // Optimize velocity setpoint
+        state.optimize(this.angle)
+        state.cosineScale(inputs.turnPosition)
 
         // Apply setpoints
-        val speedRadPerSec = scaled.velocity / (SwerveParameters.PhysicalParameters.WHEEL_DIAMETER / 2)
-
-        outputs.mode = ModuleIO.ModuleIOOutputMode.DRIVE
-        outputs.driveVelocityRadPerSec = speedRadPerSec
-        outputs.driveFeedforward = ffModel.calculate(speedRadPerSec)
-        outputs.turnRotation = scaled.angle
-        outputs.turnNeutral =
-            kotlin.math.abs(
-                scaled.angle.minus(getAngle()).degrees,
-            ) < SwerveParameters.Thresholds.TURN_DEADBAND_DEGREES
+        val speedRadPerSec: Double = state.speed / DriveConstants.wheelRadius
+        io.runDriveVelocity(speedRadPerSec, ffModel.calculate(speedRadPerSec))
+        io.runTurnPosition(state.angle)
     }
 
-    /** Runs the module with the specified output while controlling to zero degrees. */
+    /** Runs the module with the specified output while controlling to zero degrees.  */
     fun runCharacterization(output: Double) {
-        outputs.mode = ModuleIO.ModuleIOOutputMode.CHARACTERIZE
-        outputs.driveCharacterizationOutput = output
-        outputs.turnRotation = Rotation2d.kZero
+        io.runDriveOpenLoop(output)
+        io.runTurnPosition(Rotation2d())
     }
 
-    /** Disables all motor outputs in brake mode. */
-    fun brake() {
-        outputs.mode = ModuleIO.ModuleIOOutputMode.BRAKE
+    /** Disables all outputs to motors.  */
+    fun stop() {
+        io.runDriveOpenLoop(0.0)
+        io.runTurnOpenLoop(0.0)
     }
 
-    /** Disables all motor outputs in coast mode. */
-    fun coast() {
-        outputs.mode = ModuleIO.ModuleIOOutputMode.COAST
-    }
+    val angle: Rotation2d
+        /** Returns the current turn angle of the module.  */
+        get() = inputs.turnPosition
 
-    /** Returns whether the motors are connected. */
-    fun isConnected(): Boolean = inputs.driveConnected && inputs.turnConnected
+    val positionMeters: Double
+        /** Returns the current drive position of the module in meters.  */
+        get() = inputs.drivePositionRad * SwerveParameters.PhysicalParameters.WHEEL_DIAMETER / 2.0
 
-    /** Returns the current turn angle of the module. */
-    fun getAngle(): Rotation2d = inputs.turnPositionRads
+    val velocityMetersPerSec: Double
+        /** Returns the current drive velocity of the module in meters per second.  */
+        get() = inputs.driveVelocityRadPerSec * SwerveParameters.PhysicalParameters.WHEEL_DIAMETER / 2.0
 
-    /** Returns the current drive position of the module in meters. */
-    fun getPositionMeters(): Double = inputs.drivePositionRads * SwerveParameters.PhysicalParameters.WHEEL_DIAMETER / 2
+    val position: SwerveModulePosition
+        /** Returns the module position (turn angle and drive position).  */
+        get() = SwerveModulePosition(this.positionMeters, this.angle)
 
-    /** Returns the current drive velocity of the module in meters per second. */
-    fun getVelocityMetersPerSec(): Double = inputs.driveVelocityRadsPerSec * SwerveParameters.PhysicalParameters.WHEEL_DIAMETER / 2
+    val state: SwerveModuleState?
+        /** Returns the module state (turn angle and drive velocity).  */
+        get() = SwerveModuleState(this.velocityMetersPerSec, this.angle)
 
-    /** Returns the module position (turn angle and drive position). */
-    fun getPosition(): SwerveModulePosition = SwerveModulePosition(getPositionMeters(), getAngle())
+    val wheelRadiusCharacterizationPosition: Double
+        /** Returns the module position in radians.  */
+        get() = inputs.drivePositionRad
 
-    /** Returns the module velocity (turn angle and drive velocity). */
-    fun getState(): SwerveModuleVelocity = SwerveModuleVelocity(getVelocityMetersPerSec(), getAngle())
-
-    /** Returns the module position in radians. */
-    fun getWheelRadiusCharacterizationPosition(): Double = inputs.drivePositionRads
-
-    /** Returns the module velocity in rotations/sec. */
-    fun getFFCharacterizationVelocity(): Double = inputs.driveVelocityRadsPerSec
+    val fFCharacterizationVelocity: Double
+        /** Returns the module velocity in rotations/sec (Phoenix native units).  */
+        get() = Units.radiansToRotations(inputs.driveVelocityRadPerSec)
 }

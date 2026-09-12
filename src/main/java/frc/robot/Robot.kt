@@ -9,6 +9,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter
 import org.wpilib.command3.Command
 import org.wpilib.command3.Scheduler
 import org.wpilib.command3.SchedulerEvent
+import org.wpilib.hardware.bus.CANPort
 import org.wpilib.hardware.power.PowerDistribution
 
 /**
@@ -31,7 +32,7 @@ class Robot : LoggedRobot() {
             // Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
             Logger.addDataReceiver(NT4Publisher()) // Publish data to NetworkTables
             // WARNING: PowerDistribution resource leak
-            PowerDistribution(1, 1, PowerDistribution.ModuleType.REV) // Enables power distribution logging
+            PowerDistribution(CANPort.CAN_D10, 1, PowerDistribution.ModuleType.REV) // Enables power distribution logging
         } else {
             setUseTiming(false) // Run as fast as possible
             val logPath =
