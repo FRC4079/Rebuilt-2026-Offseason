@@ -5,6 +5,7 @@ import org.littletonrobotics.junction.Logger
 import org.wpilib.driverstation.RobotState
 import org.wpilib.math.geometry.Rotation2d
 import org.wpilib.math.kinematics.SwerveModulePosition
+import org.wpilib.math.kinematics.SwerveModuleVelocity
 import org.wpilib.math.util.Units
 import org.wpilib.util.Alert
 import org.wpilib.util.Alert.Level
@@ -44,17 +45,22 @@ class Module(
         }
     }
 
-    /** Runs the module with the specified setpoint state. Mutates the state to optimize it.  */
-    fun runSetpoint(state: SwerveModuleState) {
-        // Optimize velocity setpoint
-        state.optimize(this.angle)
-        state.cosineScale(inputs.turnPosition)
+    /** Runs the module with the specified setpoint state.
+     * 1. Optimizes the setpoint state to minimize rotation. Flips spin direction if the inverse direction is closer
+     * 2. Scales the speed by cosine of error to minimize inaccuracy before the module reaches the desired state
+     *
+     * @param state The setpoint state to run the module with.
+     */
+    fun runSetpoint(state: SwerveModuleVelocity) {
+        // Optimize state
+        val optimized = state.optimize(this.angle).cosineScale(inputs.turnPosition)
 
         // Apply setpoints
-        val speedRadPerSec: Double = state.speed / DriveConstants.wheelRadius
+        val speedRadPerSec: Double = optimized.velocity / SwerveParameters.PhysicalParameters.WHEEL_DIAMETER / 2
         io.runDriveVelocity(speedRadPerSec, ffModel.calculate(speedRadPerSec))
-        io.runTurnPosition(state.angle)
+        io.runTurnPosition(optimized.angle)
     }
+
 
     /** Runs the module with the specified output while controlling to zero degrees.  */
     fun runCharacterization(output: Double) {
@@ -68,31 +74,31 @@ class Module(
         io.runTurnOpenLoop(0.0)
     }
 
+    /** Returns the current turn angle of the module.  */
     val angle: Rotation2d
-        /** Returns the current turn angle of the module.  */
         get() = inputs.turnPosition
 
+    /** Returns the current drive position of the module in meters.  */
     val positionMeters: Double
-        /** Returns the current drive position of the module in meters.  */
         get() = inputs.drivePositionRad * SwerveParameters.PhysicalParameters.WHEEL_DIAMETER / 2.0
 
+    /** Returns the current drive velocity of the module in meters per second.  */
     val velocityMetersPerSec: Double
-        /** Returns the current drive velocity of the module in meters per second.  */
         get() = inputs.driveVelocityRadPerSec * SwerveParameters.PhysicalParameters.WHEEL_DIAMETER / 2.0
 
+    /** Returns the module position (turn angle and drive position).  */
     val position: SwerveModulePosition
-        /** Returns the module position (turn angle and drive position).  */
         get() = SwerveModulePosition(this.positionMeters, this.angle)
 
-    val state: SwerveModuleState?
-        /** Returns the module state (turn angle and drive velocity).  */
-        get() = SwerveModuleState(this.velocityMetersPerSec, this.angle)
+    /** Returns the module state (turn angle and drive velocity).  */
+    val state: SwerveModuleVelocity
+        get() = SwerveModuleVelocity(this.velocityMetersPerSec, this.angle)
 
+    /** Returns the module position in radians.  */
     val wheelRadiusCharacterizationPosition: Double
-        /** Returns the module position in radians.  */
         get() = inputs.drivePositionRad
 
+    /** Returns the module velocity in rotations/sec (Phoenix native units).  */
     val fFCharacterizationVelocity: Double
-        /** Returns the module velocity in rotations/sec (Phoenix native units).  */
         get() = Units.radiansToRotations(inputs.driveVelocityRadPerSec)
 }
