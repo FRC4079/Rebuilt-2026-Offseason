@@ -22,23 +22,23 @@ interface ModuleIO {
     )
 
     /** Updates the set of loggable inputs.  */
-    fun updateInputs(inputs: ModuleIOInputs?) {}
+    fun updateInputs(inputs: ModuleIOInputs?)
 
     /** Run the drive motor at the specified open loop value.  */
-    fun runDriveOpenLoop(output: Double) {}
+    fun runDriveOpenLoop(output: Double)
 
     /** Run the turn motor at the specified open loop value.  */
-    fun runTurnOpenLoop(output: Double) {}
+    fun runTurnOpenLoop(output: Double)
 
     /** Run the drive motor at the specified velocity.  */
     fun runDriveVelocity(
         velocityRadPerSec: Double,
         feedforward: Double,
-    ) {}
+    )
 
     /** Run the turn motor to the specified rotation.  */
-    fun runTurnPosition(rotation: Rotation2d?) {}
+    fun runTurnPosition(rotation: Rotation2d?)
 
     /** Run in coast mode.  */
-    fun coast() {}
+    fun coast()
 }

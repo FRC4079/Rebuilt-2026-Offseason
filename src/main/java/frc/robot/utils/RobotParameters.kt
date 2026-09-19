@@ -5,6 +5,7 @@ import com.pathplanner.lib.config.PIDConstants
 import com.pathplanner.lib.config.RobotConfig
 import com.pathplanner.lib.controllers.PPHolonomicDriveController
 import lombok.Builder
+import org.wpilib.hardware.bus.CANPort
 import org.wpilib.math.controller.PIDController
 import org.wpilib.math.controller.SimpleMotorFeedforward
 import org.wpilib.math.geometry.Rotation2d
@@ -49,7 +50,7 @@ object RobotParameters {
             val encoderOffset: Rotation2d,
             val turnInverted: Boolean,
             val encoderInverted: Boolean,
-            val CANBus: Int,
+            val CANBus: CANPort,
         )
 
         val MODULE_CONFIGS: Array<ModuleConfig> =

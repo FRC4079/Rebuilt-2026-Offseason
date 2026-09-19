@@ -10,7 +10,6 @@ import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC
 import com.ctre.phoenix6.controls.TorqueCurrentFOC
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC
 import com.ctre.phoenix6.hardware.CANcoder
-import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue
 import com.ctre.phoenix6.signals.InvertedValue
@@ -20,6 +19,8 @@ import frc.robot.utils.PhoenixOdometryThread
 import frc.robot.utils.PhoenixUtils
 import frc.robot.utils.PhoenixUtils.tryUntilOk
 import frc.robot.utils.RobotParameters.SwerveParameters
+import org.wpilib.hardware.bus.CAN
+import org.wpilib.hardware.bus.CANPort
 import org.wpilib.math.geometry.Rotation2d
 import org.wpilib.math.util.Units
 import org.wpilib.units.measure.Angle
@@ -40,9 +41,9 @@ class ModuleIOComp(
         private val brakeModeExecutor = Executors.newFixedThreadPool(8)
     }
 
-    private val driveTalon = TalonFX(config.driveMotorId, CANBus.systemcore(config.CANBus))
-    private val turnTalon = TalonFX(config.turnMotorId, CANBus.systemcore(config.CANBus))
-    private val encoder = CANcoder(config.encoderID, CANBus.systemcore(config.CANBus))
+    private val driveTalon = TalonFX(config.driveMotorId, CANBus(config.CANBus))
+    private val turnTalon = TalonFX(config.turnMotorId, CANBus(config.CANBus))
+    private val encoder = CANcoder(config.encoderID, CANBus(config.CANBus))
     private val encoderOffset = config.encoderOffset
 
     private val driveConfig = TalonFXConfiguration()
