@@ -1,9 +1,9 @@
 package frc.robot.utils
 
 import com.ctre.phoenix6.signals.InvertedValue
-import com.pathplanner.lib.config.PIDConstants
-import com.pathplanner.lib.config.RobotConfig
-import com.pathplanner.lib.controllers.PPHolonomicDriveController
+// import com.pathplanner.lib.config.PIDConstants
+// import com.pathplanner.lib.config.RobotConfig
+// import com.pathplanner.lib.controllers.PPHolonomicDriveController
 import lombok.Builder
 import org.wpilib.hardware.bus.CANPort
 import org.wpilib.math.controller.PIDController
@@ -15,6 +15,11 @@ import org.wpilib.math.kinematics.SwerveDriveKinematics
 /** Class containing global values for the robot.  */
 @Suppress("PropertyName")
 object RobotParameters {
+    object GlobalParameters {
+        val DISABLE_HAL: Boolean = false
+        val TUNING_MODE: Boolean = false
+    }
+
     /** Class containing global values related to motors.  */
     object CANBusParameters {
         // Motor CAN ID Values
@@ -43,7 +48,8 @@ object RobotParameters {
         }
 
         @Builder
-        data class ModuleConfig(
+        data class
+        ModuleConfig(
             val driveMotorId: Int,
             val turnMotorId: Int,
             val encoderID: Int,
@@ -63,7 +69,7 @@ object RobotParameters {
                     encoderOffset = Rotation2d.fromDegrees(0.0),
                     turnInverted = false,
                     encoderInverted = false,
-                    CANBus = CANBusParameters.SWERVE_CANBUS_ID,
+                    CANBus = CANPort.CAN_D0,
                 ),
                 // FR
                 ModuleConfig(
@@ -73,7 +79,7 @@ object RobotParameters {
                     encoderOffset = Rotation2d.fromDegrees(0.0),
                     turnInverted = false,
                     encoderInverted = false,
-                    CANBus = CANBusParameters.SWERVE_CANBUS_ID,
+                    CANBus = CANPort.CAN_D0,
                 ),
                 // BL
                 ModuleConfig(
@@ -129,22 +135,22 @@ object RobotParameters {
             val DIST_PID: PIDController = PIDController(0.2, 0.0, 0.0)
             val PASS_ROTATIONAL_PID: PIDController = PIDController(0.1, 0.0, 0.0)
 
-            var pathFollower: PPHolonomicDriveController =
-                PPHolonomicDriveController(
-                    PIDConstants(5.0, 0.00, 0.0), // translation
-                    PIDConstants(5.0, 0.0, 0.0), // rotation
-                )
+//            var pathFollower: PPHolonomicDriveController =
+//                PPHolonomicDriveController(
+//                    PIDConstants(5.0, 0.00, 0.0), // translation
+//                    PIDConstants(5.0, 0.0, 0.0), // rotation
+//                )
 
-            @JvmField
-            var config: RobotConfig? = null
-
-            init {
-                try {
-                    config = RobotConfig.fromGUISettings()
-                } catch (e: Exception) {
-                    throw RuntimeException("Failed to load robot config", e)
-                }
-            }
+//            @JvmField
+//            var config: RobotConfig? = null
+//
+//            init {
+//                try {
+//                    config = RobotConfig.fromGUISettings()
+//                } catch (e: Exception) {
+//                    throw RuntimeException("Failed to load robot config", e)
+//                }
+//            }
         }
 
         /** Class containing physical dimensions and kinematics for the swerve drive system.  */

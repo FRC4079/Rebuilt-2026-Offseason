@@ -4,7 +4,8 @@ import org.wpilib.math.geometry.Rotation2d
 
 interface ModuleIO {
     @AutoLog
-    class ModuleIOInputs {
+    open class ModuleIOInputs {
+        @JvmField
         var data: ModuleIOData =
             ModuleIOData(
                 driveConnected = false,
@@ -23,10 +24,14 @@ interface ModuleIO {
                 turnTorqueCurrentAmps = 0.0,
             )
 
+        @JvmField
         var odometryDrivePositionsRad: DoubleArray = doubleArrayOf()
+
+        @JvmField
         var odometryTurnPositions: Array<Rotation2d?> = arrayOf<Rotation2d?>()
     }
 
+    @JvmRecord
     data class ModuleIOData(
         val driveConnected: Boolean,
         val drivePositionRad: Double,

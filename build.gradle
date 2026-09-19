@@ -1,5 +1,5 @@
 import groovy.json.JsonSlurper
-import org.wpilib.gradlerio.GradleRIOPlugin
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id "java"
@@ -112,14 +112,24 @@ jar {
     from('build.gradle') { into 'backup' }
 }
 
-// Ensure Kotlin JVM target matches Java target
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
-    kotlinOptions {
-        jvmTarget = '25'
+kotlin {
+    jvmToolchain(25)
+
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_25)
+
+        freeCompilerArgs.add("-Xjvm-enable-preview")
+        freeCompilerArgs.add("-Xjsr305=strict")
     }
 }
 
 // Configure string concat to always inline compile
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.compilerArgs.add '-XDstringConcat=inline'
+}
+
+kapt {
+    arguments {
+        arg("-Xjvm-enable-preview")
+    }
 }

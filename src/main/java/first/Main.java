@@ -4,6 +4,7 @@
 
 package first;
 
+import frc.robot.Robot;
 import org.wpilib.framework.RobotBase;
 
 /**

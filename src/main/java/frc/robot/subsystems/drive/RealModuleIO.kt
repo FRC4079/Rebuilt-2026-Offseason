@@ -167,35 +167,32 @@ class ModuleIOComp(
     }
 
     override fun updateInputs(inputs: ModuleIO.ModuleIOInputs) {
-        inputs.data =
-            ModuleIO.ModuleIOData(
-                BaseStatusSignal.isAllGood(
-                    drivePosition,
-                    driveVelocity,
-                    driveAppliedVolts,
-                    driveSupplyCurrentAmps,
-                    driveTorqueCurrentAmps,
-                ),
-                Units.rotationsToRadians(drivePosition.valueAsDouble),
-                Units.rotationsToRadians(driveVelocity.valueAsDouble),
-                driveAppliedVolts.valueAsDouble,
-                driveSupplyCurrentAmps.valueAsDouble,
-                driveTorqueCurrentAmps.valueAsDouble,
-                BaseStatusSignal.isAllGood(
-                    turnPosition,
-                    turnVelocity,
-                    turnAppliedVolts,
-                    turnSupplyCurrentAmps,
-                    turnTorqueCurrentAmps,
-                ),
-                BaseStatusSignal.isAllGood(turnAbsolutePosition),
-                Rotation2d.fromRotations(turnAbsolutePosition.valueAsDouble).minus(encoderOffset),
-                Rotation2d.fromRotations(turnPosition.valueAsDouble),
-                Units.rotationsToRadians(turnVelocity.valueAsDouble),
-                turnAppliedVolts.valueAsDouble,
-                turnSupplyCurrentAmps.valueAsDouble,
-                turnTorqueCurrentAmps.valueAsDouble,
-            )
+        inputs.driveConnected = BaseStatusSignal.isAllGood(
+            drivePosition,
+            driveVelocity,
+            driveAppliedVolts,
+            driveSupplyCurrentAmps,
+            driveTorqueCurrentAmps,
+        )
+        inputs.drivePositionRad = Units.rotationsToRadians(drivePosition.valueAsDouble)
+        inputs.driveVelocityRadPerSec = Units.rotationsToRadians(driveVelocity.valueAsDouble)
+        inputs.driveAppliedVolts = driveAppliedVolts.valueAsDouble
+        inputs.driveSupplyCurrentAmps = driveSupplyCurrentAmps.valueAsDouble
+        inputs.driveTorqueCurrentAmps = driveTorqueCurrentAmps.valueAsDouble
+        inputs.turnConnected = BaseStatusSignal.isAllGood(
+            turnPosition,
+            turnVelocity,
+            turnAppliedVolts,
+            turnSupplyCurrentAmps,
+            turnTorqueCurrentAmps,
+        )
+        inputs.turnEncoderConnected = BaseStatusSignal.isAllGood(turnAbsolutePosition)
+        inputs.turnAbsolutePosition = Rotation2d.fromRotations(turnAbsolutePosition.valueAsDouble).minus(encoderOffset)
+        inputs.turnPosition = Rotation2d.fromRotations(turnPosition.valueAsDouble)
+        inputs.turnVelocityRadPerSec = Units.rotationsToRadians(turnVelocity.valueAsDouble)
+        inputs.turnAppliedVolts = turnAppliedVolts.valueAsDouble
+        inputs.turnSupplyCurrentAmps = turnSupplyCurrentAmps.valueAsDouble
+        inputs.turnTorqueCurrentAmps = turnTorqueCurrentAmps.valueAsDouble
 
         inputs.odometryDrivePositionsRad = drivePositionQueue.map { Units.rotationsToRadians(it) }.toDoubleArray()
         inputs.odometryTurnPositions = turnPositionQueue.map { Rotation2d.fromRotations(it) }.toTypedArray()
