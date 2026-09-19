@@ -1,15 +1,18 @@
 package frc.robot.subsystems.drive
 
+import frc.robot.subsystems.drive.ModuleIO.ModuleIOData
+import frc.robot.subsystems.drive.ModuleIO.ModuleIOInputs
 import frc.robot.utils.RobotParameters.SwerveParameters
 import org.wpilib.math.controller.PIDController
 import org.wpilib.math.geometry.Rotation2d
 import org.wpilib.math.system.DCMotor
 import org.wpilib.math.system.Models
-import org.wpilib.simulation.DCMotorSim
 import kotlin.math.abs
+import org.wpilib.simulation.DCMotorSim
 
 /**
- * Physics sim implementation of module IO. Simulation is always based on voltage control.
+ * Physics sim implementation of module IO. The sim models are configured using a set of module
+ * constants from Phoenix. Simulation is always based on voltage control.
  */
 class ModuleIOSim : ModuleIO {
     companion object {
@@ -46,38 +49,52 @@ class ModuleIOSim : ModuleIO {
     private var turnAppliedVolts = 0.0
 
     init {
+        // Enable wrapping for turn PID
         turnController.enableContinuousInput(-Math.PI, Math.PI)
     }
 
-    override fun updateInputs(inputs: ModuleIO.ModuleIOInputs?) {
-        if (inputs == null) return
-
+    override fun updateInputs(inputs: ModuleIOInputs) {
+        // Run closed-loop control
         if (driveClosedLoop) {
-            driveAppliedVolts = driveFFVolts + driveController.calculate(driveSim.angularVelocity)
+            driveAppliedVolts =
+                driveFFVolts + driveController.calculate(driveSim.angularVelocityRadPerSec)
         } else {
             driveController.reset()
         }
         if (turnClosedLoop) {
-            turnAppliedVolts = turnController.calculate(turnSim.angularPosition)
+            turnAppliedVolts = turnController.calculate(turnSim.angularPositionRad)
         } else {
             turnController.reset()
         }
 
+        // Update simulation state
         driveSim.setInputVoltage(driveAppliedVolts.coerceIn(-12.0, 12.0))
         turnSim.setInputVoltage(turnAppliedVolts.coerceIn(-12.0, 12.0))
         driveSim.update(0.02)
         turnSim.update(0.02)
 
-        inputs.driveConnected = true
-        inputs.drivePositionRad = driveSim.angularPosition
-        inputs.driveVelocityRadPerSec = driveSim.angularVelocity
-        inputs.driveAppliedVolts = driveAppliedVolts
-        inputs.driveSupplyCurrentAmps = abs(driveSim.currentDraw)
+        // Update drive inputs
+        inputs.data =
+            ModuleIOData(
+                driveConnected = true,
+                drivePositionRad = driveSim.angularPositionRad,
+                driveVelocityRadPerSec = driveSim.angularVelocityRadPerSec,
+                driveAppliedVolts = driveAppliedVolts,
+                driveSupplyCurrentAmps = abs(driveSim.currentDrawAmps),
+                driveTorqueCurrentAmps = 0.0,
+                turnConnected = true,
+                turnEncoderConnected = true,
+                turnAbsolutePosition = Rotation2d(turnSim.angularPositionRad),
+                turnPosition = Rotation2d(turnSim.angularPositionRad),
+                turnVelocityRadPerSec = turnSim.angularVelocityRadPerSec,
+                turnAppliedVolts = turnAppliedVolts,
+                turnSupplyCurrentAmps = abs(turnSim.currentDrawAmps),
+                turnTorqueCurrentAmps = 0.0,
+            )
 
-        inputs.turnConnected = true
-        inputs.turnPosition = Rotation2d(turnSim.angularPosition)
-        inputs.turnAbsolutePosition = Rotation2d(turnSim.angularPosition)
-        inputs.turnSupplyCurrentAmps = abs(turnSim.currentDraw)
+        // Update odometry inputs (50Hz because high-frequency odometry in sim doesn't matter)
+        inputs.odometryDrivePositionsRad = doubleArrayOf(inputs.data.drivePositionRad)
+        inputs.odometryTurnPositions = arrayOf<Rotation2d?>(inputs.data.turnPosition)
     }
 
     override fun runDriveOpenLoop(output: Double) {
@@ -99,17 +116,24 @@ class ModuleIOSim : ModuleIO {
         driveController.setSetpoint(velocityRadPerSec)
     }
 
-    override fun runTurnPosition(rotation: Rotation2d?) {
+    override fun runTurnPosition(rotation: Rotation2d) {
         turnClosedLoop = true
-        turnController.setSetpoint(rotation?.radians ?: turnController.setpoint)
+        turnController.setSetpoint(rotation.radians)
     }
 
-    override fun coast() {
-        driveClosedLoop = false
-        turnClosedLoop = false
-        driveController.reset()
-        turnController.reset()
-        driveAppliedVolts = 0.0
-        turnAppliedVolts = 0.0
+    override fun setDrivePID(
+        kP: Double,
+        kI: Double,
+        kD: Double,
+    ) {
+        driveController.setPID(kP, kI, kD)
+    }
+
+    override fun setTurnPID(
+        kP: Double,
+        kI: Double,
+        kD: Double,
+    ) {
+        turnController.setPID(kP, kI, kD)
     }
 }
