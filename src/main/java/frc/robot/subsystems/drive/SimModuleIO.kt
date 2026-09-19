@@ -7,8 +7,9 @@ import org.wpilib.math.controller.PIDController
 import org.wpilib.math.geometry.Rotation2d
 import org.wpilib.math.system.DCMotor
 import org.wpilib.math.system.Models
-import kotlin.math.abs
 import org.wpilib.simulation.DCMotorSim
+import java.lang.Math.clamp
+import kotlin.math.abs
 
 /**
  * Physics sim implementation of module IO. The sim models are configured using a set of module
@@ -57,19 +58,19 @@ class ModuleIOSim : ModuleIO {
         // Run closed-loop control
         if (driveClosedLoop) {
             driveAppliedVolts =
-                driveFFVolts + driveController.calculate(driveSim.angularVelocityRadPerSec)
+                driveFFVolts + driveController.calculate(driveSim.angularVelocity)
         } else {
             driveController.reset()
         }
         if (turnClosedLoop) {
-            turnAppliedVolts = turnController.calculate(turnSim.angularPositionRad)
+            turnAppliedVolts = turnController.calculate(turnSim.angularPosition)
         } else {
             turnController.reset()
         }
 
         // Update simulation state
-        driveSim.setInputVoltage(driveAppliedVolts.coerceIn(-12.0, 12.0))
-        turnSim.setInputVoltage(turnAppliedVolts.coerceIn(-12.0, 12.0))
+        driveSim.setInputVoltage(clamp(driveAppliedVolts, -12.0, 12.0))
+        turnSim.setInputVoltage(clamp(turnAppliedVolts, -12.0, 12.0))
         driveSim.update(0.02)
         turnSim.update(0.02)
 
@@ -77,18 +78,18 @@ class ModuleIOSim : ModuleIO {
         inputs.data =
             ModuleIOData(
                 driveConnected = true,
-                drivePositionRad = driveSim.angularPositionRad,
-                driveVelocityRadPerSec = driveSim.angularVelocityRadPerSec,
+                drivePositionRad = driveSim.angularPosition,
+                driveVelocityRadPerSec = driveSim.angularVelocity,
                 driveAppliedVolts = driveAppliedVolts,
-                driveSupplyCurrentAmps = abs(driveSim.currentDrawAmps),
+                driveSupplyCurrentAmps = abs(driveSim.currentDraw),
                 driveTorqueCurrentAmps = 0.0,
                 turnConnected = true,
                 turnEncoderConnected = true,
-                turnAbsolutePosition = Rotation2d(turnSim.angularPositionRad),
-                turnPosition = Rotation2d(turnSim.angularPositionRad),
-                turnVelocityRadPerSec = turnSim.angularVelocityRadPerSec,
+                turnAbsolutePosition = Rotation2d(turnSim.angularPosition),
+                turnPosition = Rotation2d(turnSim.angularPosition),
+                turnVelocityRadPerSec = turnSim.angularVelocity,
                 turnAppliedVolts = turnAppliedVolts,
-                turnSupplyCurrentAmps = abs(turnSim.currentDrawAmps),
+                turnSupplyCurrentAmps = abs(turnSim.currentDraw),
                 turnTorqueCurrentAmps = 0.0,
             )
 
