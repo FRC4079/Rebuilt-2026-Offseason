@@ -112,6 +112,13 @@ jar {
     from('build.gradle') { into 'backup' }
 }
 
+// Ensure Kotlin JVM target matches Java target
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+    kotlinOptions {
+        jvmTarget = '25'
+    }
+}
+
 // Configure string concat to always inline compile
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
