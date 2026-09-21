@@ -1,4 +1,5 @@
 package frc.robot.subsystems.drive
+import frc.robot.utils.ReflectiveLoggableInputs
 import org.littletonrobotics.junction.AutoLog
 import org.littletonrobotics.junction.LogTable
 import org.littletonrobotics.junction.inputs.LoggableInputs
@@ -19,41 +20,7 @@ data class ModuleIOData(
     var turnAppliedVolts: Double,
     var turnSupplyCurrentAmps: Double,
     var turnTorqueCurrentAmps: Double,
-) : LoggableInputs {
-    override fun toLog(table: LogTable) {
-        table.put("DriveConnected", driveConnected)
-        table.put("DrivePositionRad", drivePositionRad)
-        table.put("DriveVelocityRadPerSec", driveVelocityRadPerSec)
-        table.put("DriveAppliedVolts", driveAppliedVolts)
-        table.put("DriveSupplyCurrentAmps", driveSupplyCurrentAmps)
-        table.put("DriveTorqueCurrentAmps", driveTorqueCurrentAmps)
-        table.put("TurnConnected", turnConnected)
-        table.put("TurnEncoderConnected", turnEncoderConnected)
-        table.put("TurnAbsolutePosition", Rotation2d.struct, turnAbsolutePosition)
-        table.put("TurnPosition", Rotation2d.struct, turnPosition)
-        table.put("TurnVelocityRadPerSec", turnVelocityRadPerSec)
-        table.put("TurnAppliedVolts", turnAppliedVolts)
-        table.put("TurnSupplyCurrentAmps", turnSupplyCurrentAmps)
-        table.put("TurnTorqueCurrentAmps", turnTorqueCurrentAmps)
-    }
-
-    override fun fromLog(table: LogTable) {
-        driveConnected = table.get("DriveConnected", driveConnected)
-        drivePositionRad = table.get("DrivePositionRad", drivePositionRad)
-        driveVelocityRadPerSec = table.get("DriveVelocityRadPerSec", driveVelocityRadPerSec)
-        driveAppliedVolts = table.get("DriveAppliedVolts", driveAppliedVolts)
-        driveSupplyCurrentAmps = table.get("DriveSupplyCurrentAmps", driveSupplyCurrentAmps)
-        driveTorqueCurrentAmps = table.get("DriveTorqueCurrentAmps", driveTorqueCurrentAmps)
-        turnConnected = table.get("TurnConnected", turnConnected)
-        turnEncoderConnected = table.get("TurnEncoderConnected", turnEncoderConnected)
-        turnAbsolutePosition = table.get("TurnAbsolutePosition", Rotation2d.struct, turnAbsolutePosition)
-        turnPosition = table.get("TurnPosition", Rotation2d.struct, turnPosition)
-        turnVelocityRadPerSec = table.get("TurnVelocityRadPerSec", turnVelocityRadPerSec)
-        turnAppliedVolts = table.get("TurnAppliedVolts", turnAppliedVolts)
-        turnSupplyCurrentAmps = table.get("TurnSupplyCurrentAmps", turnSupplyCurrentAmps)
-        turnTorqueCurrentAmps = table.get("TurnTorqueCurrentAmps", turnTorqueCurrentAmps)
-    }
-}
+) : ReflectiveLoggableInputs()
 
 interface ModuleIO {
     @AutoLog
