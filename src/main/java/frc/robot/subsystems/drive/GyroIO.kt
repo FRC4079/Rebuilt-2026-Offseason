@@ -5,9 +5,14 @@ import org.wpilib.math.geometry.Rotation2d
 
 fun interface GyroIO {
     @AutoLog
-    class GyroIOInputs {
+    open class GyroIOInputs {
+        @JvmField
         var connected: Boolean = false
+
+        @JvmField
         var yawPosition: Rotation2d = Rotation2d()
+
+        @JvmField
         var yawVelocityRadPerSec: Double = 0.0
     }
 
