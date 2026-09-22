@@ -1,5 +1,6 @@
-package frc.robot.utils
+package frc.robot.utils.logging
 
+import frc.robot.utils.RobotParameters
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber
 import java.util.Arrays
 import java.util.HashMap

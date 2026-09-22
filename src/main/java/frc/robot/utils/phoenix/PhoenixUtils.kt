@@ -1,4 +1,4 @@
-package frc.robot.utils
+package frc.robot.utils.phoenix
 
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.StatusCode

@@ -16,10 +16,10 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import com.ctre.phoenix6.signals.SensorDirectionValue
-import frc.robot.utils.PhoenixOdometryThread
-import frc.robot.utils.PhoenixUtils
-import frc.robot.utils.PhoenixUtils.tryUntilOk
 import frc.robot.utils.RobotParameters.SwerveParameters
+import frc.robot.utils.phoenix.PhoenixOdometryThread
+import frc.robot.utils.phoenix.PhoenixUtils
+import frc.robot.utils.phoenix.PhoenixUtils.tryUntilOk
 import org.wpilib.math.geometry.Rotation2d
 import org.wpilib.math.util.Units
 import org.wpilib.units.measure.Angle
@@ -167,32 +167,34 @@ class ModuleIOComp(
     }
 
     override fun updateInputs(inputs: ModuleIO.ModuleIOInputs) {
-        inputs.driveConnected = BaseStatusSignal.isAllGood(
-            drivePosition,
-            driveVelocity,
-            driveAppliedVolts,
-            driveSupplyCurrentAmps,
-            driveTorqueCurrentAmps,
-        )
-        inputs.drivePositionRad = Units.rotationsToRadians(drivePosition.valueAsDouble)
-        inputs.driveVelocityRadPerSec = Units.rotationsToRadians(driveVelocity.valueAsDouble)
-        inputs.driveAppliedVolts = driveAppliedVolts.valueAsDouble
-        inputs.driveSupplyCurrentAmps = driveSupplyCurrentAmps.valueAsDouble
-        inputs.driveTorqueCurrentAmps = driveTorqueCurrentAmps.valueAsDouble
-        inputs.turnConnected = BaseStatusSignal.isAllGood(
-            turnPosition,
-            turnVelocity,
-            turnAppliedVolts,
-            turnSupplyCurrentAmps,
-            turnTorqueCurrentAmps,
-        )
-        inputs.turnEncoderConnected = BaseStatusSignal.isAllGood(turnAbsolutePosition)
-        inputs.turnAbsolutePosition = Rotation2d.fromRotations(turnAbsolutePosition.valueAsDouble).minus(encoderOffset)
-        inputs.turnPosition = Rotation2d.fromRotations(turnPosition.valueAsDouble)
-        inputs.turnVelocityRadPerSec = Units.rotationsToRadians(turnVelocity.valueAsDouble)
-        inputs.turnAppliedVolts = turnAppliedVolts.valueAsDouble
-        inputs.turnSupplyCurrentAmps = turnSupplyCurrentAmps.valueAsDouble
-        inputs.turnTorqueCurrentAmps = turnTorqueCurrentAmps.valueAsDouble
+        inputs.data.driveConnected =
+            BaseStatusSignal.isAllGood(
+                drivePosition,
+                driveVelocity,
+                driveAppliedVolts,
+                driveSupplyCurrentAmps,
+                driveTorqueCurrentAmps,
+            )
+        inputs.data.drivePositionRad = Units.rotationsToRadians(drivePosition.valueAsDouble)
+        inputs.data.driveVelocityRadPerSec = Units.rotationsToRadians(driveVelocity.valueAsDouble)
+        inputs.data.driveAppliedVolts = driveAppliedVolts.valueAsDouble
+        inputs.data.driveSupplyCurrentAmps = driveSupplyCurrentAmps.valueAsDouble
+        inputs.data.driveTorqueCurrentAmps = driveTorqueCurrentAmps.valueAsDouble
+        inputs.data.turnConnected =
+            BaseStatusSignal.isAllGood(
+                turnPosition,
+                turnVelocity,
+                turnAppliedVolts,
+                turnSupplyCurrentAmps,
+                turnTorqueCurrentAmps,
+            )
+        inputs.data.turnEncoderConnected = BaseStatusSignal.isAllGood(turnAbsolutePosition)
+        inputs.data.turnAbsolutePosition = Rotation2d.fromRotations(turnAbsolutePosition.valueAsDouble).minus(encoderOffset)
+        inputs.data.turnPosition = Rotation2d.fromRotations(turnPosition.valueAsDouble)
+        inputs.data.turnVelocityRadPerSec = Units.rotationsToRadians(turnVelocity.valueAsDouble)
+        inputs.data.turnAppliedVolts = turnAppliedVolts.valueAsDouble
+        inputs.data.turnSupplyCurrentAmps = turnSupplyCurrentAmps.valueAsDouble
+        inputs.data.turnTorqueCurrentAmps = turnTorqueCurrentAmps.valueAsDouble
 
         inputs.odometryDrivePositionsRad = drivePositionQueue.map { Units.rotationsToRadians(it) }.toDoubleArray()
         inputs.odometryTurnPositions = turnPositionQueue.map { Rotation2d.fromRotations(it) }.toTypedArray()

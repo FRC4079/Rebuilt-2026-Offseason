@@ -75,24 +75,24 @@ class ModuleIOSim : ModuleIO {
         turnSim.update(0.02)
 
         // Update drive inputs
-        inputs.driveConnected = true
-        inputs.drivePositionRad = driveSim.angularPosition
-        inputs.driveVelocityRadPerSec = driveSim.angularVelocity
-        inputs.driveAppliedVolts = driveAppliedVolts
-        inputs.driveSupplyCurrentAmps = abs(driveSim.currentDraw)
-        inputs.driveTorqueCurrentAmps = 0.0
-        inputs.turnConnected = true
-        inputs.turnEncoderConnected = true
-        inputs.turnAbsolutePosition = Rotation2d(turnSim.angularPosition)
-        inputs.turnPosition = Rotation2d(turnSim.angularPosition)
-        inputs.turnVelocityRadPerSec = turnSim.angularVelocity
-        inputs.turnAppliedVolts = turnAppliedVolts
-        inputs.turnSupplyCurrentAmps = abs(turnSim.currentDraw)
-        inputs.turnTorqueCurrentAmps = 0.0
+        inputs.data.driveConnected = true
+        inputs.data.drivePositionRad = driveSim.angularPosition
+        inputs.data.driveVelocityRadPerSec = driveSim.angularVelocity
+        inputs.data.driveAppliedVolts = driveAppliedVolts
+        inputs.data.driveSupplyCurrentAmps = abs(driveSim.currentDraw)
+        inputs.data.driveTorqueCurrentAmps = 0.0
+        inputs.data.turnConnected = true
+        inputs.data.turnEncoderConnected = true
+        inputs.data.turnAbsolutePosition = Rotation2d(turnSim.angularPosition)
+        inputs.data.turnPosition = Rotation2d(turnSim.angularPosition)
+        inputs.data.turnVelocityRadPerSec = turnSim.angularVelocity
+        inputs.data.turnAppliedVolts = turnAppliedVolts
+        inputs.data.turnSupplyCurrentAmps = abs(turnSim.currentDraw)
+        inputs.data.turnTorqueCurrentAmps = 0.0
 
         // Update odometry inputs (50Hz because high-frequency odometry in sim doesn't matter)
-        inputs.odometryDrivePositionsRad = doubleArrayOf(inputs.drivePositionRad)
-        inputs.odometryTurnPositions = arrayOf<Rotation2d?>(inputs.turnPosition)
+        inputs.odometryDrivePositionsRad = doubleArrayOf(inputs.data.drivePositionRad)
+        inputs.odometryTurnPositions = arrayOf<Rotation2d?>(inputs.data.turnPosition)
     }
 
     override fun runDriveOpenLoop(output: Double) {

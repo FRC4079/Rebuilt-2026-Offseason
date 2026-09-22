@@ -8,9 +8,9 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader
 import org.littletonrobotics.junction.wpilog.WPILOGWriter
 import org.wpilib.command3.Command
 import org.wpilib.command3.Scheduler
-import org.wpilib.command3.SchedulerEvent
 import org.wpilib.hardware.bus.CANPort
 import org.wpilib.hardware.power.PowerDistribution
+import org.wpilib.system.Timer
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -19,6 +19,11 @@ import org.wpilib.hardware.power.PowerDistribution
  * project.
  */
 class Robot : LoggedRobot() {
+    companion object {
+        /** Returns whether we should wait to enable because JIT optimizations are in progress.  */
+        fun isJITing(): Boolean = Timer.getTimestamp() < 45.0
+    }
+
     private var autonomousCommand: Command? = null
     private var robotContainer: RobotContainer? = null
 

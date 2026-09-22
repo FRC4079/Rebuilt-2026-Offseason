@@ -1,13 +1,17 @@
 package frc.robot.subsystems.drive
 
-import frc.robot.utils.PhoenixOdometryThread
 import frc.robot.utils.RobotParameters
+import frc.robot.utils.phoenix.PhoenixOdometryThread
+import frc.robot.utils.swerve.SwerveSetpoint
 import lombok.Setter
 import org.littletonrobotics.junction.AutoLogOutput
 import org.littletonrobotics.junction.Logger
 import org.wpilib.command3.Mechanism
 import org.wpilib.math.filter.Debouncer
+import org.wpilib.math.geometry.Rotation2d
+import org.wpilib.math.kinematics.ChassisVelocities
 import org.wpilib.math.kinematics.SwerveDriveKinematics
+import org.wpilib.math.kinematics.SwerveModuleVelocity
 import org.wpilib.system.Timer
 import org.wpilib.util.Alert
 import java.lang.Module
@@ -26,7 +30,7 @@ class Drive(
     brModuleIO: ModuleIO?,
 ) : Mechanism() {
     private val gyroInputs = GyroIOInputsAutoLogged()
-    private val modules: Array<Module> = arrayOfNulls<Module>(4) // FL, FR, BL, BR
+    private val modules: Array<Module> = arrayOfNulls<Module>(4) as Array<Module> // FL, FR, BL, BR
     private val gyroConnectedDebouncer: Debouncer = Debouncer(0.5, Debouncer.DebounceType.FALLING)
     private val gyroDisconnectedAlert: Alert =
         Alert(
@@ -47,12 +51,12 @@ class Drive(
 
     private var currentSetpoint: SwerveSetpoint =
         SwerveSetpoint(
-            ChassisSpeeds(),
-            arrayOf<SwerveModuleState>(
-                SwerveModuleState(),
-                SwerveModuleState(),
-                SwerveModuleState(),
-                SwerveModuleState(),
+            ChassisVelocities(0.0, 0.0, 0.0),
+            arrayOf(
+                SwerveModuleVelocity(0.0, Rotation2d.ZERO),
+                SwerveModuleVelocity(0.0, Rotation2d.ZERO),
+                SwerveModuleVelocity(0.0, Rotation2d.ZERO),
+                SwerveModuleVelocity(0.0, Rotation2d.ZERO),
             ),
         )
     private val swerveSetpointGenerator: SwerveSetpointGenerator

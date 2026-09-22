@@ -1,26 +1,7 @@
 package frc.robot.subsystems.drive
-import frc.robot.utils.ReflectiveLoggableInputs
+import frc.robot.utils.logging.ReflectiveLoggableInputs
 import org.littletonrobotics.junction.AutoLog
-import org.littletonrobotics.junction.LogTable
-import org.littletonrobotics.junction.inputs.LoggableInputs
 import org.wpilib.math.geometry.Rotation2d
-
-data class ModuleIOData(
-    var driveConnected: Boolean,
-    var drivePositionRad: Double,
-    var driveVelocityRadPerSec: Double,
-    var driveAppliedVolts: Double,
-    var driveSupplyCurrentAmps: Double,
-    var driveTorqueCurrentAmps: Double,
-    var turnConnected: Boolean,
-    var turnEncoderConnected: Boolean,
-    var turnAbsolutePosition: Rotation2d?,
-    var turnPosition: Rotation2d?,
-    var turnVelocityRadPerSec: Double,
-    var turnAppliedVolts: Double,
-    var turnSupplyCurrentAmps: Double,
-    var turnTorqueCurrentAmps: Double,
-) : ReflectiveLoggableInputs()
 
 interface ModuleIO {
     @AutoLog
@@ -50,6 +31,23 @@ interface ModuleIO {
         @JvmField
         var odometryTurnPositions: Array<Rotation2d?> = arrayOf<Rotation2d?>()
     }
+
+    data class ModuleIOData(
+        var driveConnected: Boolean,
+        var drivePositionRad: Double,
+        var driveVelocityRadPerSec: Double,
+        var driveAppliedVolts: Double,
+        var driveSupplyCurrentAmps: Double,
+        var driveTorqueCurrentAmps: Double,
+        var turnConnected: Boolean,
+        var turnEncoderConnected: Boolean,
+        var turnAbsolutePosition: Rotation2d?,
+        var turnPosition: Rotation2d?,
+        var turnVelocityRadPerSec: Double,
+        var turnAppliedVolts: Double,
+        var turnSupplyCurrentAmps: Double,
+        var turnTorqueCurrentAmps: Double,
+    ) : ReflectiveLoggableInputs()
 
     /** Updates the set of loggable inputs.  */
     fun updateInputs(inputs: ModuleIOInputs) {}

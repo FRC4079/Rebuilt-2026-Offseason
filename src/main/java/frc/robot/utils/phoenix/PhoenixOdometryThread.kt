@@ -1,9 +1,8 @@
-package frc.robot.utils
+package frc.robot.utils.phoenix
 
 import com.ctre.phoenix6.BaseStatusSignal
-import com.ctre.phoenix6.CANBus
-import com.ctre.phoenix6.CANBus.systemcore
 import com.ctre.phoenix6.StatusSignal
+import com.ctre.phoenix6.ffi.CANBusNative
 import frc.robot.utils.RobotParameters.SwerveParameters
 import org.wpilib.system.RobotController
 import org.wpilib.units.Units
@@ -21,7 +20,7 @@ import kotlin.concurrent.withLock
  */
 class PhoenixOdometryThread private constructor() : Thread("PhoenixOdometryThread") {
     companion object {
-        private val isCANFD = systemcore(1).isNetworkFD
+        private val isCANFD = true
 
         @Volatile
         private var instance: PhoenixOdometryThread? = null
