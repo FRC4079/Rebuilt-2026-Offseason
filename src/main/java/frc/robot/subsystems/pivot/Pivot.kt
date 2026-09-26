@@ -28,7 +28,7 @@ class Pivot(
 
         pivotDisconnectedAlert.set(!pivotMotorConnectedDebouncer.calculate(inputs.data.pivotConnected))
 
-        io.setPivotState(inputs.data.pivotPosition)
+        io.setPivotState(inputs.data.pivotPositionState)
 
 //        if (DriverStation.isDisabled()) {
 //            io.setPivotState(PivotIO.PivotPosition.STOW)

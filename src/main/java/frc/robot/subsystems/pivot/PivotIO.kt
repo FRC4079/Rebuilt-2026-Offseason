@@ -16,7 +16,7 @@ interface PivotIO {
             pivotAppliedVolts = 0.0,
             pivotSupplyCurrentAmps = 0.0,
             pivotTorqueCurrentAmps = 0.0,
-            pivotPosition = PivotPosition.STOW,
+            pivotPositionState = PivotPosition.STOW,
         )
     }
 
@@ -27,7 +27,7 @@ interface PivotIO {
         var pivotAppliedVolts: Double,
         var pivotSupplyCurrentAmps: Double,
         var pivotTorqueCurrentAmps: Double,
-        var pivotPosition: PivotPosition,
+        var pivotPositionState: PivotPosition,
     ) : ReflectiveLoggableInputs()
 
     enum class PivotPosition(val position : Double) {
