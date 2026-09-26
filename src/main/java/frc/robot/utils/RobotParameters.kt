@@ -41,6 +41,11 @@ object RobotParameters {
         const val SWERVE_CANBUS_ID: Int = 1
     }
 
+    object PivotParameters {
+        val pivotMotor: Int = CANBusParameters.INTAKE_PIVOT_MOTOR_ID;
+        val PIVOT_GEAR_RATIO: Double = 150.0 / 7.0;
+    }
+
     /** Class containing global values related to the swerve drive system.  */
     object SwerveParameters {
         data object OdometryConfig {
