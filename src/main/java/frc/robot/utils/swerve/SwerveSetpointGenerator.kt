@@ -10,7 +10,6 @@ import org.wpilib.math.kinematics.ChassisVelocities
 import org.wpilib.math.kinematics.SwerveDriveKinematics
 import org.wpilib.math.kinematics.SwerveModuleVelocity
 import java.util.Optional
-import kotlin.collections.get
 import kotlin.math.*
 
 /**
