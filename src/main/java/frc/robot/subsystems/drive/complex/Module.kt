@@ -1,6 +1,8 @@
-package frc.robot.subsystems.drive
+package frc.robot.subsystems.drive.complex
 
 import frc.robot.Robot
+import frc.robot.subsystems.drive.ModuleIO
+import frc.robot.subsystems.drive.ModuleIOInputsAutoLogged
 import frc.robot.utils.RobotParameters
 import frc.robot.utils.logging.LoggedTracer
 import frc.robot.utils.logging.LoggedTunableNumber
@@ -86,7 +88,7 @@ class Module(
 
         // Calculate positions for odometry
         val sampleCount = inputs.odometryDrivePositionsRad.size // All signals are sampled together
-        odometryPositions = kotlin.arrayOfNulls<SwerveModulePosition>(sampleCount)
+        odometryPositions = arrayOfNulls<SwerveModulePosition>(sampleCount)
         for (i in 0..<sampleCount) {
             val positionMeters: Double =
                 inputs.odometryDrivePositionsRad[i] * RobotParameters.SwerveParameters.PhysicalParameters.WHEEL_DIAMETER / 2

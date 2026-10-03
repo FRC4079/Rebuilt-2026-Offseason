@@ -1,6 +1,5 @@
 package frc.robot
 
-import frc.robot.subsystems.drive.Drive
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
