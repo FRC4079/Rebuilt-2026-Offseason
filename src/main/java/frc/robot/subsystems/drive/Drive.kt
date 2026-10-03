@@ -12,6 +12,7 @@ import org.wpilib.command3.Mechanism
 import org.wpilib.driverstation.DriverStation
 import org.wpilib.driverstation.RobotState.isDisabled
 import org.wpilib.math.filter.Debouncer
+import org.wpilib.math.geometry.Pose3d
 import org.wpilib.math.geometry.Rotation2d
 import org.wpilib.math.kinematics.ChassisVelocities
 import org.wpilib.math.kinematics.SwerveDriveKinematics
@@ -24,6 +25,7 @@ import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.collections.get
 import kotlin.text.get
+import frc.robot.utils.RobotParameters.SwerveParameters.PhysicalParameters
 
 class Drive(
     private val gyroIO: GyroIO,
@@ -117,7 +119,7 @@ class Drive(
 
         // Send odometry updates to robot state
         val sampleTimestamps =
-            if (Constants.getMode() === Mode.SIM) {
+            if (RobotParameters.SwerveParameters.getMode() === RobotParameters.Mode.SIM) {
                 doubleArrayOf(Timer.getTimestamp())
             } else {
                 gyroInputs.odometryYawTimestamps // All signals are sampled together
@@ -149,7 +151,7 @@ class Drive(
                             0.0,
                             0.0,
                             Math.abs(gyroInputs.data.pitchPosition().getRadians()) *
-                                DriveConstants.trackWidthX /
+                                PhysicalParameters.trackWidthX /
                                 2.0,
                             0.0,
                             gyroInputs.data.pitchPosition().getRadians(),
@@ -160,7 +162,7 @@ class Drive(
                             0.0,
                             0.0,
                             Math.abs(gyroInputs.data.rollPosition().getRadians()) *
-                                DriveConstants.trackWidthY /
+                                    PhysicalParameters.trackWidthY /
                                 2.0,
                             gyroInputs.data.rollPosition().getRadians(),
                             0.0,
@@ -298,7 +300,7 @@ class Drive(
             // Calculate wheel torque in direction
             val wheelForce: Vector<N2?> = moduleForces.get(i)
             val wheelDirection: Vector<N2?>? = VecBuilder.fill(wheelAngle.getCos(), wheelAngle.getSin())
-            val wheelTorqueNm: Double = wheelForce.dot(wheelDirection) * DriveConstants.wheelRadius
+            val wheelTorqueNm: Double = wheelForce.dot(wheelDirection) * PhysicalParameters.wheelRadius
             modules[i].runSetpoint(setpointStates[i], wheelTorqueNm)
 
             // Save to array for logging

@@ -18,7 +18,9 @@ object RobotParameters {
     object GlobalParameters {
         val DISABLE_HAL: Boolean = false
         val TUNING_MODE: Boolean = false
+        val MODE: Mode = Mode.REAL
     }
+    enum class Mode() { REAL, SIM }
 
     /** Class containing global values related to motors.  */
     object CANBusParameters {
@@ -51,6 +53,10 @@ object RobotParameters {
         data object OdometryConfig {
             const val ODOMETRY_FREQUENCY: Double = 250.0
         }
+
+        fun getMode() : Mode = GlobalParameters.MODE
+
+
 
         @Builder
         data class
@@ -166,6 +172,10 @@ object RobotParameters {
             private val BACK_LEFT: Translation2d = Translation2d(-0.3048, 0.3048)
             private val BACK_RIGHT: Translation2d = Translation2d(-0.3048, -0.3048)
             val MODULE_LOCATIONS: Array<Translation2d> = arrayOf(FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT)
+
+            // Track & Radius
+            val TRACK_WIDTH: Translation2d = Translation2d(0.43105229381, 0.43105229381)
+            val WHEEL_RADIUS: Double = 0.43105229381
 
             // Motor Property Values
             const val MAX_SPEED: Double = 5.76
