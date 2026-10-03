@@ -29,20 +29,13 @@ import org.wpilib.units.measure.Voltage
 import java.util.Queue
 import java.util.concurrent.Executors
 
-class ModuleIOComp(
+class RealModuleIO(
     config: SwerveParameters.ModuleConfig,
 ) : ModuleIO {
-    companion object {
-        private const val driveCurrentLimitAmps = 80.0
-        private const val turnCurrentLimitAmps = 40.0
-        const val driveReduction = (50.0 / 14.0) * (16.0 / 28.0) * (45.0 / 15.0)
-        const val turnReduction = 150.0 / 7.0
-        private val brakeModeExecutor = Executors.newFixedThreadPool(8)
-    }
-
-    private val driveTalon = TalonFX(config.driveMotorId, CANBus(config.CANBus))
-    private val turnTalon = TalonFX(config.turnMotorId, CANBus(config.CANBus))
-    private val encoder = CANcoder(config.encoderID, CANBus(config.CANBus))
+    private val brakeModeExecutor = Executors.newFixedThreadPool(8)
+    private val driveTalon = TalonFX(config.driveMotorId, CANBus(config.canBUS))
+    private val turnTalon = TalonFX(config.turnMotorId, CANBus(config.canBUS))
+    private val encoder = CANcoder(config.encoderID, CANBus(config.canBUS))
     private val encoderOffset = config.encoderOffset
 
     private val driveConfig = TalonFXConfiguration()
@@ -71,10 +64,10 @@ class ModuleIOComp(
         // Configure drive motor
         driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake
         driveConfig.Slot0 = Slot0Configs().withKP(0.0).withKI(0.0).withKD(0.0)
-        driveConfig.Feedback.SensorToMechanismRatio = driveReduction
-        driveConfig.TorqueCurrent.PeakForwardTorqueCurrent = driveCurrentLimitAmps
-        driveConfig.TorqueCurrent.PeakReverseTorqueCurrent = -driveCurrentLimitAmps
-        driveConfig.CurrentLimits.StatorCurrentLimit = driveCurrentLimitAmps
+        driveConfig.Feedback.SensorToMechanismRatio = SwerveParameters.PhysicalParameters.DRIVE_MOTOR_GEAR_RATIO
+        driveConfig.TorqueCurrent.PeakForwardTorqueCurrent = SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
+        driveConfig.TorqueCurrent.PeakReverseTorqueCurrent = -SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
+        driveConfig.CurrentLimits.StatorCurrentLimit = SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
         driveConfig.CurrentLimits.StatorCurrentLimitEnable = true
         driveConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02
 
@@ -86,11 +79,11 @@ class ModuleIOComp(
         turnConfig.Slot0 = Slot0Configs().withKP(0.0).withKI(0.0).withKD(0.0)
         turnConfig.Feedback.FeedbackRemoteSensorID = config.encoderID
         turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder
-        turnConfig.Feedback.RotorToSensorRatio = turnReduction
+        turnConfig.Feedback.RotorToSensorRatio = SwerveParameters.PhysicalParameters.STEER_MOTOR_GEAR_RATIO
         turnConfig.ClosedLoopGeneral.ContinuousWrap = true
-        turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = turnCurrentLimitAmps
-        turnConfig.TorqueCurrent.PeakReverseTorqueCurrent = -turnCurrentLimitAmps
-        turnConfig.CurrentLimits.StatorCurrentLimit = turnCurrentLimitAmps
+        turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = SwerveParameters.PhysicalParameters.STEER_CURRENT_LIMIT
+        turnConfig.TorqueCurrent.PeakReverseTorqueCurrent = -SwerveParameters.PhysicalParameters.STEER_CURRENT_LIMIT
+        turnConfig.CurrentLimits.StatorCurrentLimit = SwerveParameters.PhysicalParameters.STEER_CURRENT_LIMIT
         turnConfig.CurrentLimits.StatorCurrentLimitEnable = true
         turnConfig.MotorOutput.Inverted =
             if (config.turnInverted) {

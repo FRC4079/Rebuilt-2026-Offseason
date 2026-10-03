@@ -56,7 +56,7 @@ object RobotParameters {
             val encoderOffset: Rotation2d,
             val turnInverted: Boolean,
             val encoderInverted: Boolean,
-            val CANBus: CANPort,
+            val canBUS: CANPort,
         )
 
         val MODULE_CONFIGS: Array<ModuleConfig> =
@@ -69,7 +69,7 @@ object RobotParameters {
                     encoderOffset = Rotation2d.fromDegrees(0.0),
                     turnInverted = false,
                     encoderInverted = false,
-                    CANBus = CANPort.CAN_D0,
+                    canBUS = CANPort.CAN_D0,
                 ),
                 // FR
                 ModuleConfig(
@@ -79,7 +79,7 @@ object RobotParameters {
                     encoderOffset = Rotation2d.fromDegrees(0.0),
                     turnInverted = false,
                     encoderInverted = false,
-                    CANBus = CANPort.CAN_D0,
+                    canBUS = CANPort.CAN_D0,
                 ),
                 // BL
                 ModuleConfig(
@@ -89,7 +89,7 @@ object RobotParameters {
                     encoderOffset = Rotation2d.fromDegrees(0.0),
                     turnInverted = false,
                     encoderInverted = false,
-                    CANBus = CANBusParameters.SWERVE_CANBUS_ID,
+                    canBUS = CANPort.CAN_D0,
                 ),
                 // BR
                 ModuleConfig(
@@ -99,7 +99,7 @@ object RobotParameters {
                     encoderOffset = Rotation2d.fromDegrees(0.0),
                     turnInverted = false,
                     encoderInverted = false,
-                    CANBus = CANBusParameters.SWERVE_CANBUS_ID,
+                    canBUS = CANPort.CAN_D0,
                 ),
             )
 
@@ -160,6 +160,7 @@ object RobotParameters {
             private val FRONT_RIGHT: Translation2d = Translation2d(0.3048, -0.3048)
             private val BACK_LEFT: Translation2d = Translation2d(-0.3048, 0.3048)
             private val BACK_RIGHT: Translation2d = Translation2d(-0.3048, -0.3048)
+            val MODULE_LOCATIONS: Array<Translation2d> = arrayOf(FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT)
 
             // Motor Property Values
             const val MAX_SPEED: Double = 5.76
@@ -170,9 +171,8 @@ object RobotParameters {
             const val METERS_PER_REV: Double = WHEEL_DIAMETER * Math.PI * 0.975
 
             // Limit Values
-            const val DRIVE_SUPPLY_LIMIT: Double = 45.0
-            const val DRIVE_STATOR_LIMIT: Double = 80.0
-            const val STEER_SUPPLY_LIMIT: Double = 30.0
+            const val DRIVE_CURRENT_LIMIT: Double = 80.0
+            const val STEER_CURRENT_LIMIT: Double = 40.0
 
             @JvmField
             val kinematics: SwerveDriveKinematics =

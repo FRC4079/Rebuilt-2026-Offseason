@@ -1,12 +1,16 @@
 package frc.robot.subsystems.drive
 
 import frc.robot.utils.RobotParameters
+import frc.robot.utils.logging.LoggedTracer
 import frc.robot.utils.phoenix.PhoenixOdometryThread
 import frc.robot.utils.swerve.SwerveSetpoint
+import frc.robot.utils.swerve.SwerveSetpointGenerator
 import lombok.Setter
 import org.littletonrobotics.junction.AutoLogOutput
 import org.littletonrobotics.junction.Logger
 import org.wpilib.command3.Mechanism
+import org.wpilib.driverstation.DriverStation
+import org.wpilib.driverstation.RobotState.isDisabled
 import org.wpilib.math.filter.Debouncer
 import org.wpilib.math.geometry.Rotation2d
 import org.wpilib.math.kinematics.ChassisVelocities
@@ -14,7 +18,6 @@ import org.wpilib.math.kinematics.SwerveDriveKinematics
 import org.wpilib.math.kinematics.SwerveModuleVelocity
 import org.wpilib.system.Timer
 import org.wpilib.util.Alert
-import java.lang.Module
 import java.util.Arrays
 import java.util.Optional
 import java.util.concurrent.locks.Lock
@@ -24,13 +27,19 @@ import kotlin.text.get
 
 class Drive(
     private val gyroIO: GyroIO,
-    flModuleIO: ModuleIO?,
-    frModuleIO: ModuleIO?,
-    blModuleIO: ModuleIO?,
-    brModuleIO: ModuleIO?,
-) : Mechanism() {
+    flModuleIO: ModuleIO,
+    frModuleIO: ModuleIO,
+    blModuleIO: ModuleIO,
+    brModuleIO: ModuleIO,
+) : Mechanism {
     private val gyroInputs = GyroIOInputsAutoLogged()
-    private val modules: Array<Module> = arrayOfNulls<Module>(4) as Array<Module> // FL, FR, BL, BR
+    private val modules: Array<Module> =
+        arrayOf(
+            Module(flModuleIO, 0),
+            Module(frModuleIO, 1),
+            Module(blModuleIO, 2),
+            Module(brModuleIO, 3),
+        )
     private val gyroConnectedDebouncer: Debouncer = Debouncer(0.5, Debouncer.DebounceType.FALLING)
     private val gyroDisconnectedAlert: Alert =
         Alert(
@@ -59,7 +68,8 @@ class Drive(
                 SwerveModuleVelocity(0.0, Rotation2d.ZERO),
             ),
         )
-    private val swerveSetpointGenerator: SwerveSetpointGenerator
+    private val swerveSetpointGenerator: SwerveSetpointGenerator =
+        SwerveSetpointGenerator(kinematics, RobotParameters.SwerveParameters.PhysicalParameters.MODULE_LOCATIONS)
 
     enum class CoastRequest {
         AUTOMATIC,
@@ -67,26 +77,17 @@ class Drive(
         ALWAYS_COAST,
     }
 
-    @Setter
-    @AutoLogOutput
+    @Setter @AutoLogOutput
     private var coastRequest = CoastRequest.ALWAYS_BRAKE
 
     init {
-        modules[0] = Module(flModuleIO, 0)
-        modules[1] = Module(frModuleIO, 1)
-        modules[2] = Module(blModuleIO, 2)
-        modules[3] = Module(brModuleIO, 3)
         lastMovementTimer.start()
         setBrakeMode(true)
-
-        swerveSetpointGenerator =
-            SwerveSetpointGenerator(kinematics, DriveConstants.moduleTranslations)
-
         // Start odometry thread
         PhoenixOdometryThread.getInstance().start()
     }
 
-    public override fun periodic() {
+    fun periodic() {
         odometryLock.lock() // Prevents odometry updates while reading data
         gyroIO.updateInputs(gyroInputs)
         Logger.processInputs("Drive/Gyro", gyroInputs)
@@ -102,16 +103,16 @@ class Drive(
         }
 
         // Stop moving when disabled
-        if (DriverStation.isDisabled()) {
+        if (isDisabled()) {
             for (module in modules) {
                 module.stop()
             }
         }
 
         // Log empty setpoint states when disabled
-        if (DriverStation.isDisabled()) {
-            Logger.recordOutput("Drive/SwerveStates/Setpoints", arrayOf<SwerveModuleState?>())
-            Logger.recordOutput("Drive/SwerveStates/SetpointsUnoptimized", arrayOf<SwerveModuleState?>())
+        if (isDisabled()) {
+            Logger.recordOutput("Drive/SwerveStates/Setpoints", emptyArray<SwerveModuleState>())
+            Logger.recordOutput("Drive/SwerveStates/SetpointsUnoptimized", emptyArray<SwerveModuleState>())
         }
 
         // Send odometry updates to robot state

@@ -1,5 +1,6 @@
 package frc.robot
 
+import frc.robot.subsystems.drive.Drive
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
@@ -27,7 +28,7 @@ class Robot : LoggedRobot() {
     private var autonomousCommand: Command? = null
     private var robotContainer: RobotContainer? = null
 
-    /**
+    /*
      * Use for any initialization code.
      */
     init {

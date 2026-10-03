@@ -33,7 +33,7 @@ class Module(
         drivekS.initDefault(5.0)
         drivekV.initDefault(0.0)
         // Multiplied by desired wheelTorqueNm
-        drivekT.initDefault(ModuleIOComp.driveReduction / DCMotor.getKrakenX60Foc(1).Kt)
+        drivekT.initDefault(RobotParameters.SwerveParameters.PhysicalParameters.DRIVE_MOTOR_GEAR_RATIO / DCMotor.getKrakenX60Foc(1).Kt)
         drivekP.initDefault(35.0)
         drivekD.initDefault(0.0)
         turnkP.initDefault(4000.0)
@@ -156,34 +156,27 @@ class Module(
     }
 
     val angle: Rotation2d?
-        /** Returns the current turn angle of the module.  */
         get() = inputs.data.turnPosition
 
     val positionMeters: Double
-        /** Returns the current drive position of the module in meters.  */
         get() = inputs.data.drivePositionRad * RobotParameters.SwerveParameters.PhysicalParameters.WHEEL_DIAMETER / 2
 
     val velocityMetersPerSec: Double
-        /** Returns the current drive velocity of the module in meters per second.  */
         get() = inputs.data.driveVelocityRadPerSec * RobotParameters.SwerveParameters.PhysicalParameters.WHEEL_DIAMETER / 2
 
     val position: SwerveModulePosition?
-        /** Returns the module position (turn angle and drive position).  */
         get() = SwerveModulePosition(this.positionMeters, this.angle)
 
     val state: SwerveModuleVelocity?
-        /** Returns the module state (turn angle and drive velocity).  */
         get() = SwerveModuleVelocity(this.velocityMetersPerSec, this.angle)
 
     /** Returns the module positions received this cycle.  */
     fun getOdometryPositions(): Array<SwerveModulePosition?> = odometryPositions
 
     val wheelRadiusCharacterizationPosition: Double
-        /** Returns the module position in radians.  */
         get() = inputs.data.drivePositionRad
 
     val fFCharacterizationVelocity: Double
-        /** Returns the module velocity in rotations/sec (Phoenix native units).  */
         get() = Units.radiansToRotations(inputs.data.driveVelocityRadPerSec)
 
     // Sets brake mode to {@code enabled}

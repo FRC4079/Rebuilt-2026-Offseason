@@ -4,11 +4,11 @@ import org.wpilib.math.kinematics.ChassisVelocities
 import org.wpilib.math.kinematics.SwerveModuleVelocity
 
 data class SwerveSetpoint(
-    var chassisSpeeds: ChassisVelocities? = null,
-    var moduleStates: Array<SwerveModuleVelocity?>? = null,
+    var chassisVelocities: ChassisVelocities,
+    var moduleStates: Array<SwerveModuleVelocity>,
 ) {
     init {
-        this.chassisSpeeds = chassisSpeeds
+        this.chassisVelocities = chassisVelocities
         this.moduleStates = moduleStates
     }
 
@@ -18,15 +18,15 @@ data class SwerveSetpoint(
 
         other as SwerveSetpoint
 
-        if (chassisSpeeds != other.chassisSpeeds) return false
+        if (chassisVelocities != other.chassisVelocities) return false
         if (!moduleStates.contentEquals(other.moduleStates)) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = chassisSpeeds?.hashCode() ?: 0
-        result = 31 * result + (moduleStates?.contentHashCode() ?: 0)
+        var result = chassisVelocities.hashCode()
+        result = 31 * result + (moduleStates.contentHashCode())
         return result
     }
 }
