@@ -1,31 +1,35 @@
 package frc.robot.subsystems.drive
 
+import frc.robot.Robot
+import frc.robot.RobotState
 import frc.robot.utils.RobotParameters
 import frc.robot.utils.logging.LoggedTracer
+import frc.robot.utils.logging.LoggedTunableNumber
 import frc.robot.utils.phoenix.PhoenixOdometryThread
+import frc.robot.utils.swerve.ModuleLimits
 import frc.robot.utils.swerve.SwerveSetpoint
 import frc.robot.utils.swerve.SwerveSetpointGenerator
-import lombok.Setter
 import org.littletonrobotics.junction.AutoLogOutput
 import org.littletonrobotics.junction.Logger
 import org.wpilib.command3.Mechanism
-import org.wpilib.driverstation.DriverStation
 import org.wpilib.driverstation.RobotState.isDisabled
+import org.wpilib.driverstation.RobotState.isEnabled
 import org.wpilib.math.filter.Debouncer
 import org.wpilib.math.geometry.Pose3d
 import org.wpilib.math.geometry.Rotation2d
 import org.wpilib.math.kinematics.ChassisVelocities
 import org.wpilib.math.kinematics.SwerveDriveKinematics
+import org.wpilib.math.kinematics.SwerveModulePosition
 import org.wpilib.math.kinematics.SwerveModuleVelocity
+import org.wpilib.math.linalg.VecBuilder
+import org.wpilib.math.linalg.Vector
+import org.wpilib.math.numbers.N2
 import org.wpilib.system.Timer
 import org.wpilib.util.Alert
-import java.util.Arrays
 import java.util.Optional
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
-import kotlin.collections.get
-import kotlin.text.get
-import frc.robot.utils.RobotParameters.SwerveParameters.PhysicalParameters
+import kotlin.math.abs
 
 class Drive(
     private val gyroIO: GyroIO,
@@ -35,24 +39,25 @@ class Drive(
     brModuleIO: ModuleIO,
 ) : Mechanism {
     private val gyroInputs = GyroIOInputsAutoLogged()
-    private val modules: Array<Module> =
+    private val modules =
         arrayOf(
             Module(flModuleIO, 0),
             Module(frModuleIO, 1),
             Module(blModuleIO, 2),
             Module(brModuleIO, 3),
         )
-    private val gyroConnectedDebouncer: Debouncer = Debouncer(0.5, Debouncer.DebounceType.FALLING)
-    private val gyroDisconnectedAlert: Alert =
+
+    private val gyroConnectedDebouncer = Debouncer(0.5, Debouncer.DebounceType.FALLING)
+    private val gyroDisconnectedAlert =
         Alert(
             "Drive Alert",
             "Disconnected gyro, using kinematics as fallback.",
             Alert.Level.HIGH,
         )
-
-    private val lastMovementTimer: Timer = Timer()
+    private val lastMovementTimer = Timer()
 
     private val kinematics: SwerveDriveKinematics = RobotParameters.SwerveParameters.PhysicalParameters.kinematics
+    private val moduleLocations = RobotParameters.SwerveParameters.PhysicalParameters.MODULE_LOCATIONS
 
     @AutoLogOutput
     private var velocityMode = false
@@ -60,18 +65,16 @@ class Drive(
     @AutoLogOutput
     private var brakeModeEnabled = true
 
-    private var currentSetpoint: SwerveSetpoint =
+    @AutoLogOutput
+    private var coastRequest = CoastRequest.ALWAYS_BRAKE
+
+    private var currentSetpoint =
         SwerveSetpoint(
             ChassisVelocities(0.0, 0.0, 0.0),
-            arrayOf(
-                SwerveModuleVelocity(0.0, Rotation2d.ZERO),
-                SwerveModuleVelocity(0.0, Rotation2d.ZERO),
-                SwerveModuleVelocity(0.0, Rotation2d.ZERO),
-                SwerveModuleVelocity(0.0, Rotation2d.ZERO),
-            ),
+            Array(modules.size) { SwerveModuleVelocity(0.0, Rotation2d.ZERO) },
         )
-    private val swerveSetpointGenerator: SwerveSetpointGenerator =
-        SwerveSetpointGenerator(kinematics, RobotParameters.SwerveParameters.PhysicalParameters.MODULE_LOCATIONS)
+
+    private val swerveSetpointGenerator = SwerveSetpointGenerator(kinematics, moduleLocations)
 
     enum class CoastRequest {
         AUTOMATIC,
@@ -79,18 +82,14 @@ class Drive(
         ALWAYS_COAST,
     }
 
-    @Setter @AutoLogOutput
-    private var coastRequest = CoastRequest.ALWAYS_BRAKE
-
     init {
         lastMovementTimer.start()
         setBrakeMode(true)
-        // Start odometry thread
         PhoenixOdometryThread.getInstance().start()
     }
 
     fun periodic() {
-        odometryLock.lock() // Prevents odometry updates while reading data
+        odometryLock.lock()
         gyroIO.updateInputs(gyroInputs)
         Logger.processInputs("Drive/Gyro", gyroInputs)
         for (module in modules) {
@@ -99,292 +98,205 @@ class Drive(
         odometryLock.unlock()
         LoggedTracer.record("Drive/Inputs")
 
-        // Call periodic on modules
         for (module in modules) {
             module.periodic()
         }
 
-        // Stop moving when disabled
         if (isDisabled()) {
             for (module in modules) {
                 module.stop()
             }
+            Logger.recordOutput("Drive/SwerveStates/Setpoints", SwerveModuleVelocity.struct)
+            Logger.recordOutput("Drive/SwerveStates/SetpointsUnoptimized", SwerveModuleVelocity.struct)
         }
 
-        // Log empty setpoint states when disabled
-        if (isDisabled()) {
-            Logger.recordOutput("Drive/SwerveStates/Setpoints", emptyArray<SwerveModuleState>())
-            Logger.recordOutput("Drive/SwerveStates/SetpointsUnoptimized", emptyArray<SwerveModuleState>())
-        }
-
-        // Send odometry updates to robot state
         val sampleTimestamps =
-            if (RobotParameters.SwerveParameters.getMode() === RobotParameters.Mode.SIM) {
+            if (RobotParameters.SwerveParameters.getMode() == RobotParameters.Mode.SIM) {
                 doubleArrayOf(Timer.getTimestamp())
             } else {
-                gyroInputs.odometryYawTimestamps // All signals are sampled together
+                gyroInputs.odometryYawTimestamps
             }
-        val sampleCount = sampleTimestamps.size
-        for (i in 0..<sampleCount) {
-            val wheelPositions: Array<SwerveModulePosition?> = kotlin.arrayOfNulls<SwerveModulePosition>(4)
-            for (j in 0..3) {
-                wheelPositions[j] = modules[j].getOdometryPositions()[i]
-            }
-            RobotState
-                .getInstance()
-                .addOdometryObservation(
-                    OdometryObservation(
-                        wheelPositions,
-                        Optional.ofNullable<T?>(
-                            if (gyroInputs.data.connected()) gyroInputs.odometryYawPositions[i] else null,
-                        ),
-                        sampleTimestamps[i],
-                    ),
-                )
 
-            // Log 3D robot pose
-            Logger.recordOutput(
-                "RobotState/EstimatedPose3d",
-                Pose3d(RobotState.getInstance().getEstimatedPose())
-                    .exp(
-                        Twist3d(
-                            0.0,
-                            0.0,
-                            Math.abs(gyroInputs.data.pitchPosition().getRadians()) *
-                                PhysicalParameters.trackWidthX /
-                                2.0,
-                            0.0,
-                            gyroInputs.data.pitchPosition().getRadians(),
-                            0.0,
-                        ),
-                    ).exp(
-                        Twist3d(
-                            0.0,
-                            0.0,
-                            Math.abs(gyroInputs.data.rollPosition().getRadians()) *
-                                    PhysicalParameters.trackWidthY /
-                                2.0,
-                            gyroInputs.data.rollPosition().getRadians(),
-                            0.0,
-                            0.0,
-                        ),
-                    ),
+        for (i in sampleTimestamps.indices) {
+            val wheelPositions = Array(modules.size) { SwerveModulePosition() }
+            for (j in modules.indices) {
+                wheelPositions[j] = modules[j].getOdometryPositions()[i] ?: SwerveModulePosition()
+            }
+
+            val yaw =
+                if (gyroInputs.data.connected) {
+                    Optional.of(gyroInputs.odometryYawPositions[i])
+                } else {
+                    Optional.empty()
+                }
+
+            RobotState.getInstance().addOdometryObservation(
+                RobotState.OdometryObservation(
+                    timestamp = sampleTimestamps[i],
+                    wheelPositions = wheelPositions,
+                    yaw = yaw,
+                ),
             )
         }
 
-        RobotState.getInstance().addDriveSpeeds(this.chassisSpeeds)
-        RobotState.getInstance().setPitch(gyroInputs.data.pitchPosition())
-        RobotState.getInstance().setRoll(gyroInputs.data.rollPosition())
+        RobotState.getInstance().addDriveSpeeds(chassisSpeeds)
+        RobotState.getInstance().setPitch(gyroInputs.data.pitchPosition)
+        RobotState.getInstance().setRoll(gyroInputs.data.rollPosition)
 
-        // Update brake mode
-        // Reset movement timer if velocity above threshold
-        if (Arrays
-                .stream<Module?>(modules)
-                .anyMatch { module: Module? -> Math.abs(module.getVelocityMetersPerSec()) > coastMetersPerSecondThreshold.get() }
-        ) {
+        Logger.recordOutput("RobotState/EstimatedPose3d", Pose3d(RobotState.getInstance().estimatedPose))
+
+        if (modules.any { abs(it.velocityMetersPerSec) > coastMetersPerSecondThreshold.get() }) {
             lastMovementTimer.reset()
         }
 
-        if (DriverStation.isEnabled()) {
+        if (isEnabled()) {
             coastRequest = CoastRequest.ALWAYS_BRAKE
         }
 
         when (coastRequest) {
             CoastRequest.AUTOMATIC -> {
-                if (DriverStation.isEnabled()) {
+                if (isEnabled()) {
                     setBrakeMode(true)
                 } else if (lastMovementTimer.hasElapsed(coastWaitTime.get())) {
                     setBrakeMode(false)
                 }
             }
 
-            CoastRequest.ALWAYS_BRAKE -> {
-                setBrakeMode(true)
-            }
-
-            CoastRequest.ALWAYS_COAST -> {
-                setBrakeMode(false)
-            }
+            CoastRequest.ALWAYS_BRAKE -> setBrakeMode(true)
+            CoastRequest.ALWAYS_COAST -> setBrakeMode(false)
         }
 
-        // Update current setpoint if not in velocity mode
         if (!velocityMode) {
-            currentSetpoint = SwerveSetpoint(this.chassisSpeeds, this.moduleStates)
+            currentSetpoint = SwerveSetpoint(chassisSpeeds, moduleStates)
         }
 
-        // Update gyro alert
         gyroDisconnectedAlert.set(
-            !gyroConnectedDebouncer.calculate(gyroInputs.data.connected()) && Constants.getMode() !== Mode.SIM && !Robot.isJITing(),
+            !gyroConnectedDebouncer.calculate(gyroInputs.data.connected) &&
+                RobotParameters.SwerveParameters.getMode() != RobotParameters.Mode.SIM &&
+                !Robot.isJITing(),
         )
 
-        // Record cycle time
         LoggedTracer.record("Drive/Periodic")
     }
 
-    /** Set brake mode to `enabled` doesn't change brake mode if already set.  */
     private fun setBrakeMode(enabled: Boolean) {
         if (brakeModeEnabled != enabled) {
-            Arrays.stream<Module?>(modules).forEach { module: Module? -> module.setBrakeMode(enabled) }
+            modules.forEach { it.setBrakeMode(enabled) }
         }
         brakeModeEnabled = enabled
     }
 
-    /**
-     * Runs the drive at the desired velocity.
-     *
-     * @param speeds Speeds in meters/sec
-     */
-    fun runVelocity(speeds: ChassisSpeeds?) {
+    fun runVelocity(speeds: ChassisVelocities) {
         velocityMode = true
-        // Calculate module setpoints
-        val discreteSpeeds: ChassisSpeeds? = ChassisSpeeds.discretize(speeds, Constants.loopPeriodSecs)
-        val setpointStatesUnoptimized: Array<SwerveModuleState?>? = kinematics.toSwerveModuleStates(discreteSpeeds)
+        val discreteSpeeds = speeds.discretize(LOOP_PERIOD_SECS)
+        val setpointStatesUnoptimized = kinematics.toSwerveModuleVelocities(discreteSpeeds)
         currentSetpoint =
             swerveSetpointGenerator.generateSetpoint(
-                DriveConstants.moduleLimitsFree,
+                moduleLimits,
                 currentSetpoint,
                 discreteSpeeds,
-                Constants.loopPeriodSecs,
-            )
-        val setpointStates: Array<SwerveModuleState?> = currentSetpoint.moduleStates()
+                LOOP_PERIOD_SECS,
+            ) ?: currentSetpoint
+        val setpointStates = currentSetpoint.moduleStates
 
-        // Log unoptimized setpoints and setpoint speeds
-        Logger.recordOutput("Drive/SwerveStates/SetpointsUnoptimized", setpointStatesUnoptimized)
-        Logger.recordOutput("Drive/SwerveStates/Setpoints", setpointStates)
-        Logger.recordOutput("Drive/SwerveChassisSpeeds/Setpoints", currentSetpoint.chassisSpeeds())
+        Logger.recordOutput("Drive/SwerveStates/SetpointsUnoptimized", SwerveModuleVelocity.struct, *setpointStatesUnoptimized)
+        Logger.recordOutput("Drive/SwerveStates/Setpoints", SwerveModuleVelocity.struct, *setpointStates)
+        Logger.recordOutput("Drive/SwerveChassisSpeeds/Setpoints", currentSetpoint.chassisVelocities)
 
-        // Send setpoints to modules
-        for (i in 0..3) {
+        for (i in modules.indices) {
             modules[i].runSetpoint(setpointStates[i])
         }
     }
 
-    /**
-     * Runs the drive at the desired velocity with setpoint module forces.
-     *
-     * @param speeds Speeds in meters/sec
-     * @param moduleForces The forces applied to each module
-     */
     fun runVelocity(
-        speeds: ChassisSpeeds?,
-        moduleForces: MutableList<Vector<N2?>>,
+        speeds: ChassisVelocities,
+        moduleForces: List<Vector<N2>>,
     ) {
         velocityMode = true
-        // Calculate module setpoints
-        val discreteSpeeds: ChassisSpeeds? = ChassisSpeeds.discretize(speeds, Constants.loopPeriodSecs)
-        val setpointStatesUnoptimized: Array<SwerveModuleState?>? = kinematics.toSwerveModuleStates(discreteSpeeds)
+        val discreteSpeeds = speeds.discretize(LOOP_PERIOD_SECS)
+        val setpointStatesUnoptimized = kinematics.toSwerveModuleVelocities(discreteSpeeds)
         currentSetpoint =
             swerveSetpointGenerator.generateSetpoint(
-                DriveConstants.moduleLimitsFree,
+                moduleLimits,
                 currentSetpoint,
                 discreteSpeeds,
-                Constants.loopPeriodSecs,
-            )
-        val setpointStates: Array<SwerveModuleState?> = currentSetpoint.moduleStates()
+                LOOP_PERIOD_SECS,
+            ) ?: currentSetpoint
+        val setpointStates = currentSetpoint.moduleStates
+        val wheelForces = Array(modules.size) { SwerveModuleVelocity() }
 
-        // Log unoptimized setpoints and setpoint speeds
-        Logger.recordOutput("Drive/SwerveStates/SetpointsUnoptimized", setpointStatesUnoptimized)
-        Logger.recordOutput("Drive/SwerveStates/Setpoints", setpointStates)
-        Logger.recordOutput("Drive/SwerveChassisSpeeds/Setpoints", currentSetpoint.chassisSpeeds())
+        Logger.recordOutput("Drive/SwerveStates/SetpointsUnoptimized", SwerveModuleVelocity.struct, *setpointStatesUnoptimized)
+        Logger.recordOutput("Drive/SwerveStates/Setpoints", SwerveModuleVelocity.struct, *setpointStates)
+        Logger.recordOutput("Drive/SwerveChassisSpeeds/Setpoints", currentSetpoint.chassisVelocities)
 
-        // Save module forces to swerve states for logging
-        val wheelForces: Array<SwerveModuleState?> = kotlin.arrayOfNulls<SwerveModuleState>(4)
-        // Send setpoints to modules
-        val moduleStates: Array<SwerveModuleState?> = this.moduleStates
-        for (i in 0..3) {
-            // Optimize state
-            val wheelAngle: Rotation2d = moduleStates[i].angle
-            setpointStates[i].optimize(wheelAngle)
-            setpointStates[i].cosineScale(wheelAngle)
+        for (i in modules.indices) {
+            val wheelAngle = modules[i].state?.angle ?: Rotation2d.ZERO
+            val optimized = setpointStates[i].optimize(wheelAngle).cosineScale(wheelAngle)
+            setpointStates[i] = optimized
 
-            // Calculate wheel torque in direction
-            val wheelForce: Vector<N2?> = moduleForces.get(i)
-            val wheelDirection: Vector<N2?>? = VecBuilder.fill(wheelAngle.getCos(), wheelAngle.getSin())
-            val wheelTorqueNm: Double = wheelForce.dot(wheelDirection) * PhysicalParameters.wheelRadius
-            modules[i].runSetpoint(setpointStates[i], wheelTorqueNm)
+            val wheelDirection = VecBuilder.fill(wheelAngle.cos, wheelAngle.sin)
+            val wheelTorqueNm = moduleForces[i].dot(wheelDirection) * wheelRadiusMeters
+            modules[i].runSetpoint(optimized, wheelTorqueNm)
 
-            // Save to array for logging
-            wheelForces[i] = SwerveModuleState(wheelTorqueNm, setpointStates[i].angle)
+            wheelForces[i] = SwerveModuleVelocity(wheelTorqueNm, optimized.angle)
         }
-        Logger.recordOutput("Drive/SwerveStates/ModuleForces", wheelForces)
+        Logger.recordOutput("Drive/SwerveStates/ModuleForces", SwerveModuleVelocity.struct, *wheelForces)
     }
 
-    /** Runs the drive in a straight line with the specified drive output.  */
     fun runCharacterization(output: Double) {
         velocityMode = false
-        for (i in 0..3) {
-            modules[i].runCharacterization(output)
+        for (module in modules) {
+            module.runCharacterization(output)
         }
     }
 
-    /** Stops the drive.  */
     fun stop() {
-        runVelocity(ChassisSpeeds())
+        runVelocity(ChassisVelocities(0.0, 0.0, 0.0))
     }
 
-    /**
-     * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will
-     * return to their normal orientations the next time a nonzero velocity is requested.
-     */
     fun stopWithX() {
-        val headings: Array<Rotation2d?> = kotlin.arrayOfNulls<Rotation2d>(4)
-        for (i in 0..3) {
-            headings[i] = DriveConstants.moduleTranslations[i].getAngle()
-        }
-        kinematics.resetHeadings(headings)
+        val headings = Array(moduleLocations.size) { i -> moduleLocations[i].angle.orElse(Rotation2d.ZERO) }
+        kinematics.resetHeadings(*headings)
 
-        // Bypass swerve setpoint generator
-        val states: Array<SwerveModuleState?> = kinematics.toSwerveModuleStates(ChassisSpeeds())
-        for (i in 0..3) {
-            states[i].optimize(modules[i].getAngle())
-            modules[i].runSetpoint(states[i])
+        val states = kinematics.toSwerveModuleVelocities(ChassisVelocities(0.0, 0.0, 0.0))
+        for (i in modules.indices) {
+            val optimized = states[i].optimize(modules[i].angle ?: Rotation2d.ZERO)
+            modules[i].runSetpoint(optimized)
         }
     }
 
     @get:AutoLogOutput(key = "Drive/SwerveStates/Measured")
-    private val moduleStates: Array<SwerveModuleState>
-        /** Returns the module states (turn angles and drive velocities) for all the modules.  */
-        get() {
-            val states: Array<SwerveModuleState?> = kotlin.arrayOfNulls<SwerveModuleState>(4)
-            for (i in 0..3) {
-                states[i] = modules[i].getState()
-            }
-            return states
-        }
+    private val moduleStates: Array<SwerveModuleVelocity>
+        get() = Array(modules.size) { i -> modules[i].state ?: SwerveModuleVelocity() }
 
     @get:AutoLogOutput(key = "Drive/SwerveChassisSpeeds/Measured")
-    private val chassisSpeeds: ChassisSpeeds
-        /** Returns the measured chassis speeds of the robot.  */
-        get() = kinematics.toChassisSpeeds(this.moduleStates)
+    private val chassisSpeeds: ChassisVelocities
+        get() = kinematics.toChassisVelocities(*moduleStates)
 
     val wheelRadiusCharacterizationPositions: DoubleArray
-        /** Returns the position of each module in radians.  */
-        get() {
-            val values = DoubleArray(4)
-            for (i in 0..3) {
-                values[i] = modules[i].getWheelRadiusCharacterizationPosition()
-            }
-            return values
-        }
+        get() = DoubleArray(modules.size) { i -> modules[i].wheelRadiusCharacterizationPosition }
 
     val fFCharacterizationVelocity: Double
-        /** Returns the average velocity of the modules in rotations/sec (Phoenix native units).  */
-        get() {
-            var output = 0.0
-            for (i in 0..3) {
-                output += modules[i].getFFCharacterizationVelocity() / 4.0
-            }
-            return output
-        }
+        get() = modules.sumOf { it.fFCharacterizationVelocity } / modules.size.toDouble()
 
     val gyroRotation: Rotation2d
-        /** Returns the raw gyro rotation read by the IMU  */
-        get() = gyroInputs.data.yawPosition()
+        get() = gyroInputs.data.yawPosition
 
     companion object {
+        private const val LOOP_PERIOD_SECS = 0.02
+
         val odometryLock: Lock = ReentrantLock()
-        private val coastWaitTime: LoggedTunableNumber = LoggedTunableNumber("Drive/CoastWaitTimeSeconds", 0.5)
-        private val coastMetersPerSecondThreshold: LoggedTunableNumber =
-            LoggedTunableNumber("Drive/CoastMetersPerSecThreshold", .05)
+        private val coastWaitTime = LoggedTunableNumber("Drive/CoastWaitTimeSeconds", 0.5)
+        private val coastMetersPerSecondThreshold =
+            LoggedTunableNumber("Drive/CoastMetersPerSecThreshold", 0.05)
+
+        private val moduleLimits =
+            ModuleLimits(
+                RobotParameters.SwerveParameters.PhysicalParameters.MAX_SPEED,
+                RobotParameters.SwerveParameters.PhysicalParameters.MAX_SPEED * 2.0,
+                RobotParameters.SwerveParameters.PhysicalParameters.MAX_ANGULAR_SPEED,
+            )
+
+        private val wheelRadiusMeters = RobotParameters.SwerveParameters.PhysicalParameters.WHEEL_DIAMETER / 2.0
     }
 }

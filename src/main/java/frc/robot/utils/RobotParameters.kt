@@ -1,10 +1,7 @@
 package frc.robot.utils
 
 import com.ctre.phoenix6.signals.InvertedValue
-// import com.pathplanner.lib.config.PIDConstants
-// import com.pathplanner.lib.config.RobotConfig
-// import com.pathplanner.lib.controllers.PPHolonomicDriveController
-import lombok.Builder
+import frc.robot.utils.RobotParameters.CANBusParameters.SWERVE_CANBUS_ID
 import org.wpilib.hardware.bus.CANPort
 import org.wpilib.math.controller.PIDController
 import org.wpilib.math.controller.SimpleMotorFeedforward
@@ -20,7 +17,8 @@ object RobotParameters {
         val TUNING_MODE: Boolean = false
         val MODE: Mode = Mode.REAL
     }
-    enum class Mode() { REAL, SIM }
+
+    enum class Mode { REAL, SIM }
 
     /** Class containing global values related to motors.  */
     object CANBusParameters {
@@ -40,13 +38,12 @@ object RobotParameters {
         const val PIDGEY_ID: Int = 13
         const val INTAKING_MOTOR_ID: Int = 14
         const val INTAKE_PIVOT_MOTOR_ID: Int = 15
-        const val SWERVE_CANBUS_ID: Int = 1
+        val SWERVE_CANBUS_ID: CANPort = CANPort.CAN_D0
     }
 
     object PivotParameters {
-        val pivotMotor: Int = CANBusParameters.INTAKE_PIVOT_MOTOR_ID;
-        val PIVOT_GEAR_RATIO: Double = 150.0 / 7.0;
-        val PIVOT_CANPORT: CANPort = CANPort.CAN_D1;
+        val pivotMotor: Int = CANBusParameters.INTAKE_PIVOT_MOTOR_ID
+        val PIVOT_GEAR_RATIO: Double = 150.0 / 7.0
     }
 
     /** Class containing global values related to the swerve drive system.  */
@@ -55,11 +52,8 @@ object RobotParameters {
             const val ODOMETRY_FREQUENCY: Double = 250.0
         }
 
-        fun getMode() : Mode = GlobalParameters.MODE
+        fun getMode(): Mode = GlobalParameters.MODE
 
-
-
-        @Builder
         data class
         ModuleConfig(
             val driveMotorId: Int,
@@ -81,7 +75,7 @@ object RobotParameters {
                     encoderOffset = Rotation2d.fromDegrees(0.0),
                     turnInverted = false,
                     encoderInverted = false,
-                    canBUS = CANPort.CAN_D0,
+                    canBUS = SWERVE_CANBUS_ID,
                 ),
                 // FR
                 ModuleConfig(
@@ -91,7 +85,7 @@ object RobotParameters {
                     encoderOffset = Rotation2d.fromDegrees(0.0),
                     turnInverted = false,
                     encoderInverted = false,
-                    canBUS = CANPort.CAN_D0,
+                    canBUS = SWERVE_CANBUS_ID,
                 ),
                 // BL
                 ModuleConfig(
@@ -101,7 +95,7 @@ object RobotParameters {
                     encoderOffset = Rotation2d.fromDegrees(0.0),
                     turnInverted = false,
                     encoderInverted = false,
-                    canBUS = CANPort.CAN_D0,
+                    canBUS = SWERVE_CANBUS_ID,
                 ),
                 // BR
                 ModuleConfig(
@@ -111,7 +105,7 @@ object RobotParameters {
                     encoderOffset = Rotation2d.fromDegrees(0.0),
                     turnInverted = false,
                     encoderInverted = false,
-                    canBUS = CANPort.CAN_D0,
+                    canBUS = SWERVE_CANBUS_ID,
                 ),
             )
 
@@ -173,10 +167,6 @@ object RobotParameters {
             private val BACK_LEFT: Translation2d = Translation2d(-0.3048, 0.3048)
             private val BACK_RIGHT: Translation2d = Translation2d(-0.3048, -0.3048)
             val MODULE_LOCATIONS: Array<Translation2d> = arrayOf(FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT)
-
-            // Track & Radius
-            val TRACK_WIDTH: Translation2d = Translation2d(0.43105229381, 0.43105229381)
-            val WHEEL_RADIUS: Double = 0.43105229381
 
             // Motor Property Values
             const val MAX_SPEED: Double = 5.76
