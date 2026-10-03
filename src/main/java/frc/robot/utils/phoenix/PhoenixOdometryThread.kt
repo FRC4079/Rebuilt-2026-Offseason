@@ -20,7 +20,7 @@ import kotlin.concurrent.withLock
  */
 class PhoenixOdometryThread private constructor() : Thread("PhoenixOdometryThread") {
     companion object {
-        private val isCANFD = true
+        private const val IS_CAN_FD = true
 
         @Volatile
         private var instance: PhoenixOdometryThread? = null
@@ -92,7 +92,7 @@ class PhoenixOdometryThread private constructor() : Thread("PhoenixOdometryThrea
             // Block until CAN data arrives (CANivore) or sleep (RIO CAN)
             signalsLock.withLock {
                 try {
-                    if (isCANFD && phoenixSignals.isNotEmpty()) {
+                    if (IS_CAN_FD && phoenixSignals.isNotEmpty()) {
                         BaseStatusSignal.waitForAll(
                             2.0 / SwerveParameters.OdometryConfig.ODOMETRY_FREQUENCY,
                             *phoenixSignals,

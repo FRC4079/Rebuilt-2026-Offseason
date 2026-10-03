@@ -1,6 +1,5 @@
 package frc.robot
 
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser
 import org.wpilib.command3.Command
 import org.wpilib.driverstation.Gamepad
 
@@ -13,7 +12,7 @@ import org.wpilib.driverstation.Gamepad
 class RobotContainer {
     val pad: Gamepad = Gamepad(0)
 
-    var networkChooser: LoggedDashboardChooser<Command?> = LoggedDashboardChooser("AutoChooser")
+    var autonomous: Command? = null
 
     /** The container for the robot. Contains subsystems, IO devices, and commands.  */
     init {
@@ -30,5 +29,5 @@ class RobotContainer {
     }
 
     val autonomousCommand: Command?
-        get() = networkChooser.get()
+        get() = autonomous
 }

@@ -1,20 +1,40 @@
 package frc.robot.subsystems.drive
 
+import frc.robot.utils.logging.ReflectiveLoggableInputs
 import org.littletonrobotics.junction.AutoLog
 import org.wpilib.math.geometry.Rotation2d
 
-fun interface GyroIO {
+interface GyroIO {
     @AutoLog
     open class GyroIOInputs {
         @JvmField
-        var connected: Boolean = false
+        var data: GyroIOData =
+            GyroIOData(
+                connected = false,
+                yawPosition = Rotation2d.ZERO,
+                yawVelocityRadPerSec = 0.0,
+                pitchPosition = Rotation2d.ZERO,
+                pitchVelocityRadPerSec = 0.0,
+                rollPosition = Rotation2d.ZERO,
+                rollVelocityRadPerSec = 0.0,
+            )
 
         @JvmField
-        var yawPosition: Rotation2d = Rotation2d()
+        var odometryYawTimestamps: DoubleArray = doubleArrayOf()
 
         @JvmField
-        var yawVelocityRadPerSec: Double = 0.0
+        var odometryYawPositions: Array<Rotation2d> = arrayOf()
     }
 
-    fun updateInputs(inputs: GyroIOInputs?)
+    data class GyroIOData(
+        val connected: Boolean,
+        val yawPosition: Rotation2d,
+        val yawVelocityRadPerSec: Double,
+        val pitchPosition: Rotation2d,
+        val pitchVelocityRadPerSec: Double,
+        val rollPosition: Rotation2d,
+        val rollVelocityRadPerSec: Double,
+    ) : ReflectiveLoggableInputs()
+
+    fun updateInputs(inputs: GyroIOInputs) {}
 }
