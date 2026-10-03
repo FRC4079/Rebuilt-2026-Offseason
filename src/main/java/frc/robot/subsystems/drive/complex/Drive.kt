@@ -1,7 +1,9 @@
-package frc.robot.subsystems.drive
+package frc.robot.subsystems.drive.complex
 
 import frc.robot.Robot
-import frc.robot.RobotState
+import frc.robot.subsystems.drive.GyroIO
+import frc.robot.subsystems.drive.GyroIOInputsAutoLogged
+import frc.robot.subsystems.drive.ModuleIO
 import frc.robot.utils.RobotParameters
 import frc.robot.utils.logging.LoggedTracer
 import frc.robot.utils.logging.LoggedTunableNumber
@@ -12,8 +14,7 @@ import frc.robot.utils.swerve.SwerveSetpointGenerator
 import org.littletonrobotics.junction.AutoLogOutput
 import org.littletonrobotics.junction.Logger
 import org.wpilib.command3.Mechanism
-import org.wpilib.driverstation.RobotState.isDisabled
-import org.wpilib.driverstation.RobotState.isEnabled
+import org.wpilib.driverstation.RobotState
 import org.wpilib.math.filter.Debouncer
 import org.wpilib.math.geometry.Pose3d
 import org.wpilib.math.geometry.Rotation2d
@@ -102,7 +103,7 @@ class Drive(
             module.periodic()
         }
 
-        if (isDisabled()) {
+        if (RobotState.isDisabled()) {
             for (module in modules) {
                 module.stop()
             }
@@ -130,8 +131,8 @@ class Drive(
                     Optional.empty()
                 }
 
-            RobotState.getInstance().addOdometryObservation(
-                RobotState.OdometryObservation(
+            frc.robot.RobotState.getInstance().addOdometryObservation(
+                frc.robot.RobotState.OdometryObservation(
                     timestamp = sampleTimestamps[i],
                     wheelPositions = wheelPositions,
                     yaw = yaw,
@@ -139,31 +140,49 @@ class Drive(
             )
         }
 
-        RobotState.getInstance().addDriveSpeeds(chassisSpeeds)
-        RobotState.getInstance().setPitch(gyroInputs.data.pitchPosition)
-        RobotState.getInstance().setRoll(gyroInputs.data.rollPosition)
+        frc.robot.RobotState
+            .getInstance()
+            .addDriveSpeeds(chassisSpeeds)
+        frc.robot.RobotState
+            .getInstance()
+            .setPitch(gyroInputs.data.pitchPosition)
+        frc.robot.RobotState
+            .getInstance()
+            .setRoll(gyroInputs.data.rollPosition)
 
-        Logger.recordOutput("RobotState/EstimatedPose3d", Pose3d(RobotState.getInstance().estimatedPose))
+        Logger.recordOutput(
+            "RobotState/EstimatedPose3d",
+            Pose3d(
+                frc.robot.RobotState
+                    .getInstance()
+                    .estimatedPose,
+            ),
+        )
 
         if (modules.any { abs(it.velocityMetersPerSec) > coastMetersPerSecondThreshold.get() }) {
             lastMovementTimer.reset()
         }
 
-        if (isEnabled()) {
+        if (RobotState.isEnabled()) {
             coastRequest = CoastRequest.ALWAYS_BRAKE
         }
 
         when (coastRequest) {
             CoastRequest.AUTOMATIC -> {
-                if (isEnabled()) {
+                if (RobotState.isEnabled()) {
                     setBrakeMode(true)
                 } else if (lastMovementTimer.hasElapsed(coastWaitTime.get())) {
                     setBrakeMode(false)
                 }
             }
 
-            CoastRequest.ALWAYS_BRAKE -> setBrakeMode(true)
-            CoastRequest.ALWAYS_COAST -> setBrakeMode(false)
+            CoastRequest.ALWAYS_BRAKE -> {
+                setBrakeMode(true)
+            }
+
+            CoastRequest.ALWAYS_COAST -> {
+                setBrakeMode(false)
+            }
         }
 
         if (!velocityMode) {
