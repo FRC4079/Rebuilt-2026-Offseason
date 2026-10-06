@@ -41,6 +41,17 @@ object RobotParameters {
         val SWERVE_CANBUS_ID: CANPort = CANPort.CAN_D0
     }
 
+    object IntakeParameters {
+        val intakeMotor: Int = CANBusParameters.INTAKING_MOTOR_ID
+        val INTAKE_CANPORT: CANPort = CANPort.CAN_D0
+
+        object PhysicalParameters {
+            // TODO: set INTAKE_GEAR_RATIO and INTAKE_CURRENT_LIMIT to real value
+            const val INTAKE_GEAR_RATIO: Double = 0.0
+            const val INTAKE_CURRENT_LIMIT: Double = 0.0
+        }
+    }
+
     object PivotParameters {
         val pivotMotor: Int = CANBusParameters.INTAKE_PIVOT_MOTOR_ID
         val PIVOT_GEAR_RATIO: Double = 150.0 / 7.0
