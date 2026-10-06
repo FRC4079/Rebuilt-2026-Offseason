@@ -49,6 +49,7 @@ class RealIntakeIO(config: IntakeParameters) : IntakeIO {
         // TODO: set frequencyHz to real value
         BaseStatusSignal.setUpdateFrequencyForAll(
             0.0,
+            positionSignal,
             velocitySignal,
             voltageSignal,
             supplyCurrentSignal,
@@ -61,6 +62,7 @@ class RealIntakeIO(config: IntakeParameters) : IntakeIO {
 
         PhoenixUtils.registerSignals(
             false,
+            positionSignal,
             velocitySignal,
             voltageSignal,
             supplyCurrentSignal,
