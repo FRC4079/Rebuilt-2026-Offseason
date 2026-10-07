@@ -1,12 +1,12 @@
-package frc.robot.subsystems.pivot
+package frc.robot.mechanisms.pivot
 
 import org.littletonrobotics.junction.Logger
 import org.wpilib.math.filter.Debouncer
 import org.wpilib.util.Alert
-//import edu.wpi.first.wpilibj.DriverStation;
+// import edu.wpi.first.wpilibj.DriverStation;
 
 class Pivot(
-    private val io: PivotIO
+    private val io: PivotIO,
 ) {
     private val inputs = PivotIOInputsAutoLogged()
 

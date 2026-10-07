@@ -1,4 +1,4 @@
-package frc.robot.subsystems.intake
+package frc.robot.mechanisms.intake
 
 import frc.robot.utils.RobotParameters.IntakeParameters
 import org.wpilib.math.controller.PIDController
@@ -13,14 +13,15 @@ class SimIntakeIO : IntakeIO {
         private val intakeMotorModel: DCMotor = DCMotor.getKrakenX60Foc(1)
     }
 
-    private val intakeMotorSim = DCMotorSim(
-        Models.singleJointedArmFromPhysicalConstants(
+    private val intakeMotorSim =
+        DCMotorSim(
+            Models.singleJointedArmFromPhysicalConstants(
+                intakeMotorModel,
+                0.000,
+                IntakeParameters.PhysicalParameters.INTAKE_GEAR_RATIO,
+            ),
             intakeMotorModel,
-            0.000,
-            IntakeParameters.PhysicalParameters.INTAKE_GEAR_RATIO,
-        ),
-        intakeMotorModel,
-    )
+        )
 
     private var intakeClosedLoop = false
     private var intakeVelocityControl = false
@@ -67,7 +68,11 @@ class SimIntakeIO : IntakeIO {
         intakeController.setSetpoint(velocityRadPerSec)
     }
 
-    override fun setIntakePID(kP: Double, kI: Double, kD: Double) {
+    override fun setIntakePID(
+        kP: Double,
+        kI: Double,
+        kD: Double,
+    ) {
         intakeController.setPID(kP, kI, kD)
     }
 

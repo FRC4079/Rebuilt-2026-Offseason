@@ -1,9 +1,10 @@
-package frc.robot.subsystems.drive.simple
+package frc.robot.mechanisms.drive
 
 import com.ctre.phoenix6.CANBus
 import com.ctre.phoenix6.hardware.Pigeon2
 import frc.robot.RobotState
-import frc.robot.subsystems.drive.RealModuleIO
+import frc.robot.mechanisms.drive.module.RealModuleIO
+import frc.robot.mechanisms.drive.module.SwerveModule
 import frc.robot.utils.RobotParameters.CANBusParameters
 import frc.robot.utils.RobotParameters.SwerveParameters
 import frc.robot.utils.phoenix.PhoenixOdometryThread
@@ -21,13 +22,6 @@ import org.wpilib.util.Alert
 import java.util.Optional
 
 object Swerve : Mechanism {
-    private val fieldAlert =
-        Alert(
-            "Swerve",
-            "Legacy Swerve singleton is active. Prefer Drive where possible.",
-            Alert.Level.MEDIUM,
-        )
-
     private val pidgey = Pigeon2(CANBusParameters.PIDGEY_ID, CANBus(CANBusParameters.SWERVE_CANBUS_ID))
     private val modules: Array<SwerveModule> = initializeModules()
 
@@ -44,7 +38,6 @@ object Swerve : Mechanism {
 
     init {
         pidgey.reset()
-        fieldAlert.set(false)
         PhoenixOdometryThread.getInstance().start()
     }
 

@@ -1,9 +1,8 @@
 package frc.robot
 
 import frc.robot.commands.PadDrive
-import frc.robot.subsystems.drive.simple.Swerve
+import frc.robot.mechanisms.drive.Swerve
 import org.wpilib.command3.Command
-import org.wpilib.driverstation.Gamepad
 import org.wpilib.driverstation.XboxController
 
 /**

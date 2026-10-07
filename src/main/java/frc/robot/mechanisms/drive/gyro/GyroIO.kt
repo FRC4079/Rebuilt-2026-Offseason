@@ -1,4 +1,4 @@
-package frc.robot.subsystems.drive
+package frc.robot.mechanisms.drive.gyro
 
 import frc.robot.utils.logging.ReflectiveLoggableInputs
 import org.littletonrobotics.junction.AutoLog

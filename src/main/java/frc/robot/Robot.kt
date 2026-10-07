@@ -1,7 +1,6 @@
 package frc.robot
 
-import frc.robot.subsystems.drive.complex.Drive
-import frc.robot.subsystems.drive.simple.Swerve
+import frc.robot.mechanisms.drive.Swerve
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger

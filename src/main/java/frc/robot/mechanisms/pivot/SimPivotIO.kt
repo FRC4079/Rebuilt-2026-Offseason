@@ -1,6 +1,5 @@
-package frc.robot.subsystems.pivot
+package frc.robot.mechanisms.pivot
 
-import frc.robot.subsystems.pivot.PivotIO
 import frc.robot.utils.RobotParameters
 import org.wpilib.math.controller.PIDController
 import org.wpilib.math.system.DCMotor
@@ -9,19 +8,17 @@ import org.wpilib.simulation.DCMotorSim
 import java.lang.Math.clamp
 import kotlin.math.abs
 
-class SimPivotIO(
-
-) : PivotIO {
+class SimPivotIO : PivotIO {
     private val pivotMotorModel: DCMotor = DCMotor.getKrakenX60Foc(1)
 
     private val pivotSim =
         DCMotorSim(
-    Models.singleJointedArmFromPhysicalConstants(
+            Models.singleJointedArmFromPhysicalConstants(
                 pivotMotorModel,
                 0.25,
                 RobotParameters.PivotParameters.PIVOT_GEAR_RATIO,
             ),
-        pivotMotorModel,
+            pivotMotorModel,
         )
 
     private var pivotClosedLoop = false
@@ -29,9 +26,7 @@ class SimPivotIO(
     private var pivotFFVolts = 0.0
     private var pivotAppliedVolts = 0.0
 
-    override fun updateInputs(inputs: PivotIO.PivotIOInputs)
-    {
-
+    override fun updateInputs(inputs: PivotIO.PivotIOInputs) {
         if (pivotClosedLoop) {
             pivotAppliedVolts =
                 pivotFFVolts + pivotController.calculate(pivotSim.angularVelocity)

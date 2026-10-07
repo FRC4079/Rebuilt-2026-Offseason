@@ -1,16 +1,13 @@
-package frc.robot.subsystems.drive
+package frc.robot.mechanisms.drive.gyro
 
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.CANBus
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.Pigeon2Configuration
 import com.ctre.phoenix6.hardware.Pigeon2
-import frc.robot.subsystems.drive.GyroIO.GyroIOData
-import frc.robot.subsystems.drive.GyroIO.GyroIOInputs
 import frc.robot.utils.RobotParameters
 import frc.robot.utils.phoenix.PhoenixOdometryThread
-import frc.robot.utils.phoenix.PhoenixUtils.registerSignals
-import frc.robot.utils.phoenix.PhoenixUtils.tryUntilOk
+import frc.robot.utils.phoenix.PhoenixUtils
 import org.wpilib.math.geometry.Rotation2d
 import org.wpilib.math.util.Units
 import org.wpilib.units.measure.Angle
@@ -18,8 +15,9 @@ import org.wpilib.units.measure.AngularVelocity
 import java.util.Queue
 
 /** IO implementation for Pigeon 2.  */
-class RealGyroIO : GyroIO {
-    private val pigeon = Pigeon2(RobotParameters.CANBusParameters.PIDGEY_ID, CANBus(RobotParameters.CANBusParameters.SWERVE_CANBUS_ID))
+object RealGyroIO : GyroIO {
+    private val pigeon =
+        Pigeon2(RobotParameters.CANBusParameters.PIDGEY_ID, CANBus(RobotParameters.CANBusParameters.SWERVE_CANBUS_ID))
     private val yaw: StatusSignal<Angle?> = pigeon.yaw
     private val pitch: StatusSignal<Angle?> = pigeon.pitch
     private val roll: StatusSignal<Angle?> = pigeon.roll
@@ -44,13 +42,13 @@ class RealGyroIO : GyroIO {
         pigeon.optimizeBusUtilization()
         yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue()
         yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(pigeon.yaw)
-        registerSignals(true, yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity)
-        tryUntilOk(5, { pigeon.setYaw(0.0, 0.25) })
+        PhoenixUtils.registerSignals(true, yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity)
+        PhoenixUtils.tryUntilOk(5, { pigeon.setYaw(0.0, 0.25) })
     }
 
-    override fun updateInputs(inputs: GyroIOInputs) {
+    override fun updateInputs(inputs: GyroIO.GyroIOInputs) {
         inputs.data =
-            GyroIOData(
+            GyroIO.GyroIOData(
                 BaseStatusSignal.isAllGood(yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity),
                 Rotation2d.fromDegrees(yaw.valueAsDouble),
                 Units.degreesToRadians(yawVelocity.valueAsDouble),

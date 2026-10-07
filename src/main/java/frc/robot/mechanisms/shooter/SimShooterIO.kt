@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter
+package frc.robot.mechanisms.shooter
 
 import frc.robot.utils.RobotParameters
 import org.wpilib.math.controller.PIDController
@@ -66,7 +66,10 @@ class SimShooterIO : ShooterIO {
         inputs.data.bottomTorqueCurrentAmps = 0.0
     }
 
-    override fun setPower(topPower: Double, bottomPower: Double) {
+    override fun setPower(
+        topPower: Double,
+        bottomPower: Double,
+    ) {
         closedLoop = false
         topSim.setInputVoltage(clamp(topPower * 12.0, -12.0, 12.0))
         bottomSim.setInputVoltage(clamp(bottomPower * 12.0, -12.0, 12.0))

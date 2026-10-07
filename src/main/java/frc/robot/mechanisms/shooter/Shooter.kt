@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter
+package frc.robot.mechanisms.shooter
 
 import org.littletonrobotics.junction.Logger
 import org.wpilib.math.filter.Debouncer

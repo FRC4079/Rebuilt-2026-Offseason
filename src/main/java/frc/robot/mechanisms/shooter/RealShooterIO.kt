@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter
+package frc.robot.mechanisms.shooter
 
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.CANBus
@@ -19,14 +19,13 @@ import org.wpilib.units.measure.AngularVelocity
 import org.wpilib.units.measure.Current
 import org.wpilib.units.measure.Voltage
 
-class RealShooterIO(
-) : ShooterIO {
+class RealShooterIO : ShooterIO {
     private val shooterTopTalon = TalonFX(ShooterParameters.shooterTopMotor, CANBus(ShooterParameters.SHOOTER_CANPORT))
     private val shooterBottomTalon = TalonFX(ShooterParameters.shooterBottomMotor, CANBus(ShooterParameters.SHOOTER_CANPORT))
-    
+
     private val topConfig = TalonFXConfiguration()
     private val bottomConfig = TalonFXConfiguration()
-    
+
     private val velocityRequest: VelocityVoltage = VelocityVoltage(0.0).withSlot(0)
 
     private val topPosition: StatusSignal<Angle>
@@ -97,7 +96,7 @@ class RealShooterIO(
             topSupplyCurrent,
             bottomSupplyCurrent,
             topTorqueCurrent,
-            bottomTorqueCurrent
+            bottomTorqueCurrent,
         )
         PhoenixUtils.registerSignals(
             false,
@@ -110,7 +109,7 @@ class RealShooterIO(
             topSupplyCurrent,
             bottomSupplyCurrent,
             topTorqueCurrent,
-            bottomTorqueCurrent
+            bottomTorqueCurrent,
         )
     }
 
@@ -119,13 +118,13 @@ class RealShooterIO(
             BaseStatusSignal.isAllGood(
                 topPosition,
                 topVelocity,
-                topVoltage
+                topVoltage,
             )
         inputs.data.bottomMotorConnected =
             BaseStatusSignal.isAllGood(
                 bottomPosition,
                 bottomVelocity,
-                bottomVoltage
+                bottomVoltage,
             )
         inputs.data.topPositionRad = Units.rotationsToRadians(topPosition.valueAsDouble)
         inputs.data.bottomPositionRad = Units.rotationsToRadians(bottomPosition.valueAsDouble)
@@ -139,9 +138,15 @@ class RealShooterIO(
         inputs.data.bottomTorqueCurrentAmps = bottomTorqueCurrent.valueAsDouble
     }
 
-    private val openLoopRequest = com.ctre.phoenix6.controls.DutyCycleOut(0.0).withUpdateFreqHz(0.0)
+    private val openLoopRequest =
+        com.ctre.phoenix6.controls
+            .DutyCycleOut(0.0)
+            .withUpdateFreqHz(0.0)
 
-    override fun setPower(topPower: Double, bottomPower: Double) {
+    override fun setPower(
+        topPower: Double,
+        bottomPower: Double,
+    ) {
         shooterTopTalon.setControl(openLoopRequest.withOutput(topPower))
         shooterBottomTalon.setControl(openLoopRequest.withOutput(bottomPower))
     }

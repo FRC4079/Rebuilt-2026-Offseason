@@ -1,24 +1,26 @@
-package frc.robot.subsystems.intake
+package frc.robot.mechanisms.intake
 
-import com.ctre.phoenix6.hardware.TalonFX
-import com.ctre.phoenix6.hardware.ParentDevice
-import com.ctre.phoenix6.configs.TalonFXConfiguration
-import com.ctre.phoenix6.controls.VoltageOut
-import com.ctre.phoenix6.signals.NeutralModeValue
+import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.CANBus
 import com.ctre.phoenix6.StatusSignal
-import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.configs.Slot0Configs
+import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC
+import com.ctre.phoenix6.controls.VoltageOut
+import com.ctre.phoenix6.hardware.ParentDevice
+import com.ctre.phoenix6.hardware.TalonFX
+import com.ctre.phoenix6.signals.NeutralModeValue
+import frc.robot.utils.RobotParameters.IntakeParameters
+import frc.robot.utils.phoenix.PhoenixUtils
 import org.wpilib.units.measure.Angle
 import org.wpilib.units.measure.AngularVelocity
-import org.wpilib.units.measure.Voltage
 import org.wpilib.units.measure.Current
-import frc.robot.utils.phoenix.PhoenixUtils
-import frc.robot.utils.RobotParameters.IntakeParameters
+import org.wpilib.units.measure.Voltage
 
-class RealIntakeIO(config: IntakeParameters) : IntakeIO {
+class RealIntakeIO(
+    config: IntakeParameters,
+) : IntakeIO {
     private val intakeMotor = TalonFX(config.intakeMotor, CANBus(config.INTAKE_CANPORT))
     private val intakeConfig = TalonFXConfiguration()
 
@@ -71,12 +73,13 @@ class RealIntakeIO(config: IntakeParameters) : IntakeIO {
     }
 
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
-        inputs.data.intakeConnected = BaseStatusSignal.isAllGood(
-            velocitySignal,
-            voltageSignal,
-            supplyCurrentSignal,
-            torqueCurrentSignal,
-        )
+        inputs.data.intakeConnected =
+            BaseStatusSignal.isAllGood(
+                velocitySignal,
+                voltageSignal,
+                supplyCurrentSignal,
+                torqueCurrentSignal,
+            )
         inputs.data.intakeVelocityRadPerSec = velocitySignal.valueAsDouble
         inputs.data.intakeAppliedVolts = voltageSignal.valueAsDouble
         inputs.data.intakeSupplyCurrentAmps = supplyCurrentSignal.valueAsDouble
@@ -95,7 +98,11 @@ class RealIntakeIO(config: IntakeParameters) : IntakeIO {
         intakeMotor.setControl(velocityControl.withVelocity(velocityRadPerSec))
     }
 
-    override fun setIntakePID(kP: Double, kI: Double, kD: Double) {
+    override fun setIntakePID(
+        kP: Double,
+        kI: Double,
+        kD: Double,
+    ) {
         intakeConfig.Slot0.kP = kP
         intakeConfig.Slot0.kI = kI
         intakeConfig.Slot0.kD = kD

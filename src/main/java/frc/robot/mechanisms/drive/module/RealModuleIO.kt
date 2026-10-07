@@ -1,4 +1,4 @@
-package frc.robot.subsystems.drive
+package frc.robot.mechanisms.drive.module
 
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.CANBus

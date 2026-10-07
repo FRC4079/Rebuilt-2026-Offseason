@@ -1,29 +1,28 @@
-package frc.robot.subsystems.shooter
+package frc.robot.mechanisms.shooter
 
 import frc.robot.utils.logging.ReflectiveLoggableInputs
 import org.littletonrobotics.junction.AutoLog
-import org.wpilib.math.geometry.Rotation2d
-import org.wpilib.units.Units.*
 
 interface ShooterIO {
     @AutoLog
     open class ShooterIOInputs {
         @JvmField
-        var data: ShooterIOData = ShooterIOData(
-            topMotorConnected = false,
-            bottomMotorConnected = false,
-            topPositionRad = 0.0,
-            bottomPositionRad = 0.0,
-            topVelocityRadPerSec = 0.0,
-            bottomVelocityRadPerSec = 0.0,
-            topAppliedVolts = 0.0,
-            bottomAppliedVolts = 0.0,
-            topSupplyCurrentAmps = 0.0,
-            bottomSupplyCurrentAmps = 0.0,
-            topTorqueCurrentAmps = 0.0,
-            bottomTorqueCurrentAmps = 0.0,
-            shooterState = ShooterState.IDLE,
-        )
+        var data: ShooterIOData =
+            ShooterIOData(
+                topMotorConnected = false,
+                bottomMotorConnected = false,
+                topPositionRad = 0.0,
+                bottomPositionRad = 0.0,
+                topVelocityRadPerSec = 0.0,
+                bottomVelocityRadPerSec = 0.0,
+                topAppliedVolts = 0.0,
+                bottomAppliedVolts = 0.0,
+                topSupplyCurrentAmps = 0.0,
+                bottomSupplyCurrentAmps = 0.0,
+                topTorqueCurrentAmps = 0.0,
+                bottomTorqueCurrentAmps = 0.0,
+                shooterState = ShooterState.IDLE,
+            )
     }
 
     data class ShooterIOData(
@@ -42,7 +41,9 @@ interface ShooterIO {
         var shooterState: ShooterState,
     ) : ReflectiveLoggableInputs()
 
-    enum class ShooterState(val velocityRadPerSec: Double) {
+    enum class ShooterState(
+        val velocityRadPerSec: Double,
+    ) {
         IDLE(0.0),
         SPINUP(300.0),
         SHOOT(400.0),
@@ -61,7 +62,10 @@ interface ShooterIO {
      * @param topPower the power applied to the top motor between -1 and 1.
      * @param bottomPower the power applied to the bottom motor between -1 and 1.
      */
-    fun setPower(topPower: Double, bottomPower: Double) {}
+    fun setPower(
+        topPower: Double,
+        bottomPower: Double,
+    ) {}
 
     /**
      * sets the shooter state, which sets velocity in periodic

@@ -1,23 +1,22 @@
-package frc.robot.subsystems.pivot
+package frc.robot.mechanisms.pivot
 
 import frc.robot.utils.logging.ReflectiveLoggableInputs
 import org.littletonrobotics.junction.AutoLog
-import org.wpilib.math.geometry.Rotation2d
-import org.wpilib.units.Units.*
 
 interface PivotIO {
     @AutoLog
     open class PivotIOInputs {
         @JvmField
-        var data: PivotIOData = PivotIOData(
-            pivotConnected = false,
-            pivotPositionRad = 0.0,
-            pivotVelocityRadPerSec = 0.0,
-            pivotAppliedVolts = 0.0,
-            pivotSupplyCurrentAmps = 0.0,
-            pivotTorqueCurrentAmps = 0.0,
-            pivotPositionState = PivotPosition.STOW,
-        )
+        var data: PivotIOData =
+            PivotIOData(
+                pivotConnected = false,
+                pivotPositionRad = 0.0,
+                pivotVelocityRadPerSec = 0.0,
+                pivotAppliedVolts = 0.0,
+                pivotSupplyCurrentAmps = 0.0,
+                pivotTorqueCurrentAmps = 0.0,
+                pivotPositionState = PivotPosition.STOW,
+            )
     }
 
     data class PivotIOData(
@@ -30,7 +29,9 @@ interface PivotIO {
         var pivotPositionState: PivotPosition,
     ) : ReflectiveLoggableInputs()
 
-    enum class PivotPosition(val position : Double) {
+    enum class PivotPosition(
+        val position: Double,
+    ) {
         STOW(0.0),
         DEPLOY(10.0),
     }
