@@ -37,4 +37,6 @@ interface GyroIO {
     ) : ReflectiveLoggableInputs()
 
     fun updateInputs(inputs: GyroIOInputs) {}
+
+    fun reset() {}
 }

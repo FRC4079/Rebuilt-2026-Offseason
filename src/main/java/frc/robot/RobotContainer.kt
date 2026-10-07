@@ -2,6 +2,10 @@ package frc.robot
 
 import frc.robot.commands.PadDrive
 import frc.robot.mechanisms.drive.Swerve
+import frc.robot.mechanisms.drive.gyro.RealGyroIO
+import frc.robot.mechanisms.drive.module.ModuleIO
+import frc.robot.mechanisms.drive.module.RealModuleIO
+import frc.robot.utils.RobotParameters
 import org.wpilib.command3.Command
 import org.wpilib.driverstation.XboxController
 
@@ -14,11 +18,18 @@ import org.wpilib.driverstation.XboxController
 class RobotContainer {
     val pad: XboxController = XboxController(0)
 
+    val moduleIOs: Array<ModuleIO> =
+        RobotParameters.SwerveParameters.MODULE_CONFIGS
+            .map { config -> RealModuleIO(config) }
+            .toTypedArray()
+
+    val swerve: Swerve = Swerve(moduleIOs, RealGyroIO)
+
     var autonomous: Command? = null
 
     /** The container for the robot. Contains subsystems, IO devices, and commands.  */
     init {
-        Swerve.defaultCommand = PadDrive(pad)
+        swerve.defaultCommand = PadDrive(swerve, pad)
         configureBindings()
     }
 

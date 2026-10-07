@@ -65,7 +65,6 @@ class Robot : LoggedRobot() {
      */
     override fun robotPeriodic() {
         Scheduler.getDefault().run()
-        Swerve.periodic()
     }
 
     /** This autonomous runs the autonomous command selected by your [RobotContainer] class.  */

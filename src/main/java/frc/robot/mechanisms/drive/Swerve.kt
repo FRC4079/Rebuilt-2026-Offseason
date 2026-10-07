@@ -1,11 +1,10 @@
 package frc.robot.mechanisms.drive
 
-import com.ctre.phoenix6.CANBus
-import com.ctre.phoenix6.hardware.Pigeon2
 import frc.robot.RobotState
-import frc.robot.mechanisms.drive.module.RealModuleIO
+import frc.robot.mechanisms.drive.gyro.GyroIO
+import frc.robot.mechanisms.drive.gyro.GyroIOInputsAutoLogged
+import frc.robot.mechanisms.drive.module.ModuleIO
 import frc.robot.mechanisms.drive.module.SwerveModule
-import frc.robot.utils.RobotParameters.CANBusParameters
 import frc.robot.utils.RobotParameters.SwerveParameters
 import frc.robot.utils.phoenix.PhoenixOdometryThread
 import org.littletonrobotics.junction.Logger
@@ -18,17 +17,19 @@ import org.wpilib.math.kinematics.ChassisVelocities
 import org.wpilib.math.kinematics.SwerveModulePosition
 import org.wpilib.math.kinematics.SwerveModuleVelocity
 import org.wpilib.system.Timer
-import org.wpilib.util.Alert
 import java.util.Optional
 
-object Swerve : Mechanism {
-    private val pidgey = Pigeon2(CANBusParameters.PIDGEY_ID, CANBus(CANBusParameters.SWERVE_CANBUS_ID))
+class Swerve(
+    private val moduleIOs: Array<ModuleIO>,
+    private val gyroIO: GyroIO,
+) : Mechanism {
+    private val gyroInputs = GyroIOInputsAutoLogged()
     private val modules: Array<SwerveModule> = initializeModules()
 
     private val poseEstimator =
         SwerveDrivePoseEstimator(
             SwerveParameters.PhysicalParameters.kinematics,
-            pidgeyRotation,
+            Rotation2d.ZERO,
             modulePositions,
             Pose2d(),
         )
@@ -37,19 +38,20 @@ object Swerve : Mechanism {
     private var setStates = Array(modules.size) { SwerveModuleVelocity() }
 
     init {
-        pidgey.reset()
+        gyroIO.reset()
         PhoenixOdometryThread.getInstance().start()
     }
 
     private fun initializeModules(): Array<SwerveModule> =
         Array(SwerveParameters.MODULE_CONFIGS.size) { index ->
             SwerveModule(
-                RealModuleIO(SwerveParameters.MODULE_CONFIGS[index]),
+                moduleIOs[index],
                 index,
             )
         }
 
     fun periodic() {
+        gyroIO.updateInputs(gyroInputs)
         for (module in modules) {
             module.updateInputs()
         }
@@ -97,17 +99,7 @@ object Swerve : Mechanism {
         get() =
             autoSpeeds.toFieldRelative(pidgeyRotation)
     val pidgeyRotation: Rotation2d
-        get() = pidgey.rotation2d
-
-    val heading: Double
-        get() = -pidgey.yaw.valueAsDouble
-
-    val pidgeyYaw: Double
-        get() = pidgey.yaw.valueAsDouble
-
-    fun resetPidgey() {
-        pidgey.reset()
-    }
+        get() = gyroInputs.data.yawPosition
 
     val pose: Pose2d
         get() = poseEstimator.estimatedPosition
@@ -132,9 +124,6 @@ object Swerve : Mechanism {
 
     val autoSpeeds: ChassisVelocities
         get() = SwerveParameters.PhysicalParameters.kinematics.toChassisVelocities(*moduleStates)
-
-    val rotationPidgey: Rotation2d
-        get() = Rotation2d.fromDegrees(-pidgey.rotation2d.degrees)
 
     fun chassisSpeedsDrive(chassisSpeeds: ChassisVelocities?) {
         if (chassisSpeeds == null) return
@@ -204,5 +193,5 @@ object Swerve : Mechanism {
 
     fun pathFindTest(): Command? = null
 
-    private const val LOOP_PERIOD_SECS = 0.02
+    private val LOOP_PERIOD_SECS = 0.02
 }

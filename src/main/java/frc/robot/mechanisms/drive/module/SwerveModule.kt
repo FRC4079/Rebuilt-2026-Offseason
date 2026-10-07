@@ -1,7 +1,6 @@
 package frc.robot.mechanisms.drive.module
 
 import frc.robot.Robot
-import frc.robot.mechanisms.drive.ModuleIOInputsAutoLogged
 import frc.robot.utils.RobotParameters
 import frc.robot.utils.logging.LoggedTracer
 import org.littletonrobotics.junction.Logger

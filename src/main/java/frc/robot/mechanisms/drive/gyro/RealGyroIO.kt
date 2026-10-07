@@ -67,4 +67,8 @@ object RealGyroIO : GyroIO {
         yawTimestampQueue.clear()
         yawPositionQueue.clear()
     }
+
+    override fun reset() {
+        pigeon.reset()
+    }
 }

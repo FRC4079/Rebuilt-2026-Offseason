@@ -14,6 +14,7 @@ import kotlin.math.abs
 
 /** Command to control the robot's swerve drive using the Xbox controller. */
 class PadDrive(
+    private val swerve: Swerve,
     private val pad: XboxController,
 ) : Command {
     /**
@@ -29,12 +30,12 @@ class PadDrive(
         Logger.recordOutput("PadDrive/YJoystick", position.second)
         Logger.recordOutput("PadDrive/Rotation", rotation)
 
-        Swerve.setDriveSpeeds(position.second, position.first, rotation * 0.5)
+        swerve.setDriveSpeeds(position.second, position.first, rotation * 0.5)
     }
 
     override fun name(): String = "PadDrive"
 
-    override fun requirements(): Set<Mechanism> = setOf(Swerve)
+    override fun requirements(): Set<Mechanism> = setOf(swerve)
 
     companion object {
         /**
