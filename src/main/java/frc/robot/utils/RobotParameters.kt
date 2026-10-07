@@ -38,6 +38,8 @@ object RobotParameters {
         const val PIDGEY_ID: Int = 13
         const val INTAKING_MOTOR_ID: Int = 14
         const val INTAKE_PIVOT_MOTOR_ID: Int = 15
+        const val SHOOTER_TOP_MOTOR_ID: Int = 16
+        const val SHOOTER_BOTTOM_MOTOR_ID: Int = 17
         val SWERVE_CANBUS_ID: CANPort = CANPort.CAN_D0
     }
 
@@ -56,6 +58,13 @@ object RobotParameters {
         val pivotMotor: Int = CANBusParameters.INTAKE_PIVOT_MOTOR_ID
         val PIVOT_GEAR_RATIO: Double = 150.0 / 7.0
         val PIVOT_CANPORT: CANPort = CANPort.CAN_D1
+    }
+
+    object ShooterParameters {
+        val shooterTopMotor: Int = CANBusParameters.SHOOTER_TOP_MOTOR_ID
+        val shooterBottomMotor: Int = CANBusParameters.SHOOTER_BOTTOM_MOTOR_ID
+        val SHOOTER_GEAR_RATIO: Double = 1.0
+        val SHOOTER_CANPORT: CANPort = CANPort.CAN_D1
     }
 
     /** Class containing global values related to the swerve drive system.  */

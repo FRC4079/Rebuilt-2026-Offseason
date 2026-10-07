@@ -1,5 +1,7 @@
 package frc.robot
 
+import frc.robot.subsystems.drive.complex.Drive
+import frc.robot.subsystems.drive.simple.Swerve
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
@@ -64,6 +66,7 @@ class Robot : LoggedRobot() {
      */
     override fun robotPeriodic() {
         Scheduler.getDefault().run()
+        Swerve.periodic()
     }
 
     /** This autonomous runs the autonomous command selected by your [RobotContainer] class.  */

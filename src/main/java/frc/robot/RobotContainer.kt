@@ -1,7 +1,10 @@
 package frc.robot
 
+import frc.robot.commands.PadDrive
+import frc.robot.subsystems.drive.simple.Swerve
 import org.wpilib.command3.Command
 import org.wpilib.driverstation.Gamepad
+import org.wpilib.driverstation.XboxController
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -10,13 +13,13 @@ import org.wpilib.driverstation.Gamepad
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 class RobotContainer {
-    val pad: Gamepad = Gamepad(0)
+    val pad: XboxController = XboxController(0)
 
     var autonomous: Command? = null
 
     /** The container for the robot. Contains subsystems, IO devices, and commands.  */
     init {
-//        Swerve.defaultCommand = drive(pad)
+        Swerve.defaultCommand = PadDrive(pad)
         configureBindings()
     }
 
