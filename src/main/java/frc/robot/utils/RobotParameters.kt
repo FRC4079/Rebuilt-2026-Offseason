@@ -2,6 +2,7 @@ package frc.robot.utils
 
 import com.ctre.phoenix6.signals.InvertedValue
 import frc.robot.utils.RobotParameters.CANBusParameters.SWERVE_CANBUS_ID
+import org.wpilib.hardware.bus.CAN
 import org.wpilib.hardware.bus.CANPort
 import org.wpilib.math.controller.PIDController
 import org.wpilib.math.controller.SimpleMotorFeedforward
@@ -40,6 +41,8 @@ object RobotParameters {
         const val INTAKE_PIVOT_MOTOR_ID: Int = 15
         const val SHOOTER_TOP_MOTOR_ID: Int = 16
         const val SHOOTER_BOTTOM_MOTOR_ID: Int = 17
+        const val INDEXER_MOTOR_ID: Int = 18
+        const val HOPPER_MOTOR_ID: Int = 19
         val SWERVE_CANBUS_ID: CANPort = CANPort.CAN_D0
     }
 
@@ -65,6 +68,15 @@ object RobotParameters {
         val shooterBottomMotor: Int = CANBusParameters.SHOOTER_BOTTOM_MOTOR_ID
         val SHOOTER_GEAR_RATIO: Double = 1.0
         val SHOOTER_CANPORT: CANPort = CANPort.CAN_D1
+    }
+
+    object TransportParameters {
+        var indexerMotor : Int = CANBusParameters.INDEXER_MOTOR_ID
+        val INDEXER_GEAR_RATIO: Double = 1.0
+        val hopperMotor: Int = CANBusParameters.HOPPER_MOTOR_ID
+        val HOPPER_GEAR_RATIO: Double = 1.0 //TODO: set HOPPER_GEAR_RATIO and other gear ratios to real value
+        val HOPPER_CANPORT: CANPort = CANPort.CAN_D1
+        val INDEXER_CANPORT: CANPort = CANPort.CAN_D1
     }
 
     /** Class containing global values related to the swerve drive system.  */
