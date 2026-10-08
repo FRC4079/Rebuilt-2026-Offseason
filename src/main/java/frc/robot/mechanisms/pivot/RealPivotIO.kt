@@ -29,11 +29,11 @@ class RealPivotIO : PivotIO {
         pivotConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive
 
         pivotConfig.Slot0 = Slot0Configs().withKP(0.0).withKI(0.0).withKD(0.0)
-        pivotConfig.Feedback.SensorToMechanismRatio = SwerveParameters.PhysicalParameters.DRIVE_MOTOR_GEAR_RATIO
+        pivotConfig.Feedback.SensorToMechanismRatio = PivotParameters.PIVOT_GEAR_RATIO
 
-        pivotConfig.TorqueCurrent.PeakForwardTorqueCurrent = SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
-        pivotConfig.TorqueCurrent.PeakReverseTorqueCurrent = -SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
-        pivotConfig.CurrentLimits.StatorCurrentLimit = SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
+        pivotConfig.TorqueCurrent.PeakForwardTorqueCurrent = PivotParameters.PhysicalParameters.PIVOT_CURRENT_LIMIT
+        pivotConfig.TorqueCurrent.PeakReverseTorqueCurrent = -PivotParameters.PhysicalParameters.PIVOT_CURRENT_LIMIT
+        pivotConfig.CurrentLimits.StatorCurrentLimit = PivotParameters.PhysicalParameters.PIVOT_CURRENT_LIMIT
         pivotConfig.CurrentLimits.StatorCurrentLimitEnable = true
 
         pivotConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02
