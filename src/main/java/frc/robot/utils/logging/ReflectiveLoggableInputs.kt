@@ -42,9 +42,8 @@ abstract class ReflectiveLoggableInputs : LoggableInputs {
     override fun fromLog(table: LogTable) {
         for (prop in properties) {
             val key = prop.name.replaceFirstChar { it.uppercase() }
-            val current = prop.get(this)
             val updated: Any? =
-                when (current) {
+                when (val current = prop.get(this)) {
                     is Boolean -> table.get(key, current)
                     is Int -> table.get(key, current)
                     is Long -> table.get(key, current)
