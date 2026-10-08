@@ -1,5 +1,7 @@
 package frc.robot
 
+import com.ctre.phoenix6.CANBus
+import com.ctre.phoenix6.hardware.TalonFX
 import frc.robot.commands.PadDrive
 import frc.robot.mechanisms.drive.Swerve
 import frc.robot.mechanisms.drive.gyro.RealGyroIO
@@ -8,6 +10,7 @@ import frc.robot.mechanisms.drive.module.RealModuleIO
 import frc.robot.utils.RobotParameters
 import org.wpilib.command3.Command
 import org.wpilib.driverstation.XboxController
+import org.wpilib.hardware.bus.CANPort
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

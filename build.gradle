@@ -39,6 +39,7 @@ deploy {
                 wpilibJava(getArtifactTypeClass('WPILibJavaArtifact')) {
                     // Set to true to use debug including JNI, which will drastically impact performance.
                     debugJni = false
+                    jvmArgs.add("--enable-preview")
                 }
 
                 // Static files artifact

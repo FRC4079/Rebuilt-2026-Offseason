@@ -58,22 +58,22 @@ class SwerveModule(
 
     private val driveDisconnectedAlert =
         Alert(
-            "Swerve Module Alerts",
             "Disconnected drive motor on module $index.",
+            "Swerve Module $index Alerts",
             Alert.Level.HIGH,
         )
 
     private val turnDisconnectedAlert =
         Alert(
-            "Swerve Module Alerts",
             "Disconnected turn motor on module $index.",
+            "Swerve Module $index Alerts",
             Alert.Level.HIGH,
         )
 
     private val turnEncoderDisconnectedAlert =
         Alert(
-            "Swerve Module Alerts",
             "Disconnected turn encoder on module $index.",
+            "Swerve Module $index Alerts",
             Alert.Level.HIGH,
         )
 
