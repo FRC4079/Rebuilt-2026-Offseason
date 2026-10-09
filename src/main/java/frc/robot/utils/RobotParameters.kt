@@ -46,12 +46,12 @@ object RobotParameters {
         const val SHOOTER_RIGHT_MOTOR_ID: Int = 17
         const val INDEXER_MOTOR_ID: Int = 18
         const val TRANSPORT_MOTOR_ID: Int = 19
-        val SWERVE_CANBUS_ID: CANPort = CANPort.CAN_D0
+        val SWERVE_CANBUS_ID: CANPort = CANPort.CAN_S0
     }
 
     object IntakeParameters {
         val intakeMotor: Int = CANBusParameters.INTAKING_MOTOR_ID
-        val INTAKE_CANPORT: CANPort = CANPort.CAN_D0
+        val INTAKE_CANPORT: CANPort = CANPort.CAN_S1
 
         object PhysicalParameters {
             // TODO: set INTAKE_GEAR_RATIO and INTAKE_CURRENT_LIMIT to real value
@@ -63,7 +63,7 @@ object RobotParameters {
     object PivotParameters {
         val pivotMotor: Int = CANBusParameters.INTAKE_PIVOT_MOTOR_ID
         val PIVOT_GEAR_RATIO: Double = 150.0 / 7.0
-        val PIVOT_CANPORT: CANPort = CANPort.CAN_D1
+        val PIVOT_CANPORT: CANPort = CANPort.CAN_S1
         object PhysicalParameters {
             // TODO: set PIVOT_CURRENT_LIMIT to real value
             const val PIVOT_CURRENT_LIMIT: Double = 0.0
@@ -74,7 +74,7 @@ object RobotParameters {
         val shooterLeftMotor: Int = CANBusParameters.SHOOTER_LEFT_MOTOR_ID
         val shooterRightMotor: Int = CANBusParameters.SHOOTER_RIGHT_MOTOR_ID
         val SHOOTER_GEAR_RATIO: Double = 1.0
-        val SHOOTER_CANPORT: CANPort = CANPort.CAN_D1
+        val SHOOTER_CANPORT: CANPort = CANPort.CAN_S1
     }
 
     object TransportParameters {
@@ -82,8 +82,8 @@ object RobotParameters {
         val INDEXER_GEAR_RATIO: Double = 1.0
         val hopperMotor: Int = CANBusParameters.TRANSPORT_MOTOR_ID
         val HOPPER_GEAR_RATIO: Double = 1.0 //TODO: set HOPPER_GEAR_RATIO and other gear ratios to real value
-        val HOPPER_CANPORT: CANPort = CANPort.CAN_D1
-        val INDEXER_CANPORT: CANPort = CANPort.CAN_D1
+        val HOPPER_CANPORT: CANPort = CANPort.CAN_S1
+        val INDEXER_CANPORT: CANPort = CANPort.CAN_S1
     }
 
     /** Class containing global values related to the swerve drive system.  */
