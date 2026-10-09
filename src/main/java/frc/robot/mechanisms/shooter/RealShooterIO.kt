@@ -20,8 +20,8 @@ import org.wpilib.units.measure.Current
 import org.wpilib.units.measure.Voltage
 
 class RealShooterIO : ShooterIO {
-    private val shooterTopTalon = TalonFX(ShooterParameters.shooterTopMotor, CANBus(ShooterParameters.SHOOTER_CANPORT))
-    private val shooterBottomTalon = TalonFX(ShooterParameters.shooterBottomMotor, CANBus(ShooterParameters.SHOOTER_CANPORT))
+    private val shooterTopTalon = TalonFX(ShooterParameters.shooterLeftMotor, CANBus(ShooterParameters.SHOOTER_CANPORT))
+    private val shooterBottomTalon = TalonFX(ShooterParameters.shooterRightMotor, CANBus(ShooterParameters.SHOOTER_CANPORT))
 
     private val topConfig = TalonFXConfiguration()
     private val bottomConfig = TalonFXConfiguration()

@@ -2,7 +2,6 @@ package frc.robot.utils
 
 import com.ctre.phoenix6.signals.InvertedValue
 import frc.robot.utils.RobotParameters.CANBusParameters.SWERVE_CANBUS_ID
-import org.wpilib.hardware.bus.CAN
 import org.wpilib.hardware.bus.CANPort
 import org.wpilib.math.controller.PIDController
 import org.wpilib.math.controller.SimpleMotorFeedforward
@@ -24,6 +23,7 @@ object RobotParameters {
     /** Class containing global values related to motors.  */
     object CANBusParameters {
         // Motor CAN ID Values
+        // TODO: HOOD MOTOR
         const val FRONT_LEFT_STEER_ID: Int = 1
         const val FRONT_LEFT_DRIVE_ID: Int = 2
         const val FRONT_RIGHT_STEER_ID: Int = 3
@@ -39,10 +39,10 @@ object RobotParameters {
         const val PIDGEY_ID: Int = 13
         const val INTAKING_MOTOR_ID: Int = 14
         const val INTAKE_PIVOT_MOTOR_ID: Int = 15
-        const val SHOOTER_TOP_MOTOR_ID: Int = 16
-        const val SHOOTER_BOTTOM_MOTOR_ID: Int = 17
+        const val SHOOTER_LEFT_MOTOR_ID: Int = 16
+        const val SHOOTER_RIGHT_MOTOR_ID: Int = 17
         const val INDEXER_MOTOR_ID: Int = 18
-        const val HOPPER_MOTOR_ID: Int = 19
+        const val TRANSPORT_MOTOR_ID: Int = 19
         val SWERVE_CANBUS_ID: CANPort = CANPort.CAN_D0
     }
 
@@ -68,8 +68,8 @@ object RobotParameters {
     }
 
     object ShooterParameters {
-        val shooterTopMotor: Int = CANBusParameters.SHOOTER_TOP_MOTOR_ID
-        val shooterBottomMotor: Int = CANBusParameters.SHOOTER_BOTTOM_MOTOR_ID
+        val shooterLeftMotor: Int = CANBusParameters.SHOOTER_LEFT_MOTOR_ID
+        val shooterRightMotor: Int = CANBusParameters.SHOOTER_RIGHT_MOTOR_ID
         val SHOOTER_GEAR_RATIO: Double = 1.0
         val SHOOTER_CANPORT: CANPort = CANPort.CAN_D1
     }
@@ -77,7 +77,7 @@ object RobotParameters {
     object TransportParameters {
         var indexerMotor : Int = CANBusParameters.INDEXER_MOTOR_ID
         val INDEXER_GEAR_RATIO: Double = 1.0
-        val hopperMotor: Int = CANBusParameters.HOPPER_MOTOR_ID
+        val hopperMotor: Int = CANBusParameters.TRANSPORT_MOTOR_ID
         val HOPPER_GEAR_RATIO: Double = 1.0 //TODO: set HOPPER_GEAR_RATIO and other gear ratios to real value
         val HOPPER_CANPORT: CANPort = CANPort.CAN_D1
         val INDEXER_CANPORT: CANPort = CANPort.CAN_D1
