@@ -59,7 +59,12 @@ class RealModuleIO(
     init {
         // Configure drive motor
         driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake
-        driveConfig.Slot0 = Slot0Configs().withKP(0.0).withKI(0.0).withKD(0.0)
+        driveConfig.Slot0 =
+            Slot0Configs()
+                .withKP(SwerveParameters.PIDParameters.DRIVE_PID_TELE.p)
+                .withKI(SwerveParameters.PIDParameters.DRIVE_PID_TELE.i)
+                .withKD(SwerveParameters.PIDParameters.DRIVE_PID_TELE.d)
+
         driveConfig.Feedback.SensorToMechanismRatio = SwerveParameters.PhysicalParameters.DRIVE_MOTOR_GEAR_RATIO
         driveConfig.TorqueCurrent.PeakForwardTorqueCurrent = SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
         driveConfig.TorqueCurrent.PeakReverseTorqueCurrent = -SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
@@ -76,7 +81,12 @@ class RealModuleIO(
 
         // Configure turn motor
         turnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake
-        turnConfig.Slot0 = Slot0Configs().withKP(0.0).withKI(0.0).withKD(0.0)
+        turnConfig.Slot0 =
+            Slot0Configs()
+                .withKP(SwerveParameters.PIDParameters.STEER_PID_TELE.p)
+                .withKI(SwerveParameters.PIDParameters.STEER_PID_TELE.i)
+                .withKD(SwerveParameters.PIDParameters.STEER_PID_TELE.d)
+
         turnConfig.Feedback.FeedbackRemoteSensorID = config.encoderID
         turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder
         turnConfig.Feedback.RotorToSensorRatio = SwerveParameters.PhysicalParameters.STEER_MOTOR_GEAR_RATIO

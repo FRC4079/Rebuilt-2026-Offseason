@@ -26,7 +26,7 @@ class Robot : LoggedRobot() {
     }
 
     private var autonomousCommand: Command? = null
-    private var robotContainer: RobotContainer? = null
+    private var robotContainer: RobotContainer = RobotContainer()
 
     /*
      * Use for any initialization code.
@@ -65,6 +65,8 @@ class Robot : LoggedRobot() {
      */
     override fun robotPeriodic() {
         Scheduler.getDefault().run()
+
+        robotContainer.swerve.periodic()
     }
 
     /** This autonomous runs the autonomous command selected by your [RobotContainer] class.  */
