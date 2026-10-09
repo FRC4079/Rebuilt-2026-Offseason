@@ -27,18 +27,18 @@ class RobotContainer {
             .map { config -> RealModuleIO(config) }
             .toTypedArray()
 
-//    val swerve: Swerve = Swerve(moduleIOs, RealGyroIO)
+    val swerve: Swerve = Swerve(moduleIOs, RealGyroIO)
 
     var autonomous: Command? = null
 
     /** The container for the robot. Contains subsystems, IO devices, and commands.  */
     init {
-//        swerve.defaultCommand = PadDrive(swerve, pad)
-        val test : TalonFX = TalonFX(2, CANBus(CANPort.CAN_S0))
-
-
-
-        test.setVoltage(5.0)
+        swerve.defaultCommand = PadDrive(swerve, pad)
+//        val test : TalonFX = TalonFX(2, CANBus(CANPort.CAN_S0))
+//
+//
+//
+//        test.setVoltage(5.0)
         configureBindings()
     }
 

@@ -7,8 +7,10 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration
 import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC
+import com.ctre.phoenix6.controls.PositionVoltage
 import com.ctre.phoenix6.controls.TorqueCurrentFOC
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC
+import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.hardware.CANcoder
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
@@ -37,9 +39,9 @@ class RealModuleIO(
     private val driveConfig = TalonFXConfiguration()
     private val turnConfig = TalonFXConfiguration()
 
-    private val torqueCurrentRequest = TorqueCurrentFOC(0.0).withUpdateFreqHz(0.0)
-    private val positionTorqueCurrentRequest = PositionTorqueCurrentFOC(0.0).withUpdateFreqHz(0.0)
-    private val velocityTorqueCurrentRequest = VelocityTorqueCurrentFOC(0.0).withUpdateFreqHz(0.0)
+    private val torqueCurrentRequest = VelocityVoltage(0.0).withUpdateFreqHz(0.0)
+    private val positionTorqueCurrentRequest = PositionVoltage(0.0).withUpdateFreqHz(0.0)
+    private val velocityTorqueCurrentRequest = VelocityVoltage(0.0).withUpdateFreqHz(0.0)
 
     private val drivePosition: StatusSignal<Angle>
     private val driveVelocity: StatusSignal<AngularVelocity>
@@ -76,7 +78,7 @@ class RealModuleIO(
         turnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake
         turnConfig.Slot0 = Slot0Configs().withKP(0.0).withKI(0.0).withKD(0.0)
         turnConfig.Feedback.FeedbackRemoteSensorID = config.encoderID
-        turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder
+        turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder
         turnConfig.Feedback.RotorToSensorRatio = SwerveParameters.PhysicalParameters.STEER_MOTOR_GEAR_RATIO
         turnConfig.ClosedLoopGeneral.ContinuousWrap = true
         turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = SwerveParameters.PhysicalParameters.STEER_CURRENT_LIMIT
@@ -191,11 +193,11 @@ class RealModuleIO(
     }
 
     override fun runDriveOpenLoop(output: Double) {
-        driveTalon.setControl(torqueCurrentRequest.withOutput(output))
+        driveTalon.setControl(torqueCurrentRequest.withVelocity(output))
     }
 
     override fun runTurnOpenLoop(output: Double) {
-        turnTalon.setControl(torqueCurrentRequest.withOutput(output))
+        turnTalon.setControl(torqueCurrentRequest.withVelocity(output))
     }
 
     override fun runDriveVelocity(
