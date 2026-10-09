@@ -18,6 +18,10 @@ class SwerveModule(
     private val io: ModuleIO,
     private val index: Int,
 ) {
+    private val driveDisconnectedAlert: Alert
+    private val turnDisconnectedAlert: Alert
+    private val turnEncoderDisconnectedAlert: Alert
+
     private val inputs = ModuleIOInputsAutoLogged()
 
     private val driveP =
@@ -56,28 +60,30 @@ class SwerveModule(
     private val turnMotorConnectedDebouncer = Debouncer(0.5, Debouncer.DebounceType.FALLING)
     private val turnEncoderConnectedDebouncer = Debouncer(0.5, Debouncer.DebounceType.FALLING)
 
-    private val driveDisconnectedAlert =
-        Alert(
-            "Disconnected drive motor on module $index.",
-            "Swerve Module $index Alerts",
-            Alert.Level.HIGH,
-        )
-
-    private val turnDisconnectedAlert =
-        Alert(
-            "Disconnected turn motor on module $index.",
-            "Swerve Module $index Alerts",
-            Alert.Level.HIGH,
-        )
-
-    private val turnEncoderDisconnectedAlert =
-        Alert(
-            "Disconnected turn encoder on module $index.",
-            "Swerve Module $index Alerts",
-            Alert.Level.HIGH,
-        )
-
     private var odometryPositions: Array<SwerveModulePosition?> = arrayOf()
+
+    init {
+        driveDisconnectedAlert =
+            Alert(
+                "Disconnected drive motor on module $index.",
+                "Swerve Module $index Alerts",
+                Alert.Level.HIGH,
+            )
+
+        turnDisconnectedAlert =
+            Alert(
+                "Disconnected turn motor on module $index.",
+                "Swerve Module $index Alerts",
+                Alert.Level.HIGH,
+            )
+
+        turnEncoderDisconnectedAlert =
+            Alert(
+                "Disconnected turn encoder on module $index.",
+                "Swerve Module $index Alerts",
+                Alert.Level.HIGH,
+            )
+    }
 
     fun updateInputs() {
         io.updateInputs(inputs)

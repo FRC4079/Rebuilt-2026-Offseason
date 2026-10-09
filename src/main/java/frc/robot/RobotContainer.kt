@@ -1,17 +1,20 @@
 package frc.robot
 
-import com.ctre.phoenix6.CANBus
-import com.ctre.phoenix6.ffi.CANBusNative
-import com.ctre.phoenix6.hardware.TalonFX
 import frc.robot.commands.PadDrive
+import frc.robot.mechanisms.Vision
 import frc.robot.mechanisms.drive.Swerve
 import frc.robot.mechanisms.drive.gyro.RealGyroIO
 import frc.robot.mechanisms.drive.module.ModuleIO
 import frc.robot.mechanisms.drive.module.RealModuleIO
+import frc.robot.mechanisms.hood.Hood
+import frc.robot.mechanisms.intake.IntakeIO
+import frc.robot.mechanisms.pivot.Pivot
+import frc.robot.mechanisms.shooter.Shooter
+import frc.robot.mechanisms.transport.Transport
 import frc.robot.utils.RobotParameters
 import org.wpilib.command3.Command
 import org.wpilib.driverstation.XboxController
-import org.wpilib.hardware.bus.CANPort
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -30,6 +33,12 @@ class RobotContainer {
     val swerve: Swerve = Swerve(moduleIOs, RealGyroIO)
 
     var autonomous: Command? = null
+
+    private val intake: Int? = null
+    private val transport: Transport? = null
+    private val shooter: Shooter? = null
+    private val pivot: Pivot? = null
+    private val vision: Vision? = null
 
     /** The container for the robot. Contains subsystems, IO devices, and commands.  */
     init {

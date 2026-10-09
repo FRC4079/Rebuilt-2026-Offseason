@@ -26,13 +26,14 @@ class Robot : LoggedRobot() {
     }
 
     private var autonomousCommand: Command? = null
-    private var robotContainer: RobotContainer = RobotContainer()
+    private var robotContainer: RobotContainer? = null
+    var isRealRunMode: Boolean = true
 
     /*
      * Use for any initialization code.
      */
     init {
-        Logger.recordMetadata("Reefscape", "Logging") // Set a metadata value
+        Logger.recordMetadata("Rebuilt", "Logging") // Set a metadata value
 
         if (isReal()) {
             // Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
@@ -66,7 +67,7 @@ class Robot : LoggedRobot() {
     override fun robotPeriodic() {
         Scheduler.getDefault().run()
 
-        robotContainer.swerve.periodic()
+        robotContainer?.swerve?.periodic()
     }
 
     /** This autonomous runs the autonomous command selected by your [RobotContainer] class.  */
