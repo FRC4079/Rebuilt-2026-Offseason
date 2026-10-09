@@ -26,7 +26,7 @@ object RobotParameters {
     /** Class containing global values related to motors.  */
     object CANBusParameters {
         // Motor CAN ID Values
-        // TODO: HOOD MOTOR
+        const val HOOD_MOTOR_ID: Int = 20
         const val FRONT_LEFT_STEER_ID: Int = 1
         const val FRONT_LEFT_DRIVE_ID: Int = 2
         const val FRONT_RIGHT_STEER_ID: Int = 3
@@ -75,6 +75,17 @@ object RobotParameters {
         val shooterRightMotor: Int = CANBusParameters.SHOOTER_RIGHT_MOTOR_ID
         val SHOOTER_GEAR_RATIO: Double = 1.0
         val SHOOTER_CANPORT: CANPort = CANPort.CAN_S1
+        object PhysicalParameters {
+            const val SHOOTER_CURRENT_LIMIT: Double = 40.0
+        }
+    }
+    object HoodParameters {
+        val hoodMotor: Int = CANBusParameters.HOOD_MOTOR_ID
+        val HOOD_GEAR_RATIO: Double = 1.0
+        val HOOD_CANPORT: CANPort = CANPort.CAN_D1
+        object PhysicalParameters {
+            const val HOOD_CURRENT_LIMIT: Double = 20.0
+        }
     }
 
     object TransportParameters {
