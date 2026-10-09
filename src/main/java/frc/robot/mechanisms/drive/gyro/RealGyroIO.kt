@@ -24,8 +24,14 @@ object RealGyroIO : GyroIO {
     private val rollVelocity: StatusSignal<AngularVelocity?> = pigeon.angularVelocityYWorld
 
     init {
-        pigeon.configurator.apply(Pigeon2Configuration())
-        pigeon.configurator.setYaw(0.0)
+
+        for (i in 0..4) {
+            if (pigeon.configurator.apply(Pigeon2Configuration(), 0.25).isOK) break
+        }
+
+        for (i in 0..4) {
+            if (pigeon.configurator.apply(Pigeon2Configuration(), 0.25).isOK) break
+        }
 
         BaseStatusSignal.setUpdateFrequencyForAll(
             50.0,

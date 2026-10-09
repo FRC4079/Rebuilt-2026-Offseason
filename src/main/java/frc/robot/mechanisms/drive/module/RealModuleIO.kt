@@ -65,8 +65,12 @@ class RealModuleIO(
         driveConfig.CurrentLimits.StatorCurrentLimitEnable = true
         driveConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02
 
-        driveTalon.configurator.apply(driveConfig, 0.25)
-        driveTalon.setPosition(0.0, 0.25)
+        for (i in 0..4) {
+            if (driveTalon.configurator.apply(driveConfig, 0.25).isOK) break
+        }
+        for (i in 0..4) {
+            if (driveTalon.setPosition(0.0, 0.25).isOK) break
+        }
 
         // Configure turn motor
         turnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake
@@ -86,7 +90,9 @@ class RealModuleIO(
                 InvertedValue.CounterClockwise_Positive
             }
 
-        turnTalon.configurator.apply(turnConfig, 0.25)
+        for (i in 0..4) {
+            if (turnTalon.configurator.apply(turnConfig, 0.25).isOK) break
+        }
 
         // Configure CANCoder
         val cancoderConfig = CANcoderConfiguration()
@@ -97,7 +103,10 @@ class RealModuleIO(
             } else {
                 SensorDirectionValue.CounterClockwise_Positive
             }
-        encoder.configurator.apply(cancoderConfig)
+
+        for (i in 0..4) {
+            if (encoder.configurator.apply(cancoderConfig, 0.25).isOK) break
+        }
 
         // Create drive status signals
         drivePosition = driveTalon.position
@@ -212,7 +221,9 @@ class RealModuleIO(
         driveConfig.Slot0.kP = kP
         driveConfig.Slot0.kI = kI
         driveConfig.Slot0.kD = kD
-        driveTalon.configurator.apply(driveConfig, 0.25)
+        for (i in 0..4) {
+            if (driveTalon.configurator.apply(driveConfig, 0.25).isOK) break
+        }
     }
 
     override fun setTurnPID(
@@ -223,20 +234,26 @@ class RealModuleIO(
         turnConfig.Slot0.kP = kP
         turnConfig.Slot0.kI = kI
         turnConfig.Slot0.kD = kD
-        turnTalon.configurator.apply(turnConfig, 0.25)
+        for (i in 0..4) {
+            if (turnTalon.configurator.apply(turnConfig, 0.25).isOK) break
+        }
     }
 
     override fun setBrakeMode(enabled: Boolean) {
         brakeModeExecutor.execute {
             synchronized(driveConfig) {
                 driveConfig.MotorOutput.NeutralMode = if (enabled) NeutralModeValue.Brake else NeutralModeValue.Coast
-                driveTalon.configurator.apply(driveConfig, 0.25)
+                for (i in 0..4) {
+                    if (driveTalon.configurator.apply(driveConfig, 0.25).isOK) break
+                }
             }
         }
         brakeModeExecutor.execute {
             synchronized(turnConfig) {
                 turnConfig.MotorOutput.NeutralMode = if (enabled) NeutralModeValue.Brake else NeutralModeValue.Coast
-                turnTalon.configurator.apply(turnConfig, 0.25)
+                for (i in 0..4) {
+                    if (turnTalon.configurator.apply(turnConfig, 0.25).isOK) break
+                }
             }
         }
     }
