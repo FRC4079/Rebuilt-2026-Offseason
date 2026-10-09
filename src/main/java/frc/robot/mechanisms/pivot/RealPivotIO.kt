@@ -9,10 +9,9 @@ import com.ctre.phoenix6.controls.PositionVoltage
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
+import com.ctre.phoenix6.StatusCode
 import frc.robot.utils.RobotParameters.PivotParameters
 import frc.robot.utils.RobotParameters.SwerveParameters
-import frc.robot.utils.phoenix.PhoenixUtils
-import frc.robot.utils.phoenix.PhoenixUtils.tryUntilOk
 import org.wpilib.math.util.Units
 import org.wpilib.units.measure.Angle
 
@@ -38,8 +37,12 @@ class RealPivotIO : PivotIO {
 
         pivotConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02
 
-        tryUntilOk(5) { pivotTalon.configurator.apply(pivotConfig, 0.25) }
-        tryUntilOk(5) { pivotTalon.setPosition(0.0, 0.25) }
+        for (i in 0..4) {
+            if (pivotTalon.configurator.apply(pivotConfig, 0.25).isOK) break
+        }
+        for (i in 0..4) {
+            if (pivotTalon.setPosition(0.0, 0.25).isOK) break
+        }
 
         // Configure pivot signal
         pivotPosition = pivotTalon.position
@@ -47,10 +50,7 @@ class RealPivotIO : PivotIO {
             50.0,
             pivotPosition,
         )
-        PhoenixUtils.registerSignals(
-            false,
-            pivotPosition,
-        )
+
     }
 
     override fun updateInputs(inputs: PivotIO.PivotIOInputs) {

@@ -2,17 +2,21 @@ package frc.robot.mechanisms.intake
 
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.CANBus
+import com.ctre.phoenix6.StatusCode
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
+import com.ctre.phoenix6.controls.DutyCycleOut
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC
+import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
+import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import frc.robot.utils.RobotParameters.IntakeParameters
-import frc.robot.utils.phoenix.PhoenixUtils
+import org.wpilib.math.util.Units
 import org.wpilib.units.measure.Angle
 import org.wpilib.units.measure.AngularVelocity
 import org.wpilib.units.measure.Current
@@ -44,8 +48,8 @@ class RealIntakeIO(
         intakeConfig.TorqueCurrent.PeakForwardTorqueCurrent = IntakeParameters.PhysicalParameters.INTAKE_CURRENT_LIMIT
         intakeConfig.TorqueCurrent.PeakReverseTorqueCurrent = -IntakeParameters.PhysicalParameters.INTAKE_CURRENT_LIMIT
 
-        PhoenixUtils.tryUntilOk(5) {
-            intakeMotor.configurator.apply(intakeConfig, 0.25)
+        for (i in 0..4) {
+            if (intakeMotor.configurator.apply(intakeConfig, 0.25).isOK) break
         }
 
         // TODO: set frequencyHz to real value
@@ -58,18 +62,9 @@ class RealIntakeIO(
             torqueCurrentSignal,
         )
 
-        PhoenixUtils.tryUntilOk(5) {
-            ParentDevice.optimizeBusUtilizationForAll(intakeMotor)
-        }
+        ParentDevice.optimizeBusUtilizationForAll(intakeMotor)
 
-        PhoenixUtils.registerSignals(
-            false,
-            positionSignal,
-            velocitySignal,
-            voltageSignal,
-            supplyCurrentSignal,
-            torqueCurrentSignal,
-        )
+
     }
 
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
@@ -107,8 +102,8 @@ class RealIntakeIO(
         intakeConfig.Slot0.kI = kI
         intakeConfig.Slot0.kD = kD
 
-        PhoenixUtils.tryUntilOk(5) {
-            intakeMotor.configurator.apply(intakeConfig, 0.25)
+        for (i in 0..4) {
+            if (intakeMotor.configurator.apply(intakeConfig, 0.25).isOK) break
         }
     }
 

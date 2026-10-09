@@ -17,16 +17,12 @@ import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import com.ctre.phoenix6.signals.SensorDirectionValue
 import frc.robot.utils.RobotParameters.SwerveParameters
-import frc.robot.utils.phoenix.PhoenixOdometryThread
-import frc.robot.utils.phoenix.PhoenixUtils
-import frc.robot.utils.phoenix.PhoenixUtils.tryUntilOk
 import org.wpilib.math.geometry.Rotation2d
 import org.wpilib.math.util.Units
 import org.wpilib.units.measure.Angle
 import org.wpilib.units.measure.AngularVelocity
 import org.wpilib.units.measure.Current
 import org.wpilib.units.measure.Voltage
-import java.util.Queue
 import java.util.concurrent.Executors
 
 class RealModuleIO(
@@ -46,7 +42,6 @@ class RealModuleIO(
     private val velocityTorqueCurrentRequest = VelocityTorqueCurrentFOC(0.0).withUpdateFreqHz(0.0)
 
     private val drivePosition: StatusSignal<Angle>
-    private val drivePositionQueue: Queue<Double>
     private val driveVelocity: StatusSignal<AngularVelocity>
     private val driveAppliedVolts: StatusSignal<Voltage>
     private val driveSupplyCurrentAmps: StatusSignal<Current>
@@ -54,7 +49,6 @@ class RealModuleIO(
 
     private val turnAbsolutePosition: StatusSignal<Angle>
     private val turnPosition: StatusSignal<Angle>
-    private val turnPositionQueue: Queue<Double>
     private val turnVelocity: StatusSignal<AngularVelocity>
     private val turnAppliedVolts: StatusSignal<Voltage>
     private val turnSupplyCurrentAmps: StatusSignal<Current>
@@ -71,8 +65,8 @@ class RealModuleIO(
         driveConfig.CurrentLimits.StatorCurrentLimitEnable = true
         driveConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02
 
-        tryUntilOk(5) { driveTalon.configurator.apply(driveConfig, 0.25) }
-        tryUntilOk(5) { driveTalon.setPosition(0.0, 0.25) }
+        driveTalon.configurator.apply(driveConfig, 0.25)
+        driveTalon.setPosition(0.0, 0.25)
 
         // Configure turn motor
         turnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake
@@ -92,7 +86,7 @@ class RealModuleIO(
                 InvertedValue.CounterClockwise_Positive
             }
 
-        tryUntilOk(5) { turnTalon.configurator.apply(turnConfig, 0.25) }
+        turnTalon.configurator.apply(turnConfig, 0.25)
 
         // Configure CANCoder
         val cancoderConfig = CANcoderConfiguration()
@@ -103,11 +97,10 @@ class RealModuleIO(
             } else {
                 SensorDirectionValue.CounterClockwise_Positive
             }
-        tryUntilOk(5) { encoder.configurator.apply(cancoderConfig) }
+        encoder.configurator.apply(cancoderConfig)
 
         // Create drive status signals
         drivePosition = driveTalon.position
-        drivePositionQueue = PhoenixOdometryThread.getInstance().registerSignal(driveTalon.position.clone())
         driveVelocity = driveTalon.velocity
         driveAppliedVolts = driveTalon.motorVoltage
         driveSupplyCurrentAmps = driveTalon.supplyCurrent
@@ -116,50 +109,44 @@ class RealModuleIO(
         // Create turn status signals
         turnAbsolutePosition = encoder.absolutePosition
         turnPosition = turnTalon.position
-        turnPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(turnTalon.position.clone())
         turnVelocity = turnTalon.velocity
         turnAppliedVolts = turnTalon.motorVoltage
         turnSupplyCurrentAmps = turnTalon.supplyCurrent
         turnTorqueCurrentAmps = turnTalon.torqueCurrent
 
-        // Configure periodic frames
-        BaseStatusSignal.setUpdateFrequencyForAll(
-            SwerveParameters.OdometryConfig.ODOMETRY_FREQUENCY,
-            drivePosition,
-            turnPosition,
-            turnAbsolutePosition,
-        )
         BaseStatusSignal.setUpdateFrequencyForAll(
             50.0,
-            driveVelocity,
-            driveAppliedVolts,
-            driveSupplyCurrentAmps,
-            driveTorqueCurrentAmps,
-            turnVelocity,
-            turnAppliedVolts,
-            turnSupplyCurrentAmps,
-            turnTorqueCurrentAmps,
-        )
-        tryUntilOk(5) { ParentDevice.optimizeBusUtilizationForAll(driveTalon, turnTalon, encoder) }
-
-        // Register signals for refresh
-        PhoenixUtils.registerSignals(
-            false,
             drivePosition,
             driveVelocity,
             driveAppliedVolts,
             driveSupplyCurrentAmps,
             driveTorqueCurrentAmps,
-            turnPosition,
             turnAbsolutePosition,
+            turnPosition,
             turnVelocity,
             turnAppliedVolts,
             turnSupplyCurrentAmps,
             turnTorqueCurrentAmps,
         )
+
+        ParentDevice.optimizeBusUtilizationForAll(driveTalon, turnTalon, encoder)
     }
 
     override fun updateInputs(inputs: ModuleIO.ModuleIOInputs) {
+        BaseStatusSignal.refreshAll(
+            drivePosition,
+            driveVelocity,
+            driveAppliedVolts,
+            driveSupplyCurrentAmps,
+            driveTorqueCurrentAmps,
+            turnAbsolutePosition,
+            turnPosition,
+            turnVelocity,
+            turnAppliedVolts,
+            turnSupplyCurrentAmps,
+            turnTorqueCurrentAmps,
+        )
+
         inputs.data.driveConnected =
             BaseStatusSignal.isAllGood(
                 drivePosition,
@@ -173,6 +160,7 @@ class RealModuleIO(
         inputs.data.driveAppliedVolts = driveAppliedVolts.valueAsDouble
         inputs.data.driveSupplyCurrentAmps = driveSupplyCurrentAmps.valueAsDouble
         inputs.data.driveTorqueCurrentAmps = driveTorqueCurrentAmps.valueAsDouble
+
         inputs.data.turnConnected =
             BaseStatusSignal.isAllGood(
                 turnPosition,
@@ -189,10 +177,8 @@ class RealModuleIO(
         inputs.data.turnSupplyCurrentAmps = turnSupplyCurrentAmps.valueAsDouble
         inputs.data.turnTorqueCurrentAmps = turnTorqueCurrentAmps.valueAsDouble
 
-        inputs.odometryDrivePositionsRad = drivePositionQueue.map { Units.rotationsToRadians(it) }.toDoubleArray()
-        inputs.odometryTurnPositions = turnPositionQueue.map { Rotation2d.fromRotations(it) }.toTypedArray()
-        drivePositionQueue.clear()
-        turnPositionQueue.clear()
+        inputs.odometryDrivePositionsRad = doubleArrayOf(inputs.data.drivePositionRad)
+        inputs.odometryTurnPositions = arrayOf(inputs.data.turnPosition)
     }
 
     override fun runDriveOpenLoop(output: Double) {
@@ -226,7 +212,7 @@ class RealModuleIO(
         driveConfig.Slot0.kP = kP
         driveConfig.Slot0.kI = kI
         driveConfig.Slot0.kD = kD
-        tryUntilOk(5) { driveTalon.configurator.apply(driveConfig, 0.25) }
+        driveTalon.configurator.apply(driveConfig, 0.25)
     }
 
     override fun setTurnPID(
@@ -237,20 +223,20 @@ class RealModuleIO(
         turnConfig.Slot0.kP = kP
         turnConfig.Slot0.kI = kI
         turnConfig.Slot0.kD = kD
-        tryUntilOk(5) { turnTalon.configurator.apply(turnConfig, 0.25) }
+        turnTalon.configurator.apply(turnConfig, 0.25)
     }
 
     override fun setBrakeMode(enabled: Boolean) {
         brakeModeExecutor.execute {
             synchronized(driveConfig) {
                 driveConfig.MotorOutput.NeutralMode = if (enabled) NeutralModeValue.Brake else NeutralModeValue.Coast
-                tryUntilOk(5) { driveTalon.configurator.apply(driveConfig, 0.25) }
+                driveTalon.configurator.apply(driveConfig, 0.25)
             }
         }
         brakeModeExecutor.execute {
             synchronized(turnConfig) {
                 turnConfig.MotorOutput.NeutralMode = if (enabled) NeutralModeValue.Brake else NeutralModeValue.Coast
-                tryUntilOk(5) { turnTalon.configurator.apply(turnConfig, 0.25) }
+                turnTalon.configurator.apply(turnConfig, 0.25)
             }
         }
     }

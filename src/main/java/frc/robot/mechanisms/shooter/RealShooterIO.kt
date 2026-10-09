@@ -2,6 +2,7 @@ package frc.robot.mechanisms.shooter
 
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.CANBus
+import com.ctre.phoenix6.StatusCode
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
@@ -11,13 +12,12 @@ import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import frc.robot.utils.RobotParameters.ShooterParameters
 import frc.robot.utils.RobotParameters.SwerveParameters
-import frc.robot.utils.phoenix.PhoenixUtils
-import frc.robot.utils.phoenix.PhoenixUtils.tryUntilOk
 import org.wpilib.math.util.Units
 import org.wpilib.units.measure.Angle
 import org.wpilib.units.measure.AngularVelocity
 import org.wpilib.units.measure.Current
 import org.wpilib.units.measure.Voltage
+import java.util.function.Supplier
 
 class RealShooterIO : ShooterIO {
     private val shooterTopTalon = TalonFX(ShooterParameters.shooterLeftMotor, CANBus(ShooterParameters.SHOOTER_CANPORT))
@@ -68,10 +68,19 @@ class RealShooterIO : ShooterIO {
 
         bottomConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02
 
-        tryUntilOk(5) { shooterTopTalon.configurator.apply(topConfig, 0.25) }
-        tryUntilOk(5) { shooterBottomTalon.configurator.apply(bottomConfig, 0.25) }
-        tryUntilOk(5) { shooterTopTalon.setPosition(0.0, 0.25) }
-        tryUntilOk(5) { shooterBottomTalon.setPosition(0.0, 0.25) }
+        var error = StatusCode.OK
+        for (i in 0..4) {
+            if (shooterTopTalon.configurator.apply(topConfig, 0.25).isOK) break
+        }
+        for (i in 0..4) {
+            if (shooterBottomTalon.configurator.apply(bottomConfig, 0.25).isOK) break
+        }
+        for (i in 0..4) {
+            if (shooterTopTalon.setPosition(0.0, 0.25).isOK) break
+        }
+        for (i in 0..4) {
+            if (shooterBottomTalon.setPosition(0.0, 0.25).isOK) break
+        }
 
         // Configure signals
         topPosition = shooterTopTalon.position
@@ -98,19 +107,7 @@ class RealShooterIO : ShooterIO {
             topTorqueCurrent,
             bottomTorqueCurrent,
         )
-        PhoenixUtils.registerSignals(
-            false,
-            topPosition,
-            bottomPosition,
-            topVelocity,
-            bottomVelocity,
-            topVoltage,
-            bottomVoltage,
-            topSupplyCurrent,
-            bottomSupplyCurrent,
-            topTorqueCurrent,
-            bottomTorqueCurrent,
-        )
+
     }
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
@@ -165,7 +162,11 @@ class RealShooterIO : ShooterIO {
     override fun setCurrentLimit(currentLimit: Int) {
         topConfig.CurrentLimits.StatorCurrentLimit = currentLimit.toDouble()
         bottomConfig.CurrentLimits.StatorCurrentLimit = currentLimit.toDouble()
-        tryUntilOk(5) { shooterTopTalon.configurator.apply(topConfig, 0.25) }
-        tryUntilOk(5) { shooterBottomTalon.configurator.apply(bottomConfig, 0.25) }
+        for (i in 0..4) {
+            if (shooterTopTalon.configurator.apply(topConfig, 0.25).isOK) break
+        }
+        for (i in 0..4) {
+            if (shooterBottomTalon.configurator.apply(bottomConfig, 0.25).isOK) break
+        }
     }
 }

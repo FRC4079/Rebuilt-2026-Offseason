@@ -5,7 +5,10 @@ import frc.robot.utils.RobotParameters.CANBusParameters.SWERVE_CANBUS_ID
 import org.wpilib.hardware.bus.CANPort
 import org.wpilib.math.controller.PIDController
 import org.wpilib.math.controller.SimpleMotorFeedforward
+import org.wpilib.math.geometry.Pose2d
+import org.wpilib.math.geometry.Pose3d
 import org.wpilib.math.geometry.Rotation2d
+import org.wpilib.math.geometry.Rotation3d
 import org.wpilib.math.geometry.Translation2d
 import org.wpilib.math.kinematics.SwerveDriveKinematics
 
@@ -251,13 +254,23 @@ object RobotParameters {
         }
     }
 
-    /** Class containing constants for the Photonvision subsystem.  */
-    object PhotonVisionConstants {
-        const val CAMERA_ONE_HEIGHT_METER: Double = 0.47
-        const val CAMERA_ONE_ANGLE_DEG: Double = 33.0
-        const val OFFSET_TOWARD_MID_LEFT: Double = -15.00
-        const val CAMERA_TWO_HEIGHT_METER: Double = 0.61
-        const val CAMERA_TWO_ANGLE_DEG: Double = 37.5
-        const val OFFSET_TOWARD_MID_RIGHT: Double = 15.0
+    /** Class containing constants for the Vision subsystem.  */
+    object VisionParameters {
+        data class CameraParameters(
+            val name: String,
+            val pose: Pose3d,
+            )
+
+        val CAMERAS: Array<CameraParameters> = arrayOf(
+            CameraParameters(
+                name = "shooterCamera",
+                pose = Pose3d(0.0, 0.0, 0.0, Rotation3d(0.0, 0.0, 0.0)),
+            ),
+            CameraParameters(
+                name = "frontCamera",
+                pose = Pose3d(0.0, 0.0, 0.0, Rotation3d(0.0, 0.0, 0.0)),
+            )
+        )
+
     }
 }

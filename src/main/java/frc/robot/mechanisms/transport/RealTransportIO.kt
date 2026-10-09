@@ -2,6 +2,7 @@ package frc.robot.mechanisms.transport
 
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.CANBus
+import com.ctre.phoenix6.StatusCode
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
@@ -12,8 +13,6 @@ import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import frc.robot.utils.RobotParameters.TransportParameters
 import frc.robot.utils.RobotParameters.SwerveParameters
-import frc.robot.utils.phoenix.PhoenixUtils
-import frc.robot.utils.phoenix.PhoenixUtils.tryUntilOk
 import org.wpilib.math.util.Units
 import org.wpilib.units.measure.Angle
 
@@ -45,7 +44,9 @@ class RealTransportIO (
         indexerConfig.CurrentLimits.StatorCurrentLimit = SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
         indexerConfig.CurrentLimits.StatorCurrentLimitEnable = true
 
-        tryUntilOk(5) { indexerTalon.configurator.apply(indexerConfig, 0.25) }
+        for (i in 0..4) {
+            if (indexerTalon.configurator.apply(indexerConfig, 0.25).isOK) break
+        }
 
         // Configure hopper motor ouughh...
         hopperConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake
@@ -60,7 +61,9 @@ class RealTransportIO (
         hopperConfig.CurrentLimits.StatorCurrentLimit = SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
         hopperConfig.CurrentLimits.StatorCurrentLimitEnable = true
 
-        tryUntilOk(5) { hopperTalon.configurator.apply(hopperConfig, 0.25) }
+        for (i in 0..4) {
+            if (hopperTalon.configurator.apply(hopperConfig, 0.25).isOK) break
+        }
 
         // Configure signals
         indexerPosition = indexerTalon.position
@@ -71,15 +74,9 @@ class RealTransportIO (
             hopperPosition,
         )
 
-        tryUntilOk(5) {
-            ParentDevice.optimizeBusUtilizationForAll(indexerTalon, hopperTalon)
-        }
+        ParentDevice.optimizeBusUtilizationForAll(indexerTalon, hopperTalon)
 
-        PhoenixUtils.registerSignals(
-            false,
-            indexerPosition,
-            hopperPosition
-        )
+
     }
 
     override fun updateInputs(inputs: TransportIO.TransportIOInputs) {
@@ -135,9 +132,9 @@ class RealTransportIO (
         hopperConfig.Slot0.kI = hopkI
         hopperConfig.Slot0.kD = hopkD
 
-        tryUntilOk(5) {
-            hopperTalon.configurator.apply(hopperConfig, 0.25)
-        }
+            for (i in 0..4) {
+                if (hopperTalon.configurator.apply(hopperConfig).isOK) break
+            }
     }
 
     override fun setIndexerPID(
@@ -148,8 +145,8 @@ class RealTransportIO (
         indexerConfig.Slot0.kP = indkP
         indexerConfig.Slot0.kI = indkI
         indexerConfig.Slot0.kD = indkD
-        tryUntilOk(5) {
-            indexerTalon.configurator.apply(indexerConfig, 0.25)
+        for (i in 0..4) {
+            if (indexerTalon.configurator.apply(indexerConfig, 0.25).isOK) break
         }
     }
 //

@@ -6,12 +6,9 @@ import frc.robot.mechanisms.drive.gyro.GyroIOInputsAutoLogged
 import frc.robot.mechanisms.drive.module.ModuleIO
 import frc.robot.mechanisms.drive.module.SwerveModule
 import frc.robot.utils.RobotParameters.SwerveParameters
-import frc.robot.utils.phoenix.PhoenixOdometryThread
 import org.littletonrobotics.junction.Logger
 import org.wpilib.command3.Command
 import org.wpilib.command3.Mechanism
-import org.wpilib.math.estimator.SwerveDrivePoseEstimator
-import org.wpilib.math.geometry.Pose2d
 import org.wpilib.math.geometry.Rotation2d
 import org.wpilib.math.kinematics.ChassisVelocities
 import org.wpilib.math.kinematics.SwerveModulePosition
@@ -26,20 +23,11 @@ class Swerve(
     private val gyroInputs = GyroIOInputsAutoLogged()
     private val modules: Array<SwerveModule> = initializeModules()
 
-    private val poseEstimator =
-        SwerveDrivePoseEstimator(
-            SwerveParameters.PhysicalParameters.kinematics,
-            Rotation2d.ZERO,
-            modulePositions,
-            Pose2d(),
-        )
-
     private var previousFieldRelVelocities = ChassisVelocities()
     private var setStates = Array(modules.size) { SwerveModuleVelocity() }
 
     init {
         gyroIO.reset()
-        PhoenixOdometryThread.getInstance().start()
     }
 
     private fun initializeModules(): Array<SwerveModule> =
@@ -60,10 +48,7 @@ class Swerve(
             module.periodic()
         }
 
-        poseEstimator.update(pidgeyRotation, modulePositions)
-
         RobotState.getInstance().addDriveSpeeds(autoSpeeds)
-        Logger.recordOutput("Swerve/Pose", poseEstimator.estimatedPosition)
         Logger.recordOutput("Swerve/States/Measured", SwerveModuleVelocity.struct, *moduleStates)
         Logger.recordOutput("Swerve/States/Setpoints", SwerveModuleVelocity.struct, *setStates)
 
@@ -78,7 +63,7 @@ class Swerve(
     ) {
         val speeds =
             if (isFieldOriented) {
-                ChassisVelocities(forwardSpeed, leftSpeed, turnSpeed).toRobotRelative(pidgeyRotation)
+                ChassisVelocities(forwardSpeed, leftSpeed, turnSpeed).toRobotRelative(gyroYaw)
             } else {
                 ChassisVelocities(forwardSpeed, leftSpeed, turnSpeed)
             }.discretize(LOOP_PERIOD_SECS)
@@ -96,31 +81,10 @@ class Swerve(
     }
 
     val fieldRelativeVelocity: ChassisVelocities
-        get() =
-            autoSpeeds.toFieldRelative(pidgeyRotation)
-    val pidgeyRotation: Rotation2d
+        get() = autoSpeeds.toFieldRelative(gyroYaw)
+
+    val gyroYaw: Rotation2d
         get() = gyroInputs.data.yawPosition
-
-    val pose: Pose2d
-        get() = poseEstimator.estimatedPosition
-
-    fun zeroPose() {
-        poseEstimator.resetPosition(
-            pidgeyRotation,
-            modulePositions,
-            Pose2d(),
-        )
-    }
-
-    fun newPose(pose: Pose2d?) {
-        if (pose == null) return
-
-        poseEstimator.resetPosition(
-            pidgeyRotation,
-            modulePositions,
-            pose,
-        )
-    }
 
     val autoSpeeds: ChassisVelocities
         get() = SwerveParameters.PhysicalParameters.kinematics.toChassisVelocities(*moduleStates)
@@ -147,7 +111,7 @@ class Swerve(
             RobotState.OdometryObservation(
                 timestamp = Timer.getTimestamp(),
                 wheelPositions = modulePositions,
-                yaw = Optional.of(pidgeyRotation),
+                yaw = Optional.of(gyroYaw),
             ),
         )
     }
