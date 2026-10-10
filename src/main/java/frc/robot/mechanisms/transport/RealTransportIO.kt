@@ -11,18 +11,17 @@ import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
+import frc.robot.utils.RobotParameters
 import frc.robot.utils.RobotParameters.TransportParameters
 import org.wpilib.math.util.Units
 import org.wpilib.units.measure.Angle
 
-class RealTransportIO (
-    config: TransportParameters
-) : TransportIO {
-    private val indexerTalon = TalonFX(config.indexerMotor, CANBus(config.INDEXER_CANPORT))
+class RealTransportIO () : TransportIO {
+    private val indexerTalon = TalonFX(RobotParameters.TransportParameters.indexerMotor, CANBus(RobotParameters.TransportParameters.INDEXER_CANPORT))
     private val indexerConfig = TalonFXConfiguration()
     private val indexerVelocityRequest: VelocityVoltage = VelocityVoltage(0.0).withSlot(0)
 
-    private val hopperTalon = TalonFX(config.hopperMotor, CANBus(config.HOPPER_CANPORT))
+    private val hopperTalon = TalonFX(RobotParameters.TransportParameters.hopperMotor, CANBus(RobotParameters.TransportParameters.HOPPER_CANPORT))
     private val hopperConfig = TalonFXConfiguration()
     private val hopperVelocityRequest: VelocityVoltage = VelocityVoltage(0.0).withSlot(0)
 

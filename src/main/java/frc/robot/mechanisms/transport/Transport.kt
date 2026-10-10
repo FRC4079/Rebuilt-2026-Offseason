@@ -36,4 +36,7 @@ class Transport (
 //        }
     }
 
+    fun setState(state: TransportIO.TransportState) {
+        inputs.data.transportState = state
+    }
 }

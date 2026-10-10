@@ -1,6 +1,7 @@
 package frc.robot
 
 import frc.robot.commands.PadDrive
+import frc.robot.commands.SimpleShoot
 import frc.robot.commands.SpinIntake
 import frc.robot.mechanisms.OdometrySupplier
 import frc.robot.mechanisms.Vision
@@ -9,14 +10,20 @@ import frc.robot.mechanisms.drive.gyro.RealGyroIO
 import frc.robot.mechanisms.drive.module.ModuleIO
 import frc.robot.mechanisms.drive.module.RealModuleIO
 import frc.robot.mechanisms.hood.Hood
+import frc.robot.mechanisms.hood.HoodIO
+import frc.robot.mechanisms.hood.RealHoodIO
 import frc.robot.mechanisms.intake.Intake
 import frc.robot.mechanisms.intake.IntakeIO
 import frc.robot.mechanisms.intake.RealIntakeIO
 import frc.robot.mechanisms.pivot.Pivot
 import frc.robot.mechanisms.pivot.PivotIO
 import frc.robot.mechanisms.pivot.RealPivotIO
+import frc.robot.mechanisms.shooter.RealShooterIO
 import frc.robot.mechanisms.shooter.Shooter
+import frc.robot.mechanisms.shooter.ShooterIO
+import frc.robot.mechanisms.transport.RealTransportIO
 import frc.robot.mechanisms.transport.Transport
+import frc.robot.mechanisms.transport.TransportIO
 import frc.robot.utils.RobotParameters
 import frc.robot.utils.enums.State
 import org.wpilib.command3.Command
@@ -42,14 +49,18 @@ class RobotContainer {
 
     val intakeIO: IntakeIO = RealIntakeIO()
     val pivotIO: PivotIO = RealPivotIO()
+    val shooterIO: ShooterIO = RealShooterIO()
+    val transportIO: TransportIO = RealTransportIO()
+    val hoodIO: HoodIO = RealHoodIO()
 
     // CREATE ALL SUBSYSTEMS HERE
 
     val swerve: Swerve = Swerve(moduleIOs, RealGyroIO)
     val intake: Intake = Intake(intakeIO)
     val pivot: Pivot = Pivot(pivotIO)
-
-
+    val shooter: Shooter = Shooter(shooterIO)
+    val transport: Transport = Transport(transportIO)
+    val hood: Hood = Hood(hoodIO)
 
     // VIRTUAL SUBSYSTEMS
     val vision: Vision = Vision(RobotParameters.VisionParameters.CAMERAS)
