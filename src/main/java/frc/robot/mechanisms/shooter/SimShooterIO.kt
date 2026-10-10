@@ -78,7 +78,11 @@ class SimShooterIO : ShooterIO {
     override fun setShooterState(state: ShooterIO.ShooterState) {
         closedLoop = true
         targetVelocityRadPerSec = state.velocityRadPerSec
-        // For simplicity in sim, we just track the target
+    }
+
+    override fun setVelocity(velocityRadPerSec: Double) {
+        closedLoop = true
+        targetVelocityRadPerSec = velocityRadPerSec
     }
 
     override fun disablePower() {

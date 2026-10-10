@@ -2,21 +2,16 @@ package frc.robot.mechanisms.intake
 
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.CANBus
-import com.ctre.phoenix6.StatusCode
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
-import com.ctre.phoenix6.controls.DutyCycleOut
-import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC
+import com.ctre.phoenix6.controls.PositionVoltage
 import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
-import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import frc.robot.utils.RobotParameters.IntakeParameters
-import org.wpilib.math.util.Units
 import org.wpilib.units.measure.Angle
 import org.wpilib.units.measure.AngularVelocity
 import org.wpilib.units.measure.Current
@@ -28,9 +23,9 @@ class RealIntakeIO(
     private val intakeMotor = TalonFX(config.intakeMotor, CANBus(config.INTAKE_CANPORT))
     private val intakeConfig = TalonFXConfiguration()
 
-    private val voltageControl = VoltageOut(0.0).withUpdateFreqHz(0.0)
-    private val positionControl = PositionTorqueCurrentFOC(0.0).withUpdateFreqHz(0.0)
-    private val velocityControl = VelocityTorqueCurrentFOC(0.0).withUpdateFreqHz(0.0)
+    private val voltageControl = VoltageOut(0.0)
+    private val positionControl = PositionVoltage(0.0).withSlot(0)
+    private val velocityControl = VelocityVoltage(0.0).withSlot(0)
 
     private val positionSignal: StatusSignal<Angle> = intakeMotor.position
     private val velocitySignal: StatusSignal<AngularVelocity> = intakeMotor.velocity
@@ -40,13 +35,18 @@ class RealIntakeIO(
 
     init {
         intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast
-        intakeConfig.Slot0 = Slot0Configs().withKP(0.0).withKI(0.0).withKD(0.0)
+        intakeConfig.Slot0 =
+            Slot0Configs()
+                .withKP(IntakeParameters.PIDParameters.INTAKE_PID.p)
+                .withKI(IntakeParameters.PIDParameters.INTAKE_PID.i)
+                .withKD(IntakeParameters.PIDParameters.INTAKE_PID.d)
 
         intakeConfig.Feedback.SensorToMechanismRatio = IntakeParameters.PhysicalParameters.INTAKE_GEAR_RATIO
-        intakeConfig.CurrentLimits.StatorCurrentLimit = IntakeParameters.PhysicalParameters.INTAKE_CURRENT_LIMIT
-        intakeConfig.CurrentLimits.StatorCurrentLimitEnable = true
         intakeConfig.TorqueCurrent.PeakForwardTorqueCurrent = IntakeParameters.PhysicalParameters.INTAKE_CURRENT_LIMIT
         intakeConfig.TorqueCurrent.PeakReverseTorqueCurrent = -IntakeParameters.PhysicalParameters.INTAKE_CURRENT_LIMIT
+        intakeConfig.CurrentLimits.StatorCurrentLimit = IntakeParameters.PhysicalParameters.INTAKE_CURRENT_LIMIT
+        intakeConfig.CurrentLimits.StatorCurrentLimitEnable = true
+        intakeConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02
 
         for (i in 0..4) {
             if (intakeMotor.configurator.apply(intakeConfig, 0.25).isOK) break
@@ -63,8 +63,6 @@ class RealIntakeIO(
         )
 
         ParentDevice.optimizeBusUtilizationForAll(intakeMotor)
-
-
     }
 
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {

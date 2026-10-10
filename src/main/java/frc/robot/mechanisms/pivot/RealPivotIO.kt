@@ -2,6 +2,7 @@ package frc.robot.mechanisms.pivot
 
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.CANBus
+import com.ctre.phoenix6.StatusCode
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
@@ -9,9 +10,9 @@ import com.ctre.phoenix6.controls.PositionVoltage
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
-import com.ctre.phoenix6.StatusCode
 import frc.robot.utils.RobotParameters.PivotParameters
 import frc.robot.utils.RobotParameters.SwerveParameters
+import org.wpilib.math.controller.PIDController
 import org.wpilib.math.util.Units
 import org.wpilib.units.measure.Angle
 
@@ -27,7 +28,11 @@ class RealPivotIO : PivotIO {
         pivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake
         pivotConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive
 
-        pivotConfig.Slot0 = Slot0Configs().withKP(0.0).withKI(0.0).withKD(0.0)
+        pivotConfig.Slot0 =
+            Slot0Configs()
+                .withKP(PivotParameters.PIDParameters.PIVOT_PID.p)
+                .withKI(PivotParameters.PIDParameters.PIVOT_PID.i)
+                .withKD(PivotParameters.PIDParameters.PIVOT_PID.d)
         pivotConfig.Feedback.SensorToMechanismRatio = PivotParameters.PIVOT_GEAR_RATIO
 
         pivotConfig.TorqueCurrent.PeakForwardTorqueCurrent = PivotParameters.PhysicalParameters.PIVOT_CURRENT_LIMIT
@@ -50,7 +55,6 @@ class RealPivotIO : PivotIO {
             50.0,
             pivotPosition,
         )
-
     }
 
     override fun updateInputs(inputs: PivotIO.PivotIOInputs) {

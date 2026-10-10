@@ -22,8 +22,6 @@ class RealHoodIO : HoodIO {
     private val hoodTalon = TalonFX(HoodParameters.hoodMotor, CANBus(HoodParameters.HOOD_CANPORT))
     private val hoodConfig = TalonFXConfiguration()
     private val hoodPositionRequest: PositionVoltage = PositionVoltage(0.0).withSlot(0)
-    private val openLoopRequest = DutyCycleOut(0.0).withUpdateFreqHz(0.0)
-
     private val hoodPosition: StatusSignal<Angle>
     private val hoodVelocity: StatusSignal<AngularVelocity>
     private val hoodVoltage: StatusSignal<Voltage>
@@ -34,7 +32,11 @@ class RealHoodIO : HoodIO {
         hoodConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake
         hoodConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive
 
-        hoodConfig.Slot0 = Slot0Configs().withKP(0.0).withKI(0.0).withKD(0.0)
+        hoodConfig.Slot0 =
+            Slot0Configs()
+                .withKP(HoodParameters.PIDParameters.HOOD_PID.p)
+                .withKI(HoodParameters.PIDParameters.HOOD_PID.i)
+                .withKD(HoodParameters.PIDParameters.HOOD_PID.d)
         hoodConfig.Feedback.SensorToMechanismRatio = HoodParameters.HOOD_GEAR_RATIO
 
         hoodConfig.TorqueCurrent.PeakForwardTorqueCurrent = HoodParameters.PhysicalParameters.HOOD_CURRENT_LIMIT
@@ -82,15 +84,19 @@ class RealHoodIO : HoodIO {
     }
 
     override fun setPower(power: Double) {
-        hoodTalon.setControl(openLoopRequest.withOutput(power))
+        hoodTalon.setVoltage(power)
     }
 
     override fun setHoodState(state: HoodIO.HoodPositionState) {
         hoodTalon.setControl(hoodPositionRequest.withPosition(Units.radiansToRotations(state.positionRad)))
     }
 
+    override fun setPosition(positionRad: Double) {
+        hoodTalon.setControl(hoodPositionRequest.withPosition(Units.radiansToRotations(positionRad)))
+    }
+
     override fun disablePower() {
-        hoodTalon.setControl(openLoopRequest.withOutput(0.0))
+        hoodTalon.stopMotor()
     }
 
     override fun setCurrentLimit(currentLimit: Int) {

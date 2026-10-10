@@ -74,8 +74,15 @@ interface ShooterIO {
      */
     fun setShooterState(state: ShooterState) {}
 
+    /**
+     * sets the velocity of both flywheel motors directly
+     *
+     * @param velocityRadPerSec the target velocity in radians per second
+     */
+    fun setVelocity(velocityRadPerSec: Double) {}
+
     /** Disables the motors  */
-    fun disablePower() {}
+    fun disablePower()
 
     /**
      * sets the current limit for the shooter

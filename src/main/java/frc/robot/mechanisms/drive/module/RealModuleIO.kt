@@ -6,10 +6,7 @@ import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.CANcoderConfiguration
 import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
-import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC
 import com.ctre.phoenix6.controls.PositionVoltage
-import com.ctre.phoenix6.controls.TorqueCurrentFOC
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC
 import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.hardware.CANcoder
 import com.ctre.phoenix6.hardware.ParentDevice
@@ -35,14 +32,10 @@ class RealModuleIO(
     private val turnTalon = TalonFX(config.turnMotorId, CANBus(config.canBUS))
     private val encoder = CANcoder(config.encoderID, CANBus(config.canBUS))
     private val encoderOffset = config.encoderOffset
-
     private val driveConfig = TalonFXConfiguration()
     private val turnConfig = TalonFXConfiguration()
-
-    private val torqueCurrentRequest = VelocityVoltage(0.0).withUpdateFreqHz(0.0)
-    private val positionTorqueCurrentRequest = PositionVoltage(0.0).withUpdateFreqHz(0.0)
-    private val velocityTorqueCurrentRequest = VelocityVoltage(0.0).withUpdateFreqHz(0.0)
-
+    private val positionVoltageRequest = PositionVoltage(0.0).withSlot(0)
+    private val velocityVoltageRequest = VelocityVoltage(0.0).withSlot(0)
     private val drivePosition: StatusSignal<Angle>
     private val driveVelocity: StatusSignal<AngularVelocity>
     private val driveAppliedVolts: StatusSignal<Voltage>
@@ -203,11 +196,11 @@ class RealModuleIO(
     }
 
     override fun runDriveOpenLoop(output: Double) {
-        driveTalon.setControl(torqueCurrentRequest.withVelocity(output))
+        driveTalon.setVoltage(output)
     }
 
     override fun runTurnOpenLoop(output: Double) {
-        turnTalon.setControl(torqueCurrentRequest.withVelocity(output))
+        turnTalon.setVoltage(output)
     }
 
     override fun runDriveVelocity(
@@ -215,14 +208,14 @@ class RealModuleIO(
         feedforward: Double,
     ) {
         driveTalon.setControl(
-            velocityTorqueCurrentRequest
+            velocityVoltageRequest
                 .withVelocity(Units.radiansToRotations(velocityRadPerSec))
                 .withFeedForward(feedforward),
         )
     }
 
     override fun runTurnPosition(rotation: Rotation2d) {
-        turnTalon.setControl(positionTorqueCurrentRequest.withPosition(rotation.rotations))
+        turnTalon.setControl(positionVoltageRequest.withPosition(rotation.rotations))
     }
 
     override fun setDrivePID(

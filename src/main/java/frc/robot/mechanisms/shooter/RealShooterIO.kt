@@ -11,7 +11,6 @@ import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import frc.robot.utils.RobotParameters.ShooterParameters
-import frc.robot.utils.RobotParameters.SwerveParameters
 import org.wpilib.math.util.Units
 import org.wpilib.units.measure.Angle
 import org.wpilib.units.measure.AngularVelocity
@@ -44,12 +43,16 @@ class RealShooterIO : ShooterIO {
         topConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast
         topConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive
 
-        topConfig.Slot0 = Slot0Configs().withKP(0.0).withKI(0.0).withKD(0.0)
+        topConfig.Slot0 =
+            Slot0Configs()
+                .withKP(ShooterParameters.PIDParameters.SHOOTER_PID.p)
+                .withKI(ShooterParameters.PIDParameters.SHOOTER_PID.i)
+                .withKD(ShooterParameters.PIDParameters.SHOOTER_PID.d)
         topConfig.Feedback.SensorToMechanismRatio = ShooterParameters.SHOOTER_GEAR_RATIO
 
-        topConfig.TorqueCurrent.PeakForwardTorqueCurrent = SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
-        topConfig.TorqueCurrent.PeakReverseTorqueCurrent = -SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
-        topConfig.CurrentLimits.StatorCurrentLimit = SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
+        topConfig.TorqueCurrent.PeakForwardTorqueCurrent = ShooterParameters.PhysicalParameters.SHOOTER_CURRENT_LIMIT
+        topConfig.TorqueCurrent.PeakReverseTorqueCurrent = -ShooterParameters.PhysicalParameters.SHOOTER_CURRENT_LIMIT
+        topConfig.CurrentLimits.StatorCurrentLimit = ShooterParameters.PhysicalParameters.SHOOTER_CURRENT_LIMIT
         topConfig.CurrentLimits.StatorCurrentLimitEnable = true
 
         topConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02
@@ -58,12 +61,16 @@ class RealShooterIO : ShooterIO {
         bottomConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast
         bottomConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive
 
-        bottomConfig.Slot0 = Slot0Configs().withKP(0.0).withKI(0.0).withKD(0.0)
+        bottomConfig.Slot0 =
+            Slot0Configs()
+                .withKP(ShooterParameters.PIDParameters.SHOOTER_PID.p)
+                .withKI(ShooterParameters.PIDParameters.SHOOTER_PID.i)
+                .withKD(ShooterParameters.PIDParameters.SHOOTER_PID.d)
         bottomConfig.Feedback.SensorToMechanismRatio = ShooterParameters.SHOOTER_GEAR_RATIO
 
-        bottomConfig.TorqueCurrent.PeakForwardTorqueCurrent = SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
-        bottomConfig.TorqueCurrent.PeakReverseTorqueCurrent = -SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
-        bottomConfig.CurrentLimits.StatorCurrentLimit = SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
+        bottomConfig.TorqueCurrent.PeakForwardTorqueCurrent = ShooterParameters.PhysicalParameters.SHOOTER_CURRENT_LIMIT
+        bottomConfig.TorqueCurrent.PeakReverseTorqueCurrent = -ShooterParameters.PhysicalParameters.SHOOTER_CURRENT_LIMIT
+        bottomConfig.CurrentLimits.StatorCurrentLimit = ShooterParameters.PhysicalParameters.SHOOTER_CURRENT_LIMIT
         bottomConfig.CurrentLimits.StatorCurrentLimitEnable = true
 
         bottomConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02
@@ -107,7 +114,6 @@ class RealShooterIO : ShooterIO {
             topTorqueCurrent,
             bottomTorqueCurrent,
         )
-
     }
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
@@ -154,9 +160,15 @@ class RealShooterIO : ShooterIO {
         shooterBottomTalon.setControl(velocityRequest.withVelocity(velocityRotPerSec))
     }
 
+    override fun setVelocity(velocityRadPerSec: Double) {
+        val velocityRotPerSec = Units.radiansToRotations(velocityRadPerSec)
+        shooterTopTalon.setControl(velocityRequest.withVelocity(velocityRotPerSec))
+        shooterBottomTalon.setControl(velocityRequest.withVelocity(velocityRotPerSec))
+    }
+
     override fun disablePower() {
-        shooterTopTalon.setControl(openLoopRequest.withOutput(0.0))
-        shooterBottomTalon.setControl(openLoopRequest.withOutput(0.0))
+        shooterTopTalon.stopMotor()
+        shooterBottomTalon.stopMotor()
     }
 
     override fun setCurrentLimit(currentLimit: Int) {

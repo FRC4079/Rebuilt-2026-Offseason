@@ -12,7 +12,6 @@ import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import frc.robot.utils.RobotParameters.TransportParameters
-import frc.robot.utils.RobotParameters.SwerveParameters
 import org.wpilib.math.util.Units
 import org.wpilib.units.measure.Angle
 
@@ -35,14 +34,19 @@ class RealTransportIO (
         indexerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake
         indexerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive
 
-        indexerConfig.Slot0 = Slot0Configs().withKP(0.0).withKI(0.0).withKD(0.0)
-        indexerConfig.Feedback.SensorToMechanismRatio = SwerveParameters.PhysicalParameters.DRIVE_MOTOR_GEAR_RATIO
+        indexerConfig.Slot0 =
+            Slot0Configs()
+                .withKP(TransportParameters.PIDParameters.INDEXER_PID.p)
+                .withKI(TransportParameters.PIDParameters.INDEXER_PID.i)
+                .withKD(TransportParameters.PIDParameters.INDEXER_PID.d)
+        indexerConfig.Feedback.SensorToMechanismRatio = TransportParameters.INDEXER_GEAR_RATIO
 
         // TODO: Replace these values with real values
-        indexerConfig.TorqueCurrent.PeakForwardTorqueCurrent = SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
-        indexerConfig.TorqueCurrent.PeakReverseTorqueCurrent = -SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
-        indexerConfig.CurrentLimits.StatorCurrentLimit = SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
+        indexerConfig.TorqueCurrent.PeakForwardTorqueCurrent = TransportParameters.PhysicalParameters.TRANSPORT_CURRENT_LIMIT
+        indexerConfig.TorqueCurrent.PeakReverseTorqueCurrent = -TransportParameters.PhysicalParameters.TRANSPORT_CURRENT_LIMIT
+        indexerConfig.CurrentLimits.StatorCurrentLimit = TransportParameters.PhysicalParameters.TRANSPORT_CURRENT_LIMIT
         indexerConfig.CurrentLimits.StatorCurrentLimitEnable = true
+        indexerConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02
 
         for (i in 0..4) {
             if (indexerTalon.configurator.apply(indexerConfig, 0.25).isOK) break
@@ -52,14 +56,19 @@ class RealTransportIO (
         hopperConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake
         hopperConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive
 
-        hopperConfig.Slot0 = Slot0Configs().withKP(0.0).withKI(0.0).withKD(0.0)
-        hopperConfig.Feedback.SensorToMechanismRatio = SwerveParameters.PhysicalParameters.DRIVE_MOTOR_GEAR_RATIO
+        hopperConfig.Slot0 =
+            Slot0Configs()
+                .withKP(TransportParameters.PIDParameters.HOPPER_PID.p)
+                .withKI(TransportParameters.PIDParameters.HOPPER_PID.i)
+                .withKD(TransportParameters.PIDParameters.HOPPER_PID.d)
+        hopperConfig.Feedback.SensorToMechanismRatio = TransportParameters.HOPPER_GEAR_RATIO
 
         // TODO: Replace these values with real values
-        hopperConfig.TorqueCurrent.PeakForwardTorqueCurrent = SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
-        hopperConfig.TorqueCurrent.PeakReverseTorqueCurrent = -SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
-        hopperConfig.CurrentLimits.StatorCurrentLimit = SwerveParameters.PhysicalParameters.DRIVE_CURRENT_LIMIT
+        hopperConfig.TorqueCurrent.PeakForwardTorqueCurrent = TransportParameters.PhysicalParameters.TRANSPORT_CURRENT_LIMIT
+        hopperConfig.TorqueCurrent.PeakReverseTorqueCurrent = -TransportParameters.PhysicalParameters.TRANSPORT_CURRENT_LIMIT
+        hopperConfig.CurrentLimits.StatorCurrentLimit = TransportParameters.PhysicalParameters.TRANSPORT_CURRENT_LIMIT
         hopperConfig.CurrentLimits.StatorCurrentLimitEnable = true
+        hopperConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02
 
         for (i in 0..4) {
             if (hopperTalon.configurator.apply(hopperConfig, 0.25).isOK) break

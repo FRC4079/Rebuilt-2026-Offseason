@@ -3,12 +3,15 @@ package frc.robot.mechanisms
 import com.limelightvision.Limelight
 import com.limelightvision.PoseEstimateType
 import frc.robot.mechanisms.drive.Swerve
+import frc.robot.utils.PoseLookup
 import frc.robot.utils.RobotParameters
 import org.wpilib.command3.Mechanism
 import org.wpilib.math.estimator.SwerveDrivePoseEstimator
 import org.wpilib.math.geometry.Pose2d
+import org.wpilib.math.geometry.Rotation2d
 import org.wpilib.math.linalg.VecBuilder
 import org.wpilib.math.util.Units
+import kotlin.math.atan2
 
 class OdometrySupplier(
     private val swerve: Swerve,
@@ -60,10 +63,27 @@ class OdometrySupplier(
         )
     }
 
-    private fun isVisionPoseCloseToEstimate(visionPose: Pose2d): Boolean {
-        val distanceMeters = getDistanceToPoseMeters(visionPose)
-        return distanceMeters <= MAX_VISION_POSE_DIFFERENCE_METERS
-    }
+    fun isVisionPoseCloseToEstimate(pose: Pose2d): Boolean =
+        this.pose.translation.getDistance(pose.translation) <= MAX_VISION_POSE_DIFFERENCE_METERS
 
     fun getDistanceToPoseMeters(targetPose: Pose2d): Double = pose.translation.getDistance(targetPose.translation)
+
+    /**
+     * Distance from the robot's current pose to the hub.
+     *
+     * @return the distance in meters
+     */
+    fun getDistanceToHub(): Double = getDistanceToPoseMeters(PoseLookup.hubPose)
+
+    /**
+     * Field relative heading from the robot's current pose to the hub that the robot needs to point
+     * at in order to shoot.
+     *
+     * @return the heading the robot should face
+     */
+    fun getAngleToHub(): Rotation2d {
+        val robot = pose.translation
+        val hub = PoseLookup.hubPose.translation
+        return Rotation2d.fromRadians(atan2(hub.y - robot.y, hub.x - robot.x))
+    }
 }

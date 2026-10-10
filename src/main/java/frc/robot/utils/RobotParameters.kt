@@ -1,6 +1,7 @@
 package frc.robot.utils
 
 import com.ctre.phoenix6.signals.InvertedValue
+import com.limelightvision.Limelight
 import frc.robot.utils.RobotParameters.CANBusParameters.SWERVE_CANBUS_ID
 import org.wpilib.hardware.bus.CANPort
 import org.wpilib.math.controller.PIDController
@@ -10,6 +11,7 @@ import org.wpilib.math.geometry.Pose3d
 import org.wpilib.math.geometry.Rotation2d
 import org.wpilib.math.geometry.Rotation3d
 import org.wpilib.math.geometry.Translation2d
+import org.wpilib.math.geometry.Translation3d
 import org.wpilib.math.kinematics.SwerveDriveKinematics
 
 /** Class containing global values for the robot.  */
@@ -56,17 +58,26 @@ object RobotParameters {
         object PhysicalParameters {
             // TODO: set INTAKE_GEAR_RATIO and INTAKE_CURRENT_LIMIT to real value
             const val INTAKE_GEAR_RATIO: Double = 0.0
-            const val INTAKE_CURRENT_LIMIT: Double = 0.0
+            const val INTAKE_CURRENT_LIMIT: Double = 40.0
+        }
+
+        object PIDParameters {
+            val INTAKE_PID = PIDController(0.0, 0.0, 0.0)
         }
     }
 
     object PivotParameters {
         val pivotMotor: Int = CANBusParameters.INTAKE_PIVOT_MOTOR_ID
         val PIVOT_GEAR_RATIO: Double = 150.0 / 7.0
-        val PIVOT_CANPORT: CANPort = CANPort.CAN_S1
+        val PIVOT_CANPORT: CANPort = CANPort.CAN_D1
+
         object PhysicalParameters {
             // TODO: set PIVOT_CURRENT_LIMIT to real value
-            const val PIVOT_CURRENT_LIMIT: Double = 0.0
+            const val PIVOT_CURRENT_LIMIT: Double = 40.0
+        }
+
+        object PIDParameters {
+            val PIVOT_PID = PIDController(0.0, 0.0, 0.0)
         }
     }
 
@@ -74,27 +85,47 @@ object RobotParameters {
         val shooterLeftMotor: Int = CANBusParameters.SHOOTER_LEFT_MOTOR_ID
         val shooterRightMotor: Int = CANBusParameters.SHOOTER_RIGHT_MOTOR_ID
         val SHOOTER_GEAR_RATIO: Double = 1.0
-        val SHOOTER_CANPORT: CANPort = CANPort.CAN_S1
+        val SHOOTER_CANPORT: CANPort = CANPort.CAN_D1
+
         object PhysicalParameters {
             const val SHOOTER_CURRENT_LIMIT: Double = 40.0
         }
+
+        object PIDParameters {
+            val SHOOTER_PID = PIDController(0.0, 0.0, 0.0)
+        }
     }
+
     object HoodParameters {
         val hoodMotor: Int = CANBusParameters.HOOD_MOTOR_ID
         val HOOD_GEAR_RATIO: Double = 1.0
         val HOOD_CANPORT: CANPort = CANPort.CAN_D1
+
         object PhysicalParameters {
             const val HOOD_CURRENT_LIMIT: Double = 20.0
+        }
+
+        object PIDParameters {
+            val HOOD_PID = PIDController(0.0, 0.0, 0.0)
         }
     }
 
     object TransportParameters {
-        var indexerMotor : Int = CANBusParameters.INDEXER_MOTOR_ID
+        var indexerMotor: Int = CANBusParameters.INDEXER_MOTOR_ID
         val INDEXER_GEAR_RATIO: Double = 1.0
         val hopperMotor: Int = CANBusParameters.TRANSPORT_MOTOR_ID
-        val HOPPER_GEAR_RATIO: Double = 1.0 //TODO: set HOPPER_GEAR_RATIO and other gear ratios to real value
-        val HOPPER_CANPORT: CANPort = CANPort.CAN_S1
-        val INDEXER_CANPORT: CANPort = CANPort.CAN_S1
+        val HOPPER_GEAR_RATIO: Double = 1.0 // TODO: set HOPPER_GEAR_RATIO and other gear ratios to real value
+        val HOPPER_CANPORT: CANPort = CANPort.CAN_D1
+        val INDEXER_CANPORT: CANPort = CANPort.CAN_D1
+
+        object PhysicalParameters {
+            const val TRANSPORT_CURRENT_LIMIT: Double = 40.0
+        }
+
+        object PIDParameters {
+            val INDEXER_PID = PIDController(0.0, 0.0, 0.0)
+            val HOPPER_PID = PIDController(0.0, 0.0, 0.0)
+        }
     }
 
     /** Class containing global values related to the swerve drive system.  */
@@ -222,8 +253,8 @@ object RobotParameters {
             // Motor Property Values
             const val MAX_SPEED: Double = 5.76
             const val MAX_ANGULAR_SPEED: Double = (14 * Math.PI) / 3
-            const val STEER_MOTOR_GEAR_RATIO: Double = 150.0 / 7
-            const val DRIVE_MOTOR_GEAR_RATIO: Double = 6.750000000000000
+            const val STEER_MOTOR_GEAR_RATIO: Double = 287.0 / 11.0
+            const val DRIVE_MOTOR_GEAR_RATIO: Double = 7.03
             const val WHEEL_DIAMETER: Double = 0.1016
             const val METERS_PER_REV: Double = WHEEL_DIAMETER * Math.PI * 0.975
 
@@ -267,21 +298,41 @@ object RobotParameters {
 
     /** Class containing constants for the Vision subsystem.  */
     object VisionParameters {
-        data class CameraParameters(
-            val name: String,
-            val pose: Pose3d,
-            )
+        // The pose of the camera relative to the robot center
+        // (x = forward, y = left, z = up, in meters)
 
-        val CAMERAS: Array<CameraParameters> = arrayOf(
-            CameraParameters(
-                name = "shooterCamera",
-                pose = Pose3d(0.0, 0.0, 0.0, Rotation3d(0.0, 0.0, 0.0)),
-            ),
-            CameraParameters(
-                name = "frontCamera",
-                pose = Pose3d(0.0, 0.0, 0.0, Rotation3d(0.0, 0.0, 0.0)),
+        val CAMERAS: Array<Limelight> =
+            arrayOf(
+                Limelight(
+                    "shooter",
+                    Pose3d(
+                        Translation3d(
+                            0.116557,
+                            -0.009852,
+                            0.410349,
+                        ),
+                        Rotation3d(
+                            180.0,
+                            0.0,
+                            0.0,
+                        ),
+                    ),
+                ),
+                Limelight(
+                    "indexer",
+                    Pose3d(
+                        Translation3d(
+                            0.216760,
+                            -0.191,
+                            0.336850,
+                        ),
+                        Rotation3d(
+                            0.0,
+                            0.0,
+                            0.0,
+                        ),
+                    ),
+                ),
             )
-        )
-
     }
 }

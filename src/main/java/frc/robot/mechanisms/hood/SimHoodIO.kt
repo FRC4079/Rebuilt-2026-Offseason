@@ -55,6 +55,11 @@ class SimHoodIO : HoodIO {
         targetPositionRad = state.positionRad
     }
 
+    override fun setPosition(positionRad: Double) {
+        closedLoop = true
+        targetPositionRad = positionRad
+    }
+
     override fun disablePower() {
         closedLoop = false
         hoodSim.setInputVoltage(0.0)

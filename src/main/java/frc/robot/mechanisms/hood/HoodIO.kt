@@ -56,6 +56,13 @@ interface HoodIO {
      */
     fun setHoodState(state: HoodPositionState) {}
 
+    /**
+     * sets the position of the hood directly
+     *
+     * @param positionRad the target position in radians
+     */
+    fun setPosition(positionRad: Double) {}
+
     /** Disables the motor  */
     fun disablePower() {}
 

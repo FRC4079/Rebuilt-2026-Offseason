@@ -1,6 +1,7 @@
 package frc.robot
 
 import frc.robot.commands.PadDrive
+import frc.robot.mechanisms.OdometrySupplier
 import frc.robot.mechanisms.Vision
 import frc.robot.mechanisms.drive.Swerve
 import frc.robot.mechanisms.drive.gyro.RealGyroIO
@@ -12,9 +13,10 @@ import frc.robot.mechanisms.pivot.Pivot
 import frc.robot.mechanisms.shooter.Shooter
 import frc.robot.mechanisms.transport.Transport
 import frc.robot.utils.RobotParameters
+import frc.robot.utils.enums.State
 import org.wpilib.command3.Command
 import org.wpilib.driverstation.XboxController
-
+import org.wpilib.math.kinematics.Odometry
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -30,15 +32,19 @@ class RobotContainer {
             .map { config -> RealModuleIO(config) }
             .toTypedArray()
 
+    // CREATE ALL SUBSYSTEMS HERE
+
     val swerve: Swerve = Swerve(moduleIOs, RealGyroIO)
+//    val intake: IntakeIO = IntakeIO()
+//    val transport: Transport = Transport()
+//    val shooter: Shooter = Shooter()
+//    val pivot: Pivot = Pivot()
+
+    // VIRTUAL SUBSYSTEMS
+    val vision: Vision = Vision(RobotParameters.VisionParameters.CAMERAS)
+    val odometrySupplier: OdometrySupplier = OdometrySupplier(swerve, vision)
 
     var autonomous: Command? = null
-
-    private val intake: Int? = null
-    private val transport: Transport? = null
-    private val shooter: Shooter? = null
-    private val pivot: Pivot? = null
-    private val vision: Vision? = null
 
     /** The container for the robot. Contains subsystems, IO devices, and commands.  */
     init {
