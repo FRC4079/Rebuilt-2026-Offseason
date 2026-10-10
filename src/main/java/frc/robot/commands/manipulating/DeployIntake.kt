@@ -26,5 +26,6 @@ class DeployIntake(
 
     override fun onCancel() {
         pivot.setState(PivotIO.PivotState.STOW)
+        transport.setState(TransportIO.TransportState.STOP)
     }
 }

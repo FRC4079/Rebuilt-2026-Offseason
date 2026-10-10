@@ -2,6 +2,7 @@ package frc.robot.commands.manipulating
 
 import frc.robot.mechanisms.intake.Intake
 import frc.robot.mechanisms.transport.Transport
+import frc.robot.mechanisms.transport.TransportIO
 import frc.robot.mechanisms.transport.TransportIO.TransportState
 import org.wpilib.command3.Command
 import org.wpilib.command3.Coroutine
@@ -25,5 +26,6 @@ class SpinIntake(
 
     override fun onCancel() {
         intake.stop()
+        transport.setState(TransportState.STOP)
     }
 }

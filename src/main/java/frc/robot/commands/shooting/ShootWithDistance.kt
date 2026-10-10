@@ -60,5 +60,6 @@ class ShootWithDistance(
     override fun onCancel() {
         shooter.disable()
         hood.disable()
+        transport.setState(TransportIO.TransportState.STOP)
     }
 }
