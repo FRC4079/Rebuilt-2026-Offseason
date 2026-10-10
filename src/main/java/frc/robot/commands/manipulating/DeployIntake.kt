@@ -2,12 +2,15 @@ package frc.robot.commands.manipulating
 
 import frc.robot.mechanisms.pivot.Pivot
 import frc.robot.mechanisms.pivot.PivotIO
+import frc.robot.mechanisms.transport.Transport
+import frc.robot.mechanisms.transport.TransportIO
 import org.wpilib.command3.Command
 import org.wpilib.command3.Coroutine
 import org.wpilib.command3.Mechanism
 
 class DeployIntake(
     val pivot: Pivot,
+    val transport: Transport,
 ) : Command {
     override fun name(): String = "DeployIntake"
 
@@ -15,6 +18,7 @@ class DeployIntake(
 
     override fun run(coroutine: Coroutine?) {
         while (true) {
+            transport.setState(TransportIO.TransportState.ACTIVE)
             pivot.setState(PivotIO.PivotState.DEPLOY)
             coroutine?.yield()
         }

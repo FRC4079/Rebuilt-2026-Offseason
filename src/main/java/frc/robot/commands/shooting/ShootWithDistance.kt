@@ -2,7 +2,10 @@ package frc.robot.commands.shooting
 
 import frc.robot.mechanisms.OdometrySupplier
 import frc.robot.mechanisms.hood.Hood
+import frc.robot.mechanisms.pivot.PivotIO
 import frc.robot.mechanisms.shooter.Shooter
+import frc.robot.mechanisms.transport.Transport
+import frc.robot.mechanisms.transport.TransportIO
 import frc.robot.utils.ShotPoint
 import frc.robot.utils.ShotTable
 import frc.robot.utils.enums.GlobalState
@@ -22,12 +25,14 @@ class ShootWithDistance(
     private val shooter: Shooter,
     private val hood: Hood,
     private val odometrySupplier: OdometrySupplier,
+    private val transport: Transport,
 ) : Command {
     override fun name(): String = "Shoot"
 
     override fun requirements(): Set<Mechanism> = setOf(shooter, hood)
 
     override fun run(coroutine: Coroutine) {
+        transport.setState(TransportIO.TransportState.FAST)
         while (true) {
             val distanceMeters = odometrySupplier.getDistanceToHub()
             val shot: ShotPoint? = ShotTable.getShot(distanceMeters)

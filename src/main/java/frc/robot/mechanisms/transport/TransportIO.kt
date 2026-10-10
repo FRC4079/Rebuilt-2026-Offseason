@@ -15,14 +15,12 @@ interface TransportIO {
                 hopperAppliedVolts = 0.0,
                 hopperSupplyCurrentAmps = 0.0,
                 hopperTorqueCurrentAmps = 0.0,
-
                 indexerConnected = false,
                 indexerPositionRad = 0.0,
                 indexerVelocityRadPerSec = 0.0,
                 indexerAppliedVolts = 0.0,
                 indexerSupplyCurrentAmps = 0.0,
                 indexerTorqueCurrentAmps = 0.0,
-
                 transportState = TransportState.STOP,
             )
     }
@@ -34,14 +32,12 @@ interface TransportIO {
         var hopperAppliedVolts: Double,
         var hopperSupplyCurrentAmps: Double,
         var hopperTorqueCurrentAmps: Double,
-
         var indexerConnected: Boolean,
         var indexerPositionRad: Double,
         var indexerVelocityRadPerSec: Double,
         var indexerAppliedVolts: Double,
         var indexerSupplyCurrentAmps: Double,
         var indexerTorqueCurrentAmps: Double,
-
         var transportState: TransportState,
     ) : ReflectiveLoggableInputs()
 
@@ -49,6 +45,7 @@ interface TransportIO {
         val velocity: Double,
     ) {
         ACTIVE(1.0), // stupid ass enum bro :sob:
+        FAST(20.0),
         STOP(0.0),
     }
 
