@@ -1,12 +1,13 @@
 package frc.robot.mechanisms.intake
 
 import org.littletonrobotics.junction.Logger
+import org.wpilib.command3.Mechanism
 import org.wpilib.math.filter.Debouncer
 import org.wpilib.util.Alert
 
 class Intake(
     private val io: IntakeIO,
-) {
+) : Mechanism {
     private val inputs = IntakeIOInputsAutoLogged()
 
     // Connected debouncer

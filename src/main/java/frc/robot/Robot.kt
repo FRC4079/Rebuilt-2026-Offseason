@@ -12,6 +12,7 @@ import org.wpilib.command3.Scheduler
 import org.wpilib.hardware.bus.CANPort
 import org.wpilib.hardware.power.PowerDistribution
 import org.wpilib.system.Timer
+import org.wpilib.vision.stream.CameraServer
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -67,7 +68,11 @@ class Robot : LoggedRobot() {
     override fun robotPeriodic() {
         Scheduler.getDefault().run()
 
+        robotContainer?.odometrySupplier?.periodic()
+
         robotContainer?.swerve?.periodic()
+        robotContainer?.intake?.periodic()
+        robotContainer?.pivot?.periodic()
     }
 
     /** This autonomous runs the autonomous command selected by your [RobotContainer] class.  */

@@ -17,21 +17,27 @@ import org.wpilib.units.measure.AngularVelocity
 import org.wpilib.units.measure.Current
 import org.wpilib.units.measure.Voltage
 
-class RealIntakeIO(
-    config: IntakeParameters,
-) : IntakeIO {
-    private val intakeMotor = TalonFX(config.intakeMotor, CANBus(config.INTAKE_CANPORT))
+class RealIntakeIO() : IntakeIO {
+    private val intakeMotorLeft = TalonFX(IntakeParameters.intakeMotorLeft, CANBus(IntakeParameters.INTAKE_CANPORT))
+    private  val intakeMotorRight = TalonFX(IntakeParameters.intakeMotorRight, CANBus(IntakeParameters.INTAKE_CANPORT))
+
     private val intakeConfig = TalonFXConfiguration()
 
     private val voltageControl = VoltageOut(0.0)
     private val positionControl = PositionVoltage(0.0).withSlot(0)
     private val velocityControl = VelocityVoltage(0.0).withSlot(0)
 
-    private val positionSignal: StatusSignal<Angle> = intakeMotor.position
-    private val velocitySignal: StatusSignal<AngularVelocity> = intakeMotor.velocity
-    private val voltageSignal: StatusSignal<Voltage> = intakeMotor.motorVoltage
-    private val supplyCurrentSignal: StatusSignal<Current> = intakeMotor.supplyCurrent
-    private val torqueCurrentSignal: StatusSignal<Current> = intakeMotor.torqueCurrent
+    private val positionSignalLeft: StatusSignal<Angle> = intakeMotorLeft.position
+    private val velocitySignalLeft: StatusSignal<AngularVelocity> = intakeMotorLeft.velocity
+    private val voltageSignalLeft: StatusSignal<Voltage> = intakeMotorLeft.motorVoltage
+    private val supplyCurrentSignalLeft: StatusSignal<Current> = intakeMotorLeft.supplyCurrent
+    private val torqueCurrentSignalLeft: StatusSignal<Current> = intakeMotorLeft.torqueCurrent
+
+    private val positionSignalRight: StatusSignal<Angle> = intakeMotorRight.position
+    private val velocitySignalRight: StatusSignal<AngularVelocity> = intakeMotorRight.velocity
+    private val voltageSignalRight: StatusSignal<Voltage> = intakeMotorRight.motorVoltage
+    private val supplyCurrentSignalRight: StatusSignal<Current> = intakeMotorRight.supplyCurrent
+    private val torqueCurrentSignalRight: StatusSignal<Current> = intakeMotorRight.torqueCurrent
 
     init {
         intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast
@@ -49,46 +55,71 @@ class RealIntakeIO(
         intakeConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02
 
         for (i in 0..4) {
-            if (intakeMotor.configurator.apply(intakeConfig, 0.25).isOK) break
+            if (intakeMotorLeft.configurator.apply(intakeConfig, 0.25).isOK) break
+        }
+
+        for (i in 0..4) {
+            if (intakeMotorRight.configurator.apply(intakeConfig, 0.25).isOK) break
         }
 
         // TODO: set frequencyHz to real value
         BaseStatusSignal.setUpdateFrequencyForAll(
-            0.0,
-            positionSignal,
-            velocitySignal,
-            voltageSignal,
-            supplyCurrentSignal,
-            torqueCurrentSignal,
+            50.0,
+            positionSignalLeft,
+            velocitySignalLeft,
+            voltageSignalLeft,
+            supplyCurrentSignalLeft,
+            torqueCurrentSignalLeft,
         )
 
-        ParentDevice.optimizeBusUtilizationForAll(intakeMotor)
+        ParentDevice.optimizeBusUtilizationForAll(intakeMotorLeft)
+
+        BaseStatusSignal.setUpdateFrequencyForAll(
+            50.0,
+            positionSignalRight,
+            velocitySignalRight,
+            voltageSignalRight,
+            supplyCurrentSignalRight,
+            torqueCurrentSignalRight,
+        )
+
+        ParentDevice.optimizeBusUtilizationForAll(intakeMotorRight)
     }
 
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
         inputs.data.intakeConnected =
             BaseStatusSignal.isAllGood(
-                velocitySignal,
-                voltageSignal,
-                supplyCurrentSignal,
-                torqueCurrentSignal,
+                velocitySignalLeft,
+                voltageSignalLeft,
+                supplyCurrentSignalLeft,
+                torqueCurrentSignalLeft,
+            ) &&
+            BaseStatusSignal.isAllGood(
+                velocitySignalRight,
+                voltageSignalRight,
+                supplyCurrentSignalRight,
+                torqueCurrentSignalRight
             )
-        inputs.data.intakeVelocityRadPerSec = velocitySignal.valueAsDouble
-        inputs.data.intakeAppliedVolts = voltageSignal.valueAsDouble
-        inputs.data.intakeSupplyCurrentAmps = supplyCurrentSignal.valueAsDouble
-        inputs.data.intakeTorqueCurrentAmps = torqueCurrentSignal.valueAsDouble
+
+        inputs.data.intakeVelocityRadPerSec = velocitySignalLeft.valueAsDouble
+        inputs.data.intakeAppliedVolts = voltageSignalLeft.valueAsDouble
+        inputs.data.intakeSupplyCurrentAmps = supplyCurrentSignalLeft.valueAsDouble
+        inputs.data.intakeTorqueCurrentAmps = torqueCurrentSignalLeft.valueAsDouble
     }
 
     override fun setVoltage(volts: Double) {
-        intakeMotor.setControl(voltageControl.withOutput(volts))
+        intakeMotorLeft.setControl(voltageControl.withOutput(volts))
+        intakeMotorRight.setControl(voltageControl.withOutput(volts))
     }
 
     override fun setPosition(positionRad: Double) {
-        intakeMotor.setControl(positionControl.withPosition(positionRad))
+        intakeMotorLeft.setControl(positionControl.withPosition(positionRad))
+        intakeMotorRight.setControl(positionControl.withPosition(positionRad))
     }
 
     override fun setVelocity(velocityRadPerSec: Double) {
-        intakeMotor.setControl(velocityControl.withVelocity(velocityRadPerSec))
+        intakeMotorLeft.setControl(velocityControl.withVelocity(velocityRadPerSec))
+        intakeMotorRight.setControl(velocityControl.withVelocity(velocityRadPerSec))
     }
 
     override fun setIntakePID(
@@ -101,11 +132,15 @@ class RealIntakeIO(
         intakeConfig.Slot0.kD = kD
 
         for (i in 0..4) {
-            if (intakeMotor.configurator.apply(intakeConfig, 0.25).isOK) break
+            if (intakeMotorLeft.configurator.apply(intakeConfig, 0.25).isOK) break
+        }
+        for (i in 0..4) {
+            if (intakeMotorRight.configurator.apply(intakeConfig, 0.25).isOK) break
         }
     }
 
     override fun stop() {
-        intakeMotor.setControl(voltageControl.withOutput(0.0))
+        intakeMotorLeft.stopMotor()
+        intakeMotorRight.stopMotor()
     }
 }

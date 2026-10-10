@@ -5,12 +5,14 @@ import com.limelightvision.PoseEstimateType
 import frc.robot.mechanisms.drive.Swerve
 import frc.robot.utils.PoseLookup
 import frc.robot.utils.RobotParameters
+import org.littletonrobotics.junction.Logger
 import org.wpilib.command3.Mechanism
 import org.wpilib.math.estimator.SwerveDrivePoseEstimator
 import org.wpilib.math.geometry.Pose2d
 import org.wpilib.math.geometry.Rotation2d
 import org.wpilib.math.linalg.VecBuilder
 import org.wpilib.math.util.Units
+import org.wpilib.smartdashboard.Field2d
 import kotlin.math.atan2
 
 class OdometrySupplier(
@@ -34,6 +36,8 @@ class OdometrySupplier(
     val pose: Pose2d
         get() = poseEstimator.estimatedPosition
 
+    val field: Field2d = Field2d()
+
     fun periodic() {
         val yaw = swerve.gyroYaw
         val modulePositions = swerve.modulePositions
@@ -53,6 +57,8 @@ class OdometrySupplier(
         }
 
         poseEstimator.update(yaw, modulePositions)
+        field.robotPose = pose
+        Logger.recordOutput("Swerve/Pose", pose)
     }
 
     fun resetPose(pose: Pose2d = Pose2d()) {

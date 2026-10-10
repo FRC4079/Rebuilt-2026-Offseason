@@ -6,7 +6,6 @@ import frc.robot.utils.RobotParameters.CANBusParameters.SWERVE_CANBUS_ID
 import org.wpilib.hardware.bus.CANPort
 import org.wpilib.math.controller.PIDController
 import org.wpilib.math.controller.SimpleMotorFeedforward
-import org.wpilib.math.geometry.Pose2d
 import org.wpilib.math.geometry.Pose3d
 import org.wpilib.math.geometry.Rotation2d
 import org.wpilib.math.geometry.Rotation3d
@@ -28,7 +27,6 @@ object RobotParameters {
     /** Class containing global values related to motors.  */
     object CANBusParameters {
         // Motor CAN ID Values
-        const val HOOD_MOTOR_ID: Int = 20
         const val FRONT_LEFT_STEER_ID: Int = 1
         const val FRONT_LEFT_DRIVE_ID: Int = 2
         const val FRONT_RIGHT_STEER_ID: Int = 3
@@ -42,33 +40,37 @@ object RobotParameters {
         const val BACK_LEFT_CAN_CODER_ID: Int = 11
         const val BACK_RIGHT_CAN_CODER_ID: Int = 12
         const val PIDGEY_ID: Int = 13
-        const val INTAKING_MOTOR_ID: Int = 14
+        const val INTAKE_LEFT_ID: Int = 14
+        const val INTAKE_RIGHT_ID: Int = 41
         const val INTAKE_PIVOT_MOTOR_ID: Int = 15
         const val SHOOTER_LEFT_MOTOR_ID: Int = 16
         const val SHOOTER_RIGHT_MOTOR_ID: Int = 17
         const val INDEXER_MOTOR_ID: Int = 18
         const val TRANSPORT_MOTOR_ID: Int = 19
+        const val HOOD_MOTOR_ID: Int = 20
+
         val SWERVE_CANBUS_ID: CANPort = CANPort.CAN_S0
     }
 
     object IntakeParameters {
-        val intakeMotor: Int = CANBusParameters.INTAKING_MOTOR_ID
+        val intakeMotorLeft: Int = CANBusParameters.INTAKE_LEFT_ID
+        val intakeMotorRight: Int = CANBusParameters.INTAKE_RIGHT_ID
         val INTAKE_CANPORT: CANPort = CANPort.CAN_S1
 
         object PhysicalParameters {
             // TODO: set INTAKE_GEAR_RATIO and INTAKE_CURRENT_LIMIT to real value
-            const val INTAKE_GEAR_RATIO: Double = 0.0
+            const val INTAKE_GEAR_RATIO: Double = 1.0
             const val INTAKE_CURRENT_LIMIT: Double = 40.0
         }
 
         object PIDParameters {
-            val INTAKE_PID = PIDController(0.0, 0.0, 0.0)
+            val INTAKE_PID = PIDController(5.0, 0.0, 0.0)
         }
     }
 
     object PivotParameters {
         val pivotMotor: Int = CANBusParameters.INTAKE_PIVOT_MOTOR_ID
-        val PIVOT_GEAR_RATIO: Double = 150.0 / 7.0
+        val PIVOT_GEAR_RATIO: Double = 1.0
         val PIVOT_CANPORT: CANPort = CANPort.CAN_S1
 
         object PhysicalParameters {
@@ -77,7 +79,7 @@ object RobotParameters {
         }
 
         object PIDParameters {
-            val PIVOT_PID = PIDController(0.0, 0.0, 0.0)
+            val PIVOT_PID = PIDController(5.0, 0.0, 0.0)
         }
     }
 
@@ -92,7 +94,7 @@ object RobotParameters {
         }
 
         object PIDParameters {
-            val SHOOTER_PID = PIDController(0.0, 0.0, 0.0)
+            val SHOOTER_PID = PIDController(5.0, 0.0, 0.0)
         }
     }
 
@@ -102,11 +104,11 @@ object RobotParameters {
         val HOOD_CANPORT: CANPort = CANPort.CAN_D1
 
         object PhysicalParameters {
-            const val HOOD_CURRENT_LIMIT: Double = 20.0
+            const val HOOD_CURRENT_LIMIT: Double = 40.0
         }
 
         object PIDParameters {
-            val HOOD_PID = PIDController(0.0, 0.0, 0.0)
+            val HOOD_PID = PIDController(5.0, 0.0, 0.0)
         }
     }
 
@@ -123,8 +125,8 @@ object RobotParameters {
         }
 
         object PIDParameters {
-            val INDEXER_PID = PIDController(0.0, 0.0, 0.0)
-            val HOPPER_PID = PIDController(0.0, 0.0, 0.0)
+            val INDEXER_PID = PIDController(5.0, 0.0, 0.0)
+            val HOPPER_PID = PIDController(5.0, 0.0, 0.0)
         }
     }
 
@@ -154,7 +156,7 @@ object RobotParameters {
                     driveMotorId = CANBusParameters.FRONT_LEFT_DRIVE_ID,
                     turnMotorId = CANBusParameters.FRONT_LEFT_STEER_ID,
                     encoderID = CANBusParameters.FRONT_LEFT_CAN_CODER_ID,
-                    encoderOffset = Rotation2d.fromDegrees(0.0),
+                    encoderOffset = Rotation2d.fromDegrees(89.03),
                     turnInverted = false,
                     encoderInverted = false,
                     canBUS = SWERVE_CANBUS_ID,
@@ -164,7 +166,7 @@ object RobotParameters {
                     driveMotorId = CANBusParameters.FRONT_RIGHT_DRIVE_ID,
                     turnMotorId = CANBusParameters.FRONT_RIGHT_STEER_ID,
                     encoderID = CANBusParameters.FRONT_RIGHT_CAN_CODER_ID,
-                    encoderOffset = Rotation2d.fromDegrees(0.0),
+                    encoderOffset = Rotation2d.fromDegrees(-54.14),
                     turnInverted = false,
                     encoderInverted = false,
                     canBUS = SWERVE_CANBUS_ID,
@@ -174,7 +176,7 @@ object RobotParameters {
                     driveMotorId = CANBusParameters.BACK_LEFT_DRIVE_ID,
                     turnMotorId = CANBusParameters.BACK_LEFT_STEER_ID,
                     encoderID = CANBusParameters.BACK_LEFT_CAN_CODER_ID,
-                    encoderOffset = Rotation2d.fromDegrees(0.0),
+                    encoderOffset = Rotation2d.fromDegrees(18.98),
                     turnInverted = false,
                     encoderInverted = false,
                     canBUS = SWERVE_CANBUS_ID,
@@ -184,7 +186,7 @@ object RobotParameters {
                     driveMotorId = CANBusParameters.BACK_RIGHT_DRIVE_ID,
                     turnMotorId = CANBusParameters.BACK_RIGHT_STEER_ID,
                     encoderID = CANBusParameters.BACK_RIGHT_CAN_CODER_ID,
-                    encoderOffset = Rotation2d.fromDegrees(0.0),
+                    encoderOffset = Rotation2d.fromDegrees(-166.0),
                     turnInverted = false,
                     encoderInverted = false,
                     canBUS = SWERVE_CANBUS_ID,
@@ -214,7 +216,7 @@ object RobotParameters {
             val DRIVE_PID_TELE = PIDController(5.0, 0.0, 0.0)
 
             @JvmField
-            val ROTATIONAL_PID = PIDController(0.2, 0.0, 0.0)
+            val ROTATIONAL_PID = PIDController(1.0, 0.0, 0.0)
 
             @JvmField
             val Y_PID = PIDController(0.2, 0.0, 0.0)
@@ -304,7 +306,7 @@ object RobotParameters {
         val CAMERAS: Array<Limelight> =
             arrayOf(
                 Limelight(
-                    "shooter",
+                    "limelight-shooter",
                     Pose3d(
                         Translation3d(
                             0.116557,
@@ -319,7 +321,7 @@ object RobotParameters {
                     ),
                 ),
                 Limelight(
-                    "indexer",
+                    "limelight-indexer",
                     Pose3d(
                         Translation3d(
                             0.216760,

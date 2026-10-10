@@ -153,6 +153,10 @@ class Swerve(
         }
     }
 
+    fun resetGyro() {
+        gyroIO.reset()
+    }
+
     fun pathFindToGoal(): Command? = null
 
     fun pathFindTest(): Command? = null

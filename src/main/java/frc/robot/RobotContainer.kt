@@ -1,6 +1,7 @@
 package frc.robot
 
 import frc.robot.commands.PadDrive
+import frc.robot.commands.SpinIntake
 import frc.robot.mechanisms.OdometrySupplier
 import frc.robot.mechanisms.Vision
 import frc.robot.mechanisms.drive.Swerve
@@ -8,13 +9,18 @@ import frc.robot.mechanisms.drive.gyro.RealGyroIO
 import frc.robot.mechanisms.drive.module.ModuleIO
 import frc.robot.mechanisms.drive.module.RealModuleIO
 import frc.robot.mechanisms.hood.Hood
+import frc.robot.mechanisms.intake.Intake
 import frc.robot.mechanisms.intake.IntakeIO
+import frc.robot.mechanisms.intake.RealIntakeIO
 import frc.robot.mechanisms.pivot.Pivot
+import frc.robot.mechanisms.pivot.PivotIO
+import frc.robot.mechanisms.pivot.RealPivotIO
 import frc.robot.mechanisms.shooter.Shooter
 import frc.robot.mechanisms.transport.Transport
 import frc.robot.utils.RobotParameters
 import frc.robot.utils.enums.State
 import org.wpilib.command3.Command
+import org.wpilib.command3.button.RobotModeTriggers.autonomous
 import org.wpilib.driverstation.XboxController
 import org.wpilib.math.kinematics.Odometry
 
@@ -27,22 +33,27 @@ import org.wpilib.math.kinematics.Odometry
 class RobotContainer {
     val pad: XboxController = XboxController(0)
 
+    // CREATE IOS
+
     val moduleIOs: Array<ModuleIO> =
         RobotParameters.SwerveParameters.MODULE_CONFIGS
             .map { config -> RealModuleIO(config) }
             .toTypedArray()
 
+    val intakeIO: IntakeIO = RealIntakeIO()
+    val pivotIO: PivotIO = RealPivotIO()
+
     // CREATE ALL SUBSYSTEMS HERE
 
     val swerve: Swerve = Swerve(moduleIOs, RealGyroIO)
-//    val intake: IntakeIO = IntakeIO()
-//    val transport: Transport = Transport()
-//    val shooter: Shooter = Shooter()
-//    val pivot: Pivot = Pivot()
+    val intake: Intake = Intake(intakeIO)
+    val pivot: Pivot = Pivot(pivotIO)
+
+
 
     // VIRTUAL SUBSYSTEMS
-//    val vision: Vision = Vision(RobotParameters.VisionParameters.CAMERAS)
-//    val odometrySupplier: OdometrySupplier = OdometrySupplier(swerve, vision)
+    val vision: Vision = Vision(RobotParameters.VisionParameters.CAMERAS)
+    val odometrySupplier: OdometrySupplier = OdometrySupplier(swerve, vision)
 
     var autonomous: Command? = null
 
@@ -58,6 +69,8 @@ class RobotContainer {
      * the named factories in [CommandGenericHID]'s subclasses for [ ]/[CommandPS4Controller] controllers or [CommandJoystick].
      */
     private fun configureBindings() {
+        pad.aButtonPressed.run { SpinIntake(intake) }
+        pad.bButtonPressed.run { swerve.resetGyro() }
     }
 
     val autonomousCommand: Command?
