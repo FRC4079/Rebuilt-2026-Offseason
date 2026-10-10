@@ -113,6 +113,10 @@ class RealModuleIO(
             if (encoder.configurator.apply(cancoderConfig, 0.25).isOK) break
         }
 
+        for (i in 0..4) {
+            if (turnTalon.setPosition(encoder.absolutePosition.valueAsDouble, 0.25).isOK) break
+        }
+
         // Create drive status signals
         drivePosition = driveTalon.position
         driveVelocity = driveTalon.velocity
@@ -184,7 +188,7 @@ class RealModuleIO(
                 turnTorqueCurrentAmps,
             )
         inputs.data.turnEncoderConnected = BaseStatusSignal.isAllGood(turnAbsolutePosition)
-        inputs.data.turnAbsolutePosition = Rotation2d.fromRotations(turnAbsolutePosition.valueAsDouble).minus(encoderOffset)
+        inputs.data.turnAbsolutePosition = Rotation2d.fromRotations(turnAbsolutePosition.valueAsDouble)
         inputs.data.turnPosition = Rotation2d.fromRotations(turnPosition.valueAsDouble)
         inputs.data.turnVelocityRadPerSec = Units.rotationsToRadians(turnVelocity.valueAsDouble)
         inputs.data.turnAppliedVolts = turnAppliedVolts.valueAsDouble
