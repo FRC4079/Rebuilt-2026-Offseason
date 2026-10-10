@@ -1,7 +1,9 @@
 package frc.robot
 
 import frc.robot.commands.driving.PadDrive
+import frc.robot.commands.manipulating.DeployIntake
 import frc.robot.commands.manipulating.SpinIntake
+import frc.robot.commands.shooting.ShootWithDistance
 import frc.robot.mechanisms.OdometrySupplier
 import frc.robot.mechanisms.Vision
 import frc.robot.mechanisms.drive.Swerve
@@ -78,6 +80,9 @@ class RobotContainer {
     private fun configureBindings() {
         pad.aButtonPressed.run { SpinIntake(intake) }
         pad.bButtonPressed.run { swerve.resetGyro() }
+        pad.xButtonPressed. run { ShootWithDistance(shooter, hood, odometrySupplier) }
+        pad.yButtonPressed.run { DeployIntake(pivot) }
+
     }
 
     val autonomousCommand: Command?

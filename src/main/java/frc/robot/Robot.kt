@@ -73,6 +73,9 @@ class Robot : LoggedRobot() {
         robotContainer?.swerve?.periodic()
         robotContainer?.intake?.periodic()
         robotContainer?.pivot?.periodic()
+        robotContainer?.hood?.periodic()
+        robotContainer?.shooter?.periodic()
+        robotContainer?.transport?.periodic()
     }
 
     /** This autonomous runs the autonomous command selected by your [RobotContainer] class.  */
