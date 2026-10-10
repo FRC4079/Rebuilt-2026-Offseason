@@ -337,4 +337,9 @@ object RobotParameters {
                 ),
             )
     }
+
+    object PositionConstants {
+        const val DEPLOY_INTAKE_POSITION = 0.0
+        const val RETRACT_INTAKE_POSITION = 0.0
+    }
 }

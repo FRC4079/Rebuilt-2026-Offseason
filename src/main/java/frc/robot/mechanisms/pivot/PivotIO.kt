@@ -15,7 +15,7 @@ interface PivotIO {
                 pivotAppliedVolts = 0.0,
                 pivotSupplyCurrentAmps = 0.0,
                 pivotTorqueCurrentAmps = 0.0,
-                pivotPositionState = PivotPosition.STOW,
+                pivotPositionState = PivotState.STOW,
             )
     }
 
@@ -26,10 +26,10 @@ interface PivotIO {
         var pivotAppliedVolts: Double,
         var pivotSupplyCurrentAmps: Double,
         var pivotTorqueCurrentAmps: Double,
-        var pivotPositionState: PivotPosition,
+        var pivotPositionState: PivotState,
     ) : ReflectiveLoggableInputs()
 
-    enum class PivotPosition(
+    enum class PivotState(
         val position: Double,
     ) {
         STOW(0.0),
@@ -51,11 +51,11 @@ interface PivotIO {
     fun setPower(power: Double) {}
 
     /**
-     * sets the pivot state, which sets position in periodic
+     * sets the pivot position, which sets position in periodic
      *
      * @param state the state to set the pivot to
      */
-    fun setPivotState(state: PivotPosition) {}
+    fun setPivotPosition(state: PivotState) {}
 
     /** Disables the motor  */
     fun disablePower() {}

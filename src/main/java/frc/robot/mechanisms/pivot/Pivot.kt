@@ -8,7 +8,7 @@ import org.wpilib.util.Alert
 
 class Pivot(
     private val io: PivotIO,
-): Mechanism {
+) : Mechanism {
     private val inputs = PivotIOInputsAutoLogged()
 
     // Connected debouncers
@@ -17,6 +17,8 @@ class Pivot(
     // Connection alerts
     private val alertType: String = "Pivot Alerts"
     private val pivotDisconnectedAlert: Alert
+
+    private val pivotState: PivotIO.PivotState = PivotIO.PivotState.STOW
 
     init {
         pivotDisconnectedAlert =
@@ -29,10 +31,14 @@ class Pivot(
 
         pivotDisconnectedAlert.set(!pivotMotorConnectedDebouncer.calculate(inputs.data.pivotConnected))
 
-        io.setPivotState(inputs.data.pivotPositionState)
+        io.setPivotPosition(inputs.data.pivotPositionState)
 
 //        if (DriverStation.isDisabled()) {
 //            io.setPivotState(PivotIO.PivotPosition.STOW)
 //        }
+    }
+
+    fun setState(state: PivotIO.PivotState) {
+        inputs.data.pivotPositionState = state
     }
 }

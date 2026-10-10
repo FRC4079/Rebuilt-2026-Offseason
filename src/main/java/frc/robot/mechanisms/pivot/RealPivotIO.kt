@@ -2,7 +2,6 @@ package frc.robot.mechanisms.pivot
 
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.CANBus
-import com.ctre.phoenix6.StatusCode
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
@@ -11,8 +10,6 @@ import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import frc.robot.utils.RobotParameters.PivotParameters
-import frc.robot.utils.RobotParameters.SwerveParameters
-import org.wpilib.math.controller.PIDController
 import org.wpilib.math.util.Units
 import org.wpilib.units.measure.Angle
 
@@ -20,7 +17,6 @@ class RealPivotIO : PivotIO {
     private val pivotTalon = TalonFX(PivotParameters.pivotMotor, CANBus(PivotParameters.PIVOT_CANPORT))
     private val pivotConfig = TalonFXConfiguration()
     private val pivotPositionRequest: PositionVoltage = PositionVoltage(0.0).withSlot(0)
-
     private val pivotPosition: StatusSignal<Angle>
 
     init {
@@ -74,7 +70,7 @@ class RealPivotIO : PivotIO {
      *
      * @param state The desired state of the pivot.
      */
-    override fun setPivotState(state: PivotIO.PivotPosition) {
+    override fun setPivotPosition(state: PivotIO.PivotState) {
         pivotTalon.setControl(pivotPositionRequest.withPosition(state.position))
     }
 }

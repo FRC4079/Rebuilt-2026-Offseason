@@ -52,7 +52,7 @@ class SimPivotIO : PivotIO {
      *
      * @param state The desired state of the pivot.
      */
-    override fun setPivotState(state: PivotIO.PivotPosition) {
+    override fun setPivotPosition(state: PivotIO.PivotState) {
         pivotSim.setAngle(state.position * 360.0)
     }
 }

@@ -18,12 +18,11 @@ import org.wpilib.math.util.Units
  * flywheel speed and hood angle come from the distance lookup in [ShotTable]. Runs continuously until
  * interrupted.
  */
-class Shoot(
+class ShootWithDistance(
     private val shooter: Shooter,
     private val hood: Hood,
     private val odometrySupplier: OdometrySupplier,
 ) : Command {
-
     override fun name(): String = "Shoot"
 
     override fun requirements(): Set<Mechanism> = setOf(shooter, hood)
