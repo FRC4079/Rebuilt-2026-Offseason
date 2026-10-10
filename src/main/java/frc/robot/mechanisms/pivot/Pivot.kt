@@ -18,27 +18,22 @@ class Pivot(
     private val alertType: String = "Pivot Alerts"
     private val pivotDisconnectedAlert: Alert
 
-    private val pivotState: PivotIO.PivotState = PivotIO.PivotState.STOW
-
     init {
         pivotDisconnectedAlert =
             Alert(alertType, "Disconnected pivot motor.", Alert.Level.MEDIUM)
     }
 
+    fun setState(state: PivotIO.PivotState) {
+        inputs.data.pivotState = state
+    }
+
     fun periodic() {
         io.updateInputs(inputs)
+
         Logger.processInputs("Pivot", inputs)
 
         pivotDisconnectedAlert.set(!pivotMotorConnectedDebouncer.calculate(inputs.data.pivotConnected))
 
-        io.setPivotPosition(inputs.data.pivotPositionState)
-
-//        if (DriverStation.isDisabled()) {
-//            io.setPivotState(PivotIO.PivotPosition.STOW)
-//        }
-    }
-
-    fun setState(state: PivotIO.PivotState) {
-        inputs.data.pivotPositionState = state
+        io.setPivotPosition(inputs.data.pivotState)
     }
 }

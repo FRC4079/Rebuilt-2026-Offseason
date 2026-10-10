@@ -1,8 +1,7 @@
 package frc.robot
 
-import frc.robot.commands.PadDrive
-import frc.robot.commands.SimpleShoot
-import frc.robot.commands.SpinIntake
+import frc.robot.commands.driving.PadDrive
+import frc.robot.commands.manipulating.SpinIntake
 import frc.robot.mechanisms.OdometrySupplier
 import frc.robot.mechanisms.Vision
 import frc.robot.mechanisms.drive.Swerve
@@ -25,11 +24,8 @@ import frc.robot.mechanisms.transport.RealTransportIO
 import frc.robot.mechanisms.transport.Transport
 import frc.robot.mechanisms.transport.TransportIO
 import frc.robot.utils.RobotParameters
-import frc.robot.utils.enums.State
 import org.wpilib.command3.Command
-import org.wpilib.command3.button.RobotModeTriggers.autonomous
 import org.wpilib.driverstation.XboxController
-import org.wpilib.math.kinematics.Odometry
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

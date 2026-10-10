@@ -1,8 +1,7 @@
-package frc.robot.commands
+package frc.robot.commands.manipulating
 
 import frc.robot.mechanisms.pivot.Pivot
 import frc.robot.mechanisms.pivot.PivotIO
-import frc.robot.utils.RobotParameters
 import org.wpilib.command3.Command
 import org.wpilib.command3.Coroutine
 import org.wpilib.command3.Mechanism

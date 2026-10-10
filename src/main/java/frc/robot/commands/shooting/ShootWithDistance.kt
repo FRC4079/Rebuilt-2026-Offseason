@@ -1,4 +1,4 @@
-package frc.robot.commands
+package frc.robot.commands.shooting
 
 import frc.robot.mechanisms.OdometrySupplier
 import frc.robot.mechanisms.hood.Hood

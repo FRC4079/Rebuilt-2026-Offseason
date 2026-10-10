@@ -1,10 +1,7 @@
-package frc.robot.commands
+package frc.robot.commands.driving
 
 import frc.robot.mechanisms.drive.Swerve
-import frc.robot.utils.RobotParameters.SwerveParameters.PhysicalParameters.MAX_ANGULAR_SPEED
-import frc.robot.utils.RobotParameters.SwerveParameters.PhysicalParameters.MAX_SPEED
-import frc.robot.utils.RobotParameters.SwerveParameters.Thresholds.X_DEADZONE
-import frc.robot.utils.RobotParameters.SwerveParameters.Thresholds.Y_DEADZONE
+import frc.robot.utils.RobotParameters
 import org.littletonrobotics.junction.Logger
 import org.wpilib.command3.Command
 import org.wpilib.command3.Coroutine
@@ -24,7 +21,14 @@ class PadDrive(
      */
     override fun run(coroutine: Coroutine) {
         val position = positionSet(pad)
-        val rotation = if (abs(pad.rightX) >= 0.1) -pad.rightX * MAX_ANGULAR_SPEED else 0.0
+        val rotation =
+            if (abs(pad.rightX) >=
+                0.1
+            ) {
+                -pad.rightX * RobotParameters.SwerveParameters.PhysicalParameters.MAX_ANGULAR_SPEED
+            } else {
+                0.0
+            }
 
         Logger.recordOutput("PadDrive/XJoystick", position.first)
         Logger.recordOutput("PadDrive/YJoystick", position.second)
@@ -46,11 +50,21 @@ class PadDrive(
          * the second element is the y-coordinate.
          */
         fun positionSet(pad: XboxController): Pair<Double, Double> {
-            var x = -pad.leftX * MAX_SPEED
-            if (abs(x) < X_DEADZONE * MAX_SPEED) x = 0.0
+            var x = -pad.leftX * RobotParameters.SwerveParameters.PhysicalParameters.MAX_SPEED
+            if (abs(x) <
+                RobotParameters.SwerveParameters.Thresholds.X_DEADZONE * RobotParameters.SwerveParameters.PhysicalParameters.MAX_SPEED
+            ) {
+                x =
+                    0.0
+            }
 
-            var y = -pad.leftY * MAX_SPEED
-            if (abs(y) < Y_DEADZONE * MAX_SPEED) y = 0.0
+            var y = -pad.leftY * RobotParameters.SwerveParameters.PhysicalParameters.MAX_SPEED
+            if (abs(y) <
+                RobotParameters.SwerveParameters.Thresholds.Y_DEADZONE * RobotParameters.SwerveParameters.PhysicalParameters.MAX_SPEED
+            ) {
+                y =
+                    0.0
+            }
 
             return x to y
         }
