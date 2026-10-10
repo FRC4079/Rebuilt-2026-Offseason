@@ -6,8 +6,8 @@ import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.CANcoderConfiguration
 import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
-import com.ctre.phoenix6.controls.PositionVoltage
-import com.ctre.phoenix6.controls.VelocityVoltage
+import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC
 import com.ctre.phoenix6.hardware.CANcoder
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
@@ -31,11 +31,13 @@ class RealModuleIO(
     private val driveTalon = TalonFX(config.driveMotorId, CANBus(config.canBUS))
     private val turnTalon = TalonFX(config.turnMotorId, CANBus(config.canBUS))
     private val encoder = CANcoder(config.encoderID, CANBus(config.canBUS))
-    private val encoderOffset = config.encoderOffset
     private val driveConfig = TalonFXConfiguration()
     private val turnConfig = TalonFXConfiguration()
-    private val positionVoltageRequest = PositionVoltage(0.0).withSlot(0)
-    private val velocityVoltageRequest = VelocityVoltage(0.0).withSlot(0)
+
+    // Pro-licensed closed-loop requests (FOC torque current)
+    private val positionTorqueRequest = PositionTorqueCurrentFOC(0.0).withSlot(0)
+    private val velocityTorqueRequest = VelocityTorqueCurrentFOC(0.0).withSlot(0)
+
     private val drivePosition: StatusSignal<Angle>
     private val driveVelocity: StatusSignal<AngularVelocity>
     private val driveAppliedVolts: StatusSignal<Voltage>
@@ -52,6 +54,12 @@ class RealModuleIO(
     init {
         // Configure drive motor
         driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake
+        driveConfig.MotorOutput.Inverted =
+            if (config.driveInverted) {
+                InvertedValue.Clockwise_Positive
+            } else {
+                InvertedValue.CounterClockwise_Positive
+            }
         driveConfig.Slot0 =
             Slot0Configs()
                 .withKP(SwerveParameters.PIDParameters.DRIVE_PID_TELE.p)
@@ -80,8 +88,10 @@ class RealModuleIO(
                 .withKI(SwerveParameters.PIDParameters.STEER_PID_TELE.i)
                 .withKD(SwerveParameters.PIDParameters.STEER_PID_TELE.d)
 
+        // FusedCANcoder (Pro): rotor position fused with CANcoder for the full 1:1
+        // azimuth range instead of absolute-position syncing
         turnConfig.Feedback.FeedbackRemoteSensorID = config.encoderID
-        turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder
+        turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder
         turnConfig.Feedback.RotorToSensorRatio = SwerveParameters.PhysicalParameters.STEER_MOTOR_GEAR_RATIO
         turnConfig.ClosedLoopGeneral.ContinuousWrap = true
         turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = SwerveParameters.PhysicalParameters.STEER_CURRENT_LIMIT
@@ -113,8 +123,12 @@ class RealModuleIO(
             if (encoder.configurator.apply(cancoderConfig, 0.25).isOK) break
         }
 
+        // Seed the turn motor's fused position from the CANcoder so the rotor
+        // reference matches the wheel's actual azimuth at boot. Refresh first —
+        // the signal hasn't been read yet and valueAsDouble would be stale.
+        val absRot = encoder.absolutePosition.refresh().valueAsDouble
         for (i in 0..4) {
-            if (turnTalon.setPosition(encoder.absolutePosition.valueAsDouble, 0.25).isOK) break
+            if (turnTalon.setPosition(absRot, 0.25).isOK) break
         }
 
         // Create drive status signals
@@ -188,6 +202,8 @@ class RealModuleIO(
                 turnTorqueCurrentAmps,
             )
         inputs.data.turnEncoderConnected = BaseStatusSignal.isAllGood(turnAbsolutePosition)
+        // Offset is applied once here, via MagnetOffset in the CANcoder config.
+        // Do NOT subtract config.encoderOffset again.
         inputs.data.turnAbsolutePosition = Rotation2d.fromRotations(turnAbsolutePosition.valueAsDouble)
         inputs.data.turnPosition = Rotation2d.fromRotations(turnPosition.valueAsDouble)
         inputs.data.turnVelocityRadPerSec = Units.rotationsToRadians(turnVelocity.valueAsDouble)
@@ -212,14 +228,17 @@ class RealModuleIO(
         feedforward: Double,
     ) {
         driveTalon.setControl(
-            velocityVoltageRequest
+            velocityTorqueRequest
                 .withVelocity(Units.radiansToRotations(velocityRadPerSec))
+                // NOTE: VelocityTorqueCurrentFOC feedforward is in AMPS (torque current),
+                // not volts. Callers passing a SimpleMotorFeedforward voltage need
+                // conversion (volts / kA or /12*slipCurrent).
                 .withFeedForward(feedforward),
         )
     }
 
     override fun runTurnPosition(rotation: Rotation2d) {
-        turnTalon.setControl(positionVoltageRequest.withPosition(rotation.rotations))
+        turnTalon.setControl(positionTorqueRequest.withPosition(rotation.rotations))
     }
 
     override fun setDrivePID(

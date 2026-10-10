@@ -58,7 +58,6 @@ object RobotParameters {
         val INTAKE_CANPORT: CANPort = CANPort.CAN_S1
 
         object PhysicalParameters {
-            // TODO: set INTAKE_GEAR_RATIO and INTAKE_CURRENT_LIMIT to real value
             const val INTAKE_GEAR_RATIO: Double = 1.0
             const val INTAKE_CURRENT_LIMIT: Double = 40.0
         }
@@ -74,7 +73,6 @@ object RobotParameters {
         val PIVOT_CANPORT: CANPort = CANPort.CAN_S1
 
         object PhysicalParameters {
-            // TODO: set PIVOT_CURRENT_LIMIT to real value
             const val PIVOT_CURRENT_LIMIT: Double = 40.0
         }
 
@@ -116,7 +114,7 @@ object RobotParameters {
         var indexerMotor: Int = CANBusParameters.INDEXER_MOTOR_ID
         val INDEXER_GEAR_RATIO: Double = 1.0
         val hopperMotor: Int = CANBusParameters.TRANSPORT_MOTOR_ID
-        val HOPPER_GEAR_RATIO: Double = 1.0 // TODO: set HOPPER_GEAR_RATIO and other gear ratios to real value
+        val HOPPER_GEAR_RATIO: Double = 1.0
         val HOPPER_CANPORT: CANPort = CANPort.CAN_D1
         val INDEXER_CANPORT: CANPort = CANPort.CAN_D1
 
@@ -138,83 +136,89 @@ object RobotParameters {
 
         fun getMode(): Mode = GlobalParameters.MODE
 
-        data class
-        ModuleConfig(
+        data class ModuleConfig(
             val driveMotorId: Int,
             val turnMotorId: Int,
             val encoderID: Int,
             val encoderOffset: Rotation2d,
             val turnInverted: Boolean,
+            val driveInverted: Boolean,
             val encoderInverted: Boolean,
             val canBUS: CANPort,
         )
 
         val MODULE_CONFIGS: Array<ModuleConfig> =
             arrayOf(
-                // FL
+                // FL (kInvertLeftSide = false)
                 ModuleConfig(
                     driveMotorId = CANBusParameters.FRONT_LEFT_DRIVE_ID,
                     turnMotorId = CANBusParameters.FRONT_LEFT_STEER_ID,
                     encoderID = CANBusParameters.FRONT_LEFT_CAN_CODER_ID,
-                    encoderOffset = Rotation2d(1.80240 * 2 * Math.PI),
+                    encoderOffset = Rotation2d.fromRotations(0.247802734375),
                     turnInverted = false,
+                    driveInverted = false,
                     encoderInverted = false,
                     canBUS = SWERVE_CANBUS_ID,
                 ),
-                // FR
+                // FR (kInvertRightSide = true)
                 ModuleConfig(
                     driveMotorId = CANBusParameters.FRONT_RIGHT_DRIVE_ID,
                     turnMotorId = CANBusParameters.FRONT_RIGHT_STEER_ID,
                     encoderID = CANBusParameters.FRONT_RIGHT_CAN_CODER_ID,
-                    encoderOffset = Rotation2d.fromRotations((-0.252930 - 0.139064)-0.5),
-//                    encoderOffset = Rotation2d(-0348633. * 2 * Math.PI),
+                    encoderOffset = Rotation2d.fromRotations(-0.34326171875),
                     turnInverted = false,
+                    driveInverted = true,
                     encoderInverted = false,
                     canBUS = SWERVE_CANBUS_ID,
                 ),
-                // BL
+                // BL (kInvertLeftSide = false)
                 ModuleConfig(
                     driveMotorId = CANBusParameters.BACK_LEFT_DRIVE_ID,
                     turnMotorId = CANBusParameters.BACK_LEFT_STEER_ID,
                     encoderID = CANBusParameters.BACK_LEFT_CAN_CODER_ID,
-                    encoderOffset = Rotation2d.fromDegrees(0.0),
+                    encoderOffset = Rotation2d.fromRotations(0.450927734375),
                     turnInverted = false,
+                    driveInverted = false,
                     encoderInverted = false,
                     canBUS = SWERVE_CANBUS_ID,
                 ),
-                // BR
+                // BR (kInvertRightSide = true)
                 ModuleConfig(
                     driveMotorId = CANBusParameters.BACK_RIGHT_DRIVE_ID,
                     turnMotorId = CANBusParameters.BACK_RIGHT_STEER_ID,
                     encoderID = CANBusParameters.BACK_RIGHT_CAN_CODER_ID,
-                    encoderOffset = Rotation2d.fromDegrees(0.0),
+                    encoderOffset = Rotation2d.fromRotations(-0.032958984375),
                     turnInverted = false,
+                    driveInverted = true,
                     encoderInverted = false,
                     canBUS = SWERVE_CANBUS_ID,
                 ),
             )
 
-        /** Class containing PID constants for the swerve drive system.  */
+        /** Class containing PID constants for the swerve drive system.
+         *
+         * NOTE: these gains are in TalonFX/CTRE units (volts, mechanism rotations),
+         * taken directly from the Tuner X project. They are NOT WPILib PIDController
+         * gains — if you ever run PID on the Rio instead of the Talons, retune them.
+         */
         object PIDParameters {
             @JvmField
-            val STEER_FF = SimpleMotorFeedforward(0.2, 2.3)
+            val STEER_FF = SimpleMotorFeedforward(0.1, 2.49)
 
             @JvmField
-            val DRIVE_FF = SimpleMotorFeedforward(0.2, 2.3)
+            val DRIVE_FF = SimpleMotorFeedforward(0.0, 0.124)
 
             @JvmField
-            val STEER_PID_TELE = PIDController(5.0, 0.000, 0.0)
-
-            // val STEER_PID_AUTO = PIDController(200.0, 0.000, 20.0, 0.0)
-            @JvmField
-            val STEER_PID_AUTO = PIDController(5.0, 0.000, 0.0)
-            // val STEER_PID_AUTO = PIDController(5.0, 0.000, 0.0, 1.0)
+            val STEER_PID_TELE = PIDController(100.0, 0.0, 0.5)
 
             @JvmField
-            val DRIVE_PID_AUTO = PIDController(5.0, 0.0, 0.0)
+            val STEER_PID_AUTO = PIDController(100.0, 0.0, 0.5)
 
             @JvmField
-            val DRIVE_PID_TELE = PIDController(5.0, 0.0, 0.0)
+            val DRIVE_PID_AUTO = PIDController(0.2, 0.0, 0.0)
+
+            @JvmField
+            val DRIVE_PID_TELE = PIDController(0.2, 0.0, 0.0)
 
             @JvmField
             val ROTATIONAL_PID = PIDController(1.0, 0.0, 0.0)
@@ -224,46 +228,37 @@ object RobotParameters {
 
             @JvmField
             val DIST_PID: PIDController = PIDController(0.2, 0.0, 0.0)
+
             val PASS_ROTATIONAL_PID: PIDController = PIDController(0.1, 0.0, 0.0)
-
-//            var pathFollower: PPHolonomicDriveController =
-//                PPHolonomicDriveController(
-//                    PIDConstants(5.0, 0.00, 0.0), // translation
-//                    PIDConstants(5.0, 0.0, 0.0), // rotation
-//                )
-
-//            @JvmField
-//            var config: RobotConfig? = null
-//
-//            init {
-//                try {
-//                    config = RobotConfig.fromGUISettings()
-//                } catch (e: Exception) {
-//                    throw RuntimeException("Failed to load robot config", e)
-//                }
-//            }
         }
 
         /** Class containing physical dimensions and kinematics for the swerve drive system.  */
         object PhysicalParameters {
             const val ROBOT_SIZE: Double = 0.43105229381
-            private val FRONT_LEFT: Translation2d = Translation2d(0.3048, 0.3048)
-            private val FRONT_RIGHT: Translation2d = Translation2d(0.3048, -0.3048)
-            private val BACK_LEFT: Translation2d = Translation2d(-0.3048, 0.3048)
-            private val BACK_RIGHT: Translation2d = Translation2d(-0.3048, -0.3048)
+
+            // 9.475 inches in meters (from Tuner X)
+            private const val MODULE_POS: Double = 0.240665
+            private val FRONT_LEFT: Translation2d = Translation2d(MODULE_POS, MODULE_POS)
+            private val FRONT_RIGHT: Translation2d = Translation2d(MODULE_POS, -MODULE_POS)
+            private val BACK_LEFT: Translation2d = Translation2d(-MODULE_POS, MODULE_POS)
+            private val BACK_RIGHT: Translation2d = Translation2d(-MODULE_POS, -MODULE_POS)
             val MODULE_LOCATIONS: Array<Translation2d> = arrayOf(FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT)
 
             // Motor Property Values
-            const val MAX_SPEED: Double = 5.76
+            // Measured speed at 12V from Tuner X (not theoretical free speed)
+            const val MAX_SPEED: Double = 4.39
             const val MAX_ANGULAR_SPEED: Double = (14 * Math.PI) / 3
             const val STEER_MOTOR_GEAR_RATIO: Double = 287.0 / 11.0
-            const val DRIVE_MOTOR_GEAR_RATIO: Double = 7.03
+            const val DRIVE_MOTOR_GEAR_RATIO: Double = 7.03125
             const val WHEEL_DIAMETER: Double = 0.1016
             const val METERS_PER_REV: Double = WHEEL_DIAMETER * Math.PI * 0.975
 
-            // Limit Values
-            const val DRIVE_CURRENT_LIMIT: Double = 80.0
-            const val STEER_CURRENT_LIMIT: Double = 40.0
+            // Every 1 rotation of the azimuth = kCoupleRatio drive motor turns
+            const val COUPLE_RATIO: Double = 4.5
+
+            // Limit Values (from Tuner X: 120A slip, 60A steer stator)
+            const val DRIVE_CURRENT_LIMIT: Double = 120.0
+            const val STEER_CURRENT_LIMIT: Double = 60.0
 
             @JvmField
             val kinematics: SwerveDriveKinematics =
@@ -273,12 +268,6 @@ object RobotParameters {
         /** Class containing various thresholds and constants for the swerve drive system.  */
         object Thresholds {
             const val STATE_SPEED_THRESHOLD: Double = 0.05
-
-            @JvmField
-            val DRIVE_MOTOR_INVERTED: InvertedValue = InvertedValue.CounterClockwise_Positive
-
-            @JvmField
-            val STEER_MOTOR_INVERTED: InvertedValue = InvertedValue.Clockwise_Positive
 
             const val TURN_DEADBAND_DEGREES: Double = 0.3
 
@@ -301,9 +290,6 @@ object RobotParameters {
 
     /** Class containing constants for the Vision subsystem.  */
     object VisionParameters {
-        // The pose of the camera relative to the robot center
-        // (x = forward, y = left, z = up, in meters)
-
         val CAMERAS: Array<Limelight> =
             arrayOf(
                 Limelight(
