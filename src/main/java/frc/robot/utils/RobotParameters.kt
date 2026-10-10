@@ -69,7 +69,7 @@ object RobotParameters {
     object PivotParameters {
         val pivotMotor: Int = CANBusParameters.INTAKE_PIVOT_MOTOR_ID
         val PIVOT_GEAR_RATIO: Double = 150.0 / 7.0
-        val PIVOT_CANPORT: CANPort = CANPort.CAN_D1
+        val PIVOT_CANPORT: CANPort = CANPort.CAN_S1
 
         object PhysicalParameters {
             // TODO: set PIVOT_CURRENT_LIMIT to real value
