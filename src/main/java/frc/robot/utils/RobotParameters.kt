@@ -85,7 +85,7 @@ object RobotParameters {
         val shooterLeftMotor: Int = CANBusParameters.SHOOTER_LEFT_MOTOR_ID
         val shooterRightMotor: Int = CANBusParameters.SHOOTER_RIGHT_MOTOR_ID
         val SHOOTER_GEAR_RATIO: Double = 1.0
-        val SHOOTER_CANPORT: CANPort = CANPort.CAN_D1
+        val SHOOTER_CANPORT: CANPort = CANPort.CAN_S1
 
         object PhysicalParameters {
             const val SHOOTER_CURRENT_LIMIT: Double = 40.0
@@ -99,7 +99,7 @@ object RobotParameters {
     object HoodParameters {
         val hoodMotor: Int = CANBusParameters.HOOD_MOTOR_ID
         val HOOD_GEAR_RATIO: Double = 1.0
-        val HOOD_CANPORT: CANPort = CANPort.CAN_D1
+        val HOOD_CANPORT: CANPort = CANPort.CAN_S1
 
         object PhysicalParameters {
             const val HOOD_CURRENT_LIMIT: Double = 40.0
@@ -115,8 +115,8 @@ object RobotParameters {
         val INDEXER_GEAR_RATIO: Double = 1.0
         val hopperMotor: Int = CANBusParameters.TRANSPORT_MOTOR_ID
         val HOPPER_GEAR_RATIO: Double = 1.0
-        val HOPPER_CANPORT: CANPort = CANPort.CAN_D1
-        val INDEXER_CANPORT: CANPort = CANPort.CAN_D1
+        val HOPPER_CANPORT: CANPort = CANPort.CAN_S1
+        val INDEXER_CANPORT: CANPort = CANPort.CAN_S1
 
         object PhysicalParameters {
             const val TRANSPORT_CURRENT_LIMIT: Double = 40.0
@@ -209,16 +209,16 @@ object RobotParameters {
             val DRIVE_FF = SimpleMotorFeedforward(0.0, 0.124)
 
             @JvmField
-            val STEER_PID_TELE = PIDController(100.0, 0.0, 0.5)
+            val STEER_PID_TELE = PIDController(45.0, 0.0, 2.0)
 
             @JvmField
-            val STEER_PID_AUTO = PIDController(100.0, 0.0, 0.5)
+            val STEER_PID_AUTO = PIDController(45.0, 0.0, 2.0)
 
             @JvmField
-            val DRIVE_PID_AUTO = PIDController(0.2, 0.0, 0.0)
+            val DRIVE_PID_AUTO = PIDController(100.0, 0.0, 0.0)
 
             @JvmField
-            val DRIVE_PID_TELE = PIDController(0.2, 0.0, 0.0)
+            val DRIVE_PID_TELE = PIDController(100.0, 0.0, 0.0)
 
             @JvmField
             val ROTATIONAL_PID = PIDController(1.0, 0.0, 0.0)

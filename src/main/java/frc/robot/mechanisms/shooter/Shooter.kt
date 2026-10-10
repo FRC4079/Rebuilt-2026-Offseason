@@ -18,8 +18,13 @@ class Shooter(
 
     // Connection alerts
     private val alertType: String = "Shooter Alerts"
-    private val topDisconnectedAlert: Alert = Alert(alertType, "Disconnected top shooter motor.", Alert.Level.MEDIUM)
-    private val bottomDisconnectedAlert: Alert = Alert(alertType, "Disconnected bottom shooter motor.", Alert.Level.MEDIUM)
+    private val topDisconnectedAlert: Alert
+    private val bottomDisconnectedAlert: Alert
+
+    init {
+        topDisconnectedAlert = Alert("$alertType - Top", "Disconnected top shooter motor.", Alert.Level.MEDIUM)
+        bottomDisconnectedAlert = Alert("$alertType - Bottom", "Disconnected bottom shooter motor.", Alert.Level.MEDIUM)
+    }
 
     fun periodic() {
         io.updateInputs(inputs)
