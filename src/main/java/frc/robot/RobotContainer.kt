@@ -41,8 +41,8 @@ class RobotContainer {
 //    val pivot: Pivot = Pivot()
 
     // VIRTUAL SUBSYSTEMS
-    val vision: Vision = Vision(RobotParameters.VisionParameters.CAMERAS)
-    val odometrySupplier: OdometrySupplier = OdometrySupplier(swerve, vision)
+//    val vision: Vision = Vision(RobotParameters.VisionParameters.CAMERAS)
+//    val odometrySupplier: OdometrySupplier = OdometrySupplier(swerve, vision)
 
     var autonomous: Command? = null
 

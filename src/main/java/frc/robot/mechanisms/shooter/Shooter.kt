@@ -38,7 +38,7 @@ class Shooter(
 
     fun setState(state: State) {
         targetVelocityRadPerSec = null
-        inputs.data.shooterState = state
+//        inputs.data.shooterState = state
     }
 
     fun setVelocity(velocityRadPerSec: Double) {

@@ -200,18 +200,18 @@ object RobotParameters {
             val DRIVE_FF = SimpleMotorFeedforward(0.2, 2.3)
 
             @JvmField
-            val STEER_PID_TELE = PIDController(250.0, 0.000, 20.0, 0.5)
+            val STEER_PID_TELE = PIDController(5.0, 0.000, 0.0)
 
             // val STEER_PID_AUTO = PIDController(200.0, 0.000, 20.0, 0.0)
             @JvmField
-            val STEER_PID_AUTO = PIDController(750.0, 5.000, 15.0, 0.5)
+            val STEER_PID_AUTO = PIDController(5.0, 0.000, 0.0)
             // val STEER_PID_AUTO = PIDController(5.0, 0.000, 0.0, 1.0)
 
             @JvmField
-            val DRIVE_PID_AUTO = PIDController(5.0, 0.0, 0.0, 0.4)
+            val DRIVE_PID_AUTO = PIDController(5.0, 0.0, 0.0)
 
             @JvmField
-            val DRIVE_PID_TELE = PIDController(5.0, 0.0, 0.0, 0.4)
+            val DRIVE_PID_TELE = PIDController(5.0, 0.0, 0.0)
 
             @JvmField
             val ROTATIONAL_PID = PIDController(0.2, 0.0, 0.0)
