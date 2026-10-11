@@ -3,6 +3,8 @@ package frc.robot.commands.shooting
 import frc.robot.mechanisms.OdometrySupplier
 import frc.robot.mechanisms.hood.Hood
 import frc.robot.mechanisms.shooter.Shooter
+import frc.robot.mechanisms.transport.Transport
+import frc.robot.mechanisms.transport.TransportIO
 import frc.robot.utils.ShotPoint
 import frc.robot.utils.ShotTable
 import frc.robot.utils.enums.GlobalState
@@ -22,6 +24,7 @@ class ShootWithDistance(
     private val shooter: Shooter,
     private val hood: Hood,
     private val odometrySupplier: OdometrySupplier,
+    val transport: Transport,
 ) : Command {
     override fun name(): String = "Shoot"
 
@@ -40,6 +43,7 @@ class ShootWithDistance(
             GlobalState.state = State.SHOOT
 
             shooter.setState(State.SHOOT)
+            transport.setState(TransportIO.TransportState.ACTIVE)
 
             shooter.setVelocity(Units.rotationsPerMinuteToRadiansPerSecond(shot.flywheelRPM))
             hood.setPosition(Units.degreesToRadians(shot.hoodAngleDegrees))
@@ -54,6 +58,7 @@ class ShootWithDistance(
 
     override fun onCancel() {
         shooter.disable()
+        transport.disable()
         hood.disable()
     }
 }

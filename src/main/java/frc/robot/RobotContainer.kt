@@ -78,9 +78,11 @@ class RobotContainer {
      * the named factories in [CommandGenericHID]'s subclasses for [ ]/[CommandPS4Controller] controllers or [CommandJoystick].
      */
     private fun configureBindings() {
-        pad.aButtonPressed.run { SpinIntake(intake) }
-        pad.bButtonPressed.run { swerve.resetGyro() }
-        pad.xButtonPressed. run { ShootWithDistance(shooter, hood, odometrySupplier) }
+//        pad.aButtonPressed.run { SpinIntake(intake) }
+        pad.bButtonPressed.run {
+            swerve.resetGyro()
+        }
+//        pad.xButtonPressed. run { ShootWithDistance(shooter, hood, odometrySupplier) }
         pad.yButtonPressed.run { DeployIntake(pivot) }
 
     }

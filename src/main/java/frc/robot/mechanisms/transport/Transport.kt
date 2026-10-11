@@ -31,12 +31,14 @@ class Transport (
 
         io.setTransportState(inputs.data.transportState)
 
-//        if (DriverStation.isDisabled()) {
-//            io.setPivotState(PivotIO.PivotPosition.STOW)
-//        }
     }
 
     fun setState(state: TransportIO.TransportState) {
         inputs.data.transportState = state
+    }
+
+    fun disable() {
+        io.disablePower()
+        inputs.data.transportState = TransportIO.TransportState.STOP
     }
 }
