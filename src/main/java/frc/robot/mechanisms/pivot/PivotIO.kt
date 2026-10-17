@@ -33,7 +33,7 @@ interface PivotIO {
         val position: Double,
     ) {
         STOW(0.0),
-        DEPLOY(10.0),
+        DEPLOY(-37.29),
     }
 
     /**

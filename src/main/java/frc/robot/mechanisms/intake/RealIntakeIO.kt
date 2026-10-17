@@ -119,7 +119,7 @@ class RealIntakeIO() : IntakeIO {
 
     override fun setVelocity(velocityRadPerSec: Double) {
         intakeMotorLeft.setControl(velocityControl.withVelocity(velocityRadPerSec))
-        intakeMotorRight.setControl(velocityControl.withVelocity(velocityRadPerSec))
+        intakeMotorRight.setControl(velocityControl.withVelocity(-velocityRadPerSec))
     }
 
     override fun setIntakePID(

@@ -157,6 +157,11 @@ class RealTransportIO () : TransportIO {
             if (indexerTalon.configurator.apply(indexerConfig, 0.25).isOK) break
         }
     }
+
+    override fun disablePower() {
+        indexerTalon.setControl(indexerVelocityRequest.withVelocity(0.0))
+        hopperTalon.setControl(hopperVelocityRequest.withVelocity(0.0))
+    }
 //
 //    override fun stop() {
 //        intakeMotor.setControl(voltageControl.withOutput(0.0))

@@ -39,6 +39,6 @@ class Transport (
 
     fun disable() {
         io.disablePower()
-        inputs.data.transportState = TransportIO.TransportState.STOP
+        setState(TransportIO.TransportState.STOP)
     }
 }

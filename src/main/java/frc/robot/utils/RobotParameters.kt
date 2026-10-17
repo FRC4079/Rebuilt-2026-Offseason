@@ -58,12 +58,12 @@ object RobotParameters {
         val INTAKE_CANPORT: CANPort = CANPort.CAN_S1
 
         object PhysicalParameters {
-            const val INTAKE_GEAR_RATIO: Double = 1.0
+            const val INTAKE_GEAR_RATIO: Double = 29.0/12.0
             const val INTAKE_CURRENT_LIMIT: Double = 40.0
         }
 
         object PIDParameters {
-            val INTAKE_PID = PIDController(5.0, 0.0, 0.0)
+            val INTAKE_PID = PIDController(30.0, 0.0, 0.0)
         }
     }
 
@@ -123,8 +123,8 @@ object RobotParameters {
         }
 
         object PIDParameters {
-            val INDEXER_PID = PIDController(0.5, 0.0, 0.0)
-            val HOPPER_PID = PIDController(0.5, 0.0, 0.0) //Sat. PID for both was 5.0
+            val INDEXER_PID = PIDController(1.0, 1.2, 0.08)
+            val HOPPER_PID = PIDController(1.0, 1.2, 0.08) //Sat. PID for both was 5.0
         }
     }
 

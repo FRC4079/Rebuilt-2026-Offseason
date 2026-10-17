@@ -15,6 +15,7 @@ class DeployIntake(
 
     override fun run(coroutine: Coroutine?) {
         while (true) {
+            println("alkdsfjlk;asjdfl;kasjdf;lkjaslk;dfjasdf")
             pivot.setState(PivotIO.PivotState.DEPLOY)
             coroutine?.yield()
         }

@@ -24,7 +24,7 @@ class ShootWithDistance(
     private val shooter: Shooter,
     private val hood: Hood,
     private val odometrySupplier: OdometrySupplier,
-    val transport: Transport,
+    //val transport: Transport,
 ) : Command {
     override fun name(): String = "Shoot"
 
@@ -43,7 +43,7 @@ class ShootWithDistance(
             GlobalState.state = State.SHOOT
 
             shooter.setState(State.SHOOT)
-            transport.setState(TransportIO.TransportState.ACTIVE)
+            //transport.setState(TransportIO.TransportState.ACTIVE)
 
             shooter.setVelocity(Units.rotationsPerMinuteToRadiansPerSecond(shot.flywheelRPM))
             hood.setPosition(Units.degreesToRadians(shot.hoodAngleDegrees))
@@ -58,7 +58,7 @@ class ShootWithDistance(
 
     override fun onCancel() {
         shooter.disable()
-        transport.disable()
+        //transport.disable()
         hood.disable()
     }
 }

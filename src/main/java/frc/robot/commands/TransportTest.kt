@@ -1,0 +1,27 @@
+package frc.robot.commands
+
+import frc.robot.mechanisms.intake.Intake
+import frc.robot.mechanisms.transport.Transport
+import frc.robot.mechanisms.transport.TransportIO
+import org.wpilib.command3.Command
+import org.wpilib.command3.Coroutine
+import org.wpilib.command3.Mechanism
+
+class TransportTest(
+    val transport: Transport,
+) : Command {
+    override fun name(): String = "TransportTest"
+
+    override fun requirements(): Set<Mechanism> = setOf(transport)
+
+    override fun run(coroutine: Coroutine) {
+        while (true) {
+            transport.setState(TransportIO.TransportState.ACTIVE)
+            coroutine.yield()
+        }
+    }
+
+    override fun onCancel() {
+        transport.disable()
+    }
+}

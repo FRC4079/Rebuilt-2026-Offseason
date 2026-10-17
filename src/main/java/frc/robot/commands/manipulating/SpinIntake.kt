@@ -14,7 +14,7 @@ class SpinIntake(
 
     override fun run(coroutine: Coroutine) {
         while (true) {
-            intake.setVelocity(600.0)
+            intake.setVelocity(-600.0)
             coroutine.yield()
         }
     }
