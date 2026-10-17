@@ -6,13 +6,14 @@ import org.littletonrobotics.junction.Logger
 import org.wpilib.command3.Command
 import org.wpilib.command3.Coroutine
 import org.wpilib.command3.Mechanism
+import org.wpilib.command3.button.CommandXboxController
 import org.wpilib.driverstation.XboxController
 import kotlin.math.abs
 
 /** Command to control the robot's swerve drive using the Xbox controller. */
 class PadDrive(
     private val swerve: Swerve,
-    private val pad: XboxController,
+    private val pad: CommandXboxController,
 ) : Command {
     /**
      * Called every time the scheduler runs while the command is scheduled. This method retrieves the
@@ -49,7 +50,7 @@ class PadDrive(
          * @return The coordinate representing the position. The first element is the x-coordinate, and
          * the second element is the y-coordinate.
          */
-        fun positionSet(pad: XboxController): Pair<Double, Double> {
+        fun positionSet(pad: CommandXboxController): Pair<Double, Double> {
             var x = -pad.leftX * RobotParameters.SwerveParameters.PhysicalParameters.MAX_SPEED
             if (abs(x) <
                 RobotParameters.SwerveParameters.Thresholds.X_DEADZONE * RobotParameters.SwerveParameters.PhysicalParameters.MAX_SPEED

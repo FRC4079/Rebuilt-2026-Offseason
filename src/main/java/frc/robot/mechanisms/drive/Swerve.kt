@@ -5,9 +5,11 @@ import frc.robot.mechanisms.drive.gyro.GyroIO
 import frc.robot.mechanisms.drive.gyro.GyroIOInputsAutoLogged
 import frc.robot.mechanisms.drive.module.ModuleIO
 import frc.robot.mechanisms.drive.module.SwerveModule
+import frc.robot.mechanisms.pivot.PivotIO
 import frc.robot.utils.RobotParameters.SwerveParameters
 import org.littletonrobotics.junction.Logger
 import org.wpilib.command3.Command
+import org.wpilib.command3.Coroutine
 import org.wpilib.command3.Mechanism
 import org.wpilib.math.geometry.Rotation2d
 import org.wpilib.math.kinematics.ChassisVelocities

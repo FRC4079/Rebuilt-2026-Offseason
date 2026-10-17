@@ -1,6 +1,7 @@
 package frc.robot
 
 import frc.robot.commands.driving.PadDrive
+import frc.robot.commands.driving.ResetGyro
 import frc.robot.commands.manipulating.DeployIntake
 import frc.robot.commands.manipulating.SpinIntake
 import frc.robot.commands.shooting.ShootWithDistance
@@ -27,6 +28,9 @@ import frc.robot.mechanisms.transport.Transport
 import frc.robot.mechanisms.transport.TransportIO
 import frc.robot.utils.RobotParameters
 import org.wpilib.command3.Command
+import org.wpilib.command3.Scheduler
+import org.wpilib.command3.button.CommandGamepad
+import org.wpilib.command3.button.CommandXboxController
 import org.wpilib.driverstation.XboxController
 
 /**
@@ -36,7 +40,7 @@ import org.wpilib.driverstation.XboxController
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 class RobotContainer {
-    val pad: XboxController = XboxController(0)
+    val pad: CommandXboxController = CommandXboxController(0)
 
     // CREATE IOS
 
@@ -78,10 +82,10 @@ class RobotContainer {
      * the named factories in [CommandGenericHID]'s subclasses for [ ]/[CommandPS4Controller] controllers or [CommandJoystick].
      */
     private fun configureBindings() {
-        pad.aButtonPressed.run { SpinIntake(intake) }
-        pad.bButtonPressed.run { swerve.resetGyro() }
-        pad.xButtonPressed. run { ShootWithDistance(shooter, hood, odometrySupplier) }
-        pad.yButtonPressed.run { DeployIntake(pivot) }
+        pad.a().whileTrue(SpinIntake(intake))
+        pad.b().onTrue(ResetGyro(swerve))
+        pad.x().whileTrue(ShootWithDistance(shooter, hood, odometrySupplier))
+        pad.y().whileTrue(DeployIntake(pivot))
 
     }
 
