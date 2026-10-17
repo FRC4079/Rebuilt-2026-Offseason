@@ -1,4 +1,4 @@
-import groovy.json.JsonSlurper
+    import groovy.json.JsonSlurper
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
