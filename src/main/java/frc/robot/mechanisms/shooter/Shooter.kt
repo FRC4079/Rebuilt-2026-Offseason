@@ -33,12 +33,12 @@ class Shooter(
         topDisconnectedAlert.set(!topMotorConnectedDebouncer.calculate(inputs.data.topMotorConnected))
         bottomDisconnectedAlert.set(!bottomMotorConnectedDebouncer.calculate(inputs.data.bottomMotorConnected))
 
-        val target = targetVelocityRadPerSec
-        if (target != null) {
-            io.setVelocity(target)
-        } else {
-            io.setShooterState(inputs.data.shooterState)
-        }
+//        val target = targetVelocityRadPerSec
+//        if (target != null) {
+//            io.setVelocity(target)
+//        } else {
+//            io.setShooterState(inputs.data.shooterState)
+//        }
     }
 
     fun setState(state: State) {

@@ -14,7 +14,7 @@ class SimpleShoot(
 
     override fun run(coroutine: Coroutine) {
         while (true) {
-            shooter.setVelocity(600.0)
+            shooter.setVelocity(450.0)
             coroutine.yield()
         }
     }

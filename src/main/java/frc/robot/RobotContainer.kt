@@ -6,6 +6,7 @@ import frc.robot.commands.driving.ResetGyro
 import frc.robot.commands.manipulating.DeployIntake
 import frc.robot.commands.manipulating.SpinIntake
 import frc.robot.commands.shooting.ShootWithDistance
+import frc.robot.commands.shooting.SimpleShoot
 import frc.robot.mechanisms.OdometrySupplier
 import frc.robot.mechanisms.Vision
 import frc.robot.mechanisms.drive.Swerve
@@ -88,6 +89,7 @@ class RobotContainer {
         pad.x().whileTrue(ShootWithDistance(shooter, hood, odometrySupplier))
         pad.y().whileTrue(DeployIntake(pivot))
         pad.rightBumper().whileTrue(TransportTest(transport))
+        pad.leftBumper().whileTrue(SimpleShoot(shooter))
 
     }
 

@@ -8,7 +8,7 @@ import org.wpilib.simulation.DCMotorSim
 import java.lang.Math.clamp
 import kotlin.math.abs
 
-class SimHoodIO : HoodIO {
+class   SimHoodIO : HoodIO {
     private val hoodMotorModel: DCMotor = DCMotor.getKrakenX60Foc(1)
 
     private val hoodSim =

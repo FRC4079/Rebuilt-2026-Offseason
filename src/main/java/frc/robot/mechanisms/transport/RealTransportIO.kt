@@ -30,7 +30,7 @@ class RealTransportIO () : TransportIO {
 
     init {
         // Configure indexer motor ouughh...
-        indexerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake
+        indexerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast
         indexerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive
 
         indexerConfig.Slot0 =
@@ -52,7 +52,7 @@ class RealTransportIO () : TransportIO {
         }
 
         // Configure hopper motor ouughh...
-        hopperConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake
+        hopperConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast
         hopperConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive
 
         hopperConfig.Slot0 =
@@ -115,8 +115,8 @@ class RealTransportIO () : TransportIO {
      * @param state The desired state of the pivot.
      */
     override fun setTransportState(state: TransportIO.TransportState) {
-        hopperTalon.setControl(hopperVelocityRequest.withVelocity(state.velocity))
-        indexerTalon.setControl(indexerVelocityRequest.withVelocity(state.velocity))
+        hopperTalon.setControl(hopperVelocityRequest.withVelocity(-state.velocity))
+        indexerTalon.setControl(indexerVelocityRequest.withVelocity(-state.velocity))
     }
 
 //    override fun setVoltage(volts: Double) {
@@ -159,8 +159,9 @@ class RealTransportIO () : TransportIO {
     }
 
     override fun disablePower() {
-        indexerTalon.setControl(indexerVelocityRequest.withVelocity(0.0))
-        hopperTalon.setControl(hopperVelocityRequest.withVelocity(0.0))
+        setTransportState(TransportIO.TransportState.STOP)
+        indexerTalon.stopMotor()
+        hopperTalon.stopMotor()
     }
 //
 //    override fun stop() {

@@ -73,11 +73,11 @@ object RobotParameters {
         val PIVOT_CANPORT: CANPort = CANPort.CAN_S1
 
         object PhysicalParameters {
-            const val PIVOT_CURRENT_LIMIT: Double = 40.0
+            const val PIVOT_CURRENT_LIMIT: Double = 20.0
         }
 
         object PIDParameters {
-            val PIVOT_PID = PIDController(0.25, 0.0, 0.0)
+            val PIVOT_PID = PIDController(0.5, 0.0, 0.0)
         }
     }
 
@@ -123,8 +123,8 @@ object RobotParameters {
         }
 
         object PIDParameters {
-            val INDEXER_PID = PIDController(1.0, 1.2, 0.08)
-            val HOPPER_PID = PIDController(1.0, 1.2, 0.08) //Sat. PID for both was 5.0
+            val INDEXER_PID = PIDController(0.5, 0.0, 0.0)
+            val HOPPER_PID = PIDController(0.5, 0.0, 0.0) //Sat. PID for both was 5.0
         }
     }
 
@@ -209,16 +209,16 @@ object RobotParameters {
             val DRIVE_FF = SimpleMotorFeedforward(0.0, 0.124)
 
             @JvmField
-            val STEER_PID_TELE = PIDController(200.0, 0.5, 5.0)
+            val STEER_PID_TELE = PIDController(400.0, 0.0, 0.01)
 
             @JvmField
-            val STEER_PID_AUTO = PIDController(200.0, 0.5, 5.0)
+            val STEER_PID_AUTO = PIDController(400.0, 0.0, 0.01)
 
             @JvmField
-            val DRIVE_PID_AUTO = PIDController(600.0, 1.0, 10.0)
+            val DRIVE_PID_AUTO = PIDController(600.0, 0.0005, 0.05)
 
             @JvmField
-            val DRIVE_PID_TELE = PIDController(600.0, 1.0, 10.0)
+            val DRIVE_PID_TELE = PIDController(600.0, 0.0005, 0.05)
 
             @JvmField
             val ROTATIONAL_PID = PIDController(1.0, 0.0, 0.0)
@@ -278,8 +278,8 @@ object RobotParameters {
             const val IS_FIELD_ORIENTED: Boolean = true
             const val SHOULD_INVERT: Boolean = false
             const val ENCODER_OFFSET: Double = (0 / 360.0)
-            const val X_DEADZONE: Double = 0.0
-            const val Y_DEADZONE: Double = 0.0
+            const val X_DEADZONE: Double = 0.05
+            const val Y_DEADZONE: Double = 0.05
             const val OFF_BALANCE_ANGLE_THRESHOLD: Double = 10.0
             const val ON_BALANCE_ANGLE_THRESHOLD: Double = 5.0
 
