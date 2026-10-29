@@ -11,25 +11,23 @@ import org.wpilib.command3.Mechanism
 
 class DeployIntake(
     val pivot: Pivot,
-//    val transport: Transport,
+    val transport: Transport,
 //    val intake: Intake,
 ) : Command {
     override fun name(): String = "DeployIntake"
 
-    override fun requirements(): Set<Mechanism> = setOf(pivot)
+    override fun requirements(): Set<Mechanism> = setOf(pivot, transport)
 
     override fun run(coroutine: Coroutine?) {
         while (true) {
-            pivot.setState(PivotIO.PivotState.DEPLOY)
-//            transport.setState(TransportIO.TransportState.ACTIVE)
+            pivot.swapPosition()
+            transport.setVelocity(TransportIO.TransportState.MEDIUM.velocity)
 //            intake.setVelocity(-600.0)
             coroutine?.yield()
         }
     }
 
     override fun onCancel() {
-        pivot.setState(PivotIO.PivotState.STOW)
-//        intake.stop()
-//        transport.disable()
+        transport.disable()
     }
 }

@@ -77,6 +77,7 @@ class RealHoodIO : HoodIO {
                 hoodVoltage,
             )
         inputs.data.hoodPositionRad = Units.rotationsToRadians(hoodPosition.valueAsDouble)
+        print(inputs.data.hoodPositionRad)
         inputs.data.hoodVelocityRadPerSec = Units.rotationsToRadians(hoodVelocity.valueAsDouble)
         inputs.data.hoodAppliedVolts = hoodVoltage.valueAsDouble
         inputs.data.hoodSupplyCurrentAmps = hoodSupplyCurrent.valueAsDouble

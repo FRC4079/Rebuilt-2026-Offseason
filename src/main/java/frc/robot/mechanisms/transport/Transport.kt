@@ -29,12 +29,16 @@ class Transport (
 
         transportDisconnectedAlert.set(!motorConnectedDebouncer.calculate(inputs.data.hopperConnected) || !motorConnectedDebouncer.calculate(inputs.data.indexerConnected))
 
-        io.setTransportState(inputs.data.transportState)
+//        io.setTransportState(inputs.data.transportState)
 
     }
 
     fun setState(state: TransportIO.TransportState) {
         inputs.data.transportState = state
+    }
+
+    fun setVelocity(speed: Double) {
+        io.setVelocity(speed)
     }
 
     fun disable() {

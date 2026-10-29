@@ -1,4 +1,4 @@
-package frc.robot.commands.manipulating
+package frc.robot.commands.manipulating.simple
 
 import frc.robot.mechanisms.intake.Intake
 import org.wpilib.command3.Command
@@ -6,7 +6,7 @@ import org.wpilib.command3.Coroutine
 import org.wpilib.command3.Mechanism
 
 class SpinIntake(
-    val intake: Intake,
+    val intake: Intake
 ) : Command {
     override fun name(): String = "SpinIntake"
 
@@ -14,7 +14,8 @@ class SpinIntake(
 
     override fun run(coroutine: Coroutine) {
         while (true) {
-            intake.setVelocity(-600.0)
+            intake.setVelocity(-650.0)
+//            hood.setPosition()
             coroutine.yield()
         }
     }

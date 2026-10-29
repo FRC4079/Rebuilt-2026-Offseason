@@ -77,7 +77,7 @@ object RobotParameters {
         }
 
         object PIDParameters {
-            val PIVOT_PID = PIDController(0.5, 0.0, 0.0)
+            val PIVOT_PID = PIDController(5.0, 0.0, 0.0)
         }
     }
 
@@ -92,7 +92,7 @@ object RobotParameters {
         }
 
         object PIDParameters {
-            val SHOOTER_PID = PIDController(5.0, 0.0, 0.0)
+            val SHOOTER_PID = PIDController(15.0, 0.0, 0.0)
         }
     }
 

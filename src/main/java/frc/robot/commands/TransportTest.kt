@@ -16,7 +16,7 @@ class TransportTest(
 
     override fun run(coroutine: Coroutine) {
         while (true) {
-            transport.setState(TransportIO.TransportState.ACTIVE)
+            transport.setVelocity(50.0)
             coroutine.yield()
         }
     }

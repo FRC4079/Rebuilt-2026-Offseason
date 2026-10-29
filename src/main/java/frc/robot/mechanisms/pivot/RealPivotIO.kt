@@ -64,13 +64,17 @@ class RealPivotIO : PivotIO {
         inputs.data.pivotTorqueCurrentAmps = pivotTalon.torqueCurrent.valueAsDouble
         inputs.data.pivotVelocityRadPerSec = pivotTalon.supplyCurrent.valueAsDouble
     }
+//
+//    /**
+//     * Sets the angle of the simPivot motor based on state. Flips the state.
+//     *
+//     * @param state The desired state of the pivot.
+//     */
+//    override fun setPivotPosition(state: PivotIO.PivotState) {
+//        pivotTalon.setPosition(state.position)
+//    }
 
-    /**
-     * Sets the angle of the simPivot motor based on state. Input is * by 360 degrees since the real motor takes in rotations.
-     *
-     * @param state The desired state of the pivot.
-     */
-    override fun setPivotPosition(state: PivotIO.PivotState) {
-        pivotTalon.setControl(pivotPositionRequest.withPosition(state.position))
+    override fun setPosition(position: Double) {
+        pivotTalon.setControl(pivotPositionRequest.withPosition(Units.radiansToRotations(position)))
     }
 }

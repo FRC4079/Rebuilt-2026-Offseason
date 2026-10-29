@@ -4,6 +4,8 @@ import org.littletonrobotics.junction.Logger
 import org.wpilib.command3.Mechanism
 import org.wpilib.math.filter.Debouncer
 import org.wpilib.util.Alert
+import javax.swing.text.Position
+
 // import edu.wpi.first.wpilibj.DriverStation;
 
 class Pivot(
@@ -27,6 +29,24 @@ class Pivot(
         inputs.data.pivotState = state
     }
 
+    fun setPosition(position: Double) {
+        io.setPosition(position)
+    }
+
+    fun swapPosition() {
+        io.setPosition(if (inputs.data.pivotState == PivotIO.PivotState.DEPLOY) {
+            PivotIO.PivotState.STOW.position
+        } else {
+            PivotIO.PivotState.DEPLOY.position
+        })
+
+        inputs.data.pivotState = if (inputs.data.pivotState == PivotIO.PivotState.DEPLOY) {
+            PivotIO.PivotState.STOW
+        } else {
+            PivotIO.PivotState.DEPLOY
+        }
+    }
+
     fun periodic() {
         io.updateInputs(inputs)
 
@@ -34,6 +54,6 @@ class Pivot(
 
         pivotDisconnectedAlert.set(!pivotMotorConnectedDebouncer.calculate(inputs.data.pivotConnected))
 
-        io.setPivotPosition(inputs.data.pivotState)
+//        io.setPivotPosition(inputs.data.pivotState)
     }
 }

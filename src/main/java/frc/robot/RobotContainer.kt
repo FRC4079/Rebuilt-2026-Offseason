@@ -4,8 +4,8 @@ import frc.robot.commands.TransportTest
 import frc.robot.commands.driving.PadDrive
 import frc.robot.commands.driving.ResetGyro
 import frc.robot.commands.manipulating.DeployIntake
-import frc.robot.commands.manipulating.SpinIntake
-import frc.robot.commands.shooting.ShootWithDistance
+import frc.robot.commands.manipulating.simple.RetractIntake
+import frc.robot.commands.manipulating.simple.SpinIntake
 import frc.robot.commands.shooting.SimpleShoot
 import frc.robot.mechanisms.OdometrySupplier
 import frc.robot.mechanisms.Vision
@@ -30,10 +30,7 @@ import frc.robot.mechanisms.transport.Transport
 import frc.robot.mechanisms.transport.TransportIO
 import frc.robot.utils.RobotParameters
 import org.wpilib.command3.Command
-import org.wpilib.command3.Scheduler
-import org.wpilib.command3.button.CommandGamepad
 import org.wpilib.command3.button.CommandXboxController
-import org.wpilib.driverstation.XboxController
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -86,10 +83,11 @@ class RobotContainer {
     private fun configureBindings() {
         pad.a().whileTrue(SpinIntake(intake))
         pad.b().onTrue(ResetGyro(swerve))
-        pad.x().whileTrue(ShootWithDistance(shooter, hood, odometrySupplier))
-        pad.y().whileTrue(DeployIntake(pivot))
+//        pad.x().whileTrue(ShootWithDistance(shooter, hood, odometrySupplier))
+        pad.x().onTrue(RetractIntake(pivot))
+        pad.y().whileTrue(DeployIntake(pivot, transport))
         pad.rightBumper().whileTrue(TransportTest(transport))
-        pad.leftBumper().whileTrue(SimpleShoot(shooter))
+        pad.leftBumper().whileTrue(SimpleShoot(shooter, transport))
 
     }
 
