@@ -31,9 +31,9 @@ class Hood(
 
         val target = targetPositionRad
         if (target != null) {
-            io.setPosition(target)
+//            io.setPosition(target)
         } else {
-            io.setHoodState(inputs.data.hoodPositionState)
+//            io.setHoodState(inputs.data.hoodPositionState)
         }
     }
 

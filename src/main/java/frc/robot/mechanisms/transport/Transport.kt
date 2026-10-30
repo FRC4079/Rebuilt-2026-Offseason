@@ -41,6 +41,23 @@ class Transport (
         io.setVelocity(speed)
     }
 
+    fun toggleState() {
+        io.setVelocity(
+            if (inputs.data.transportState == TransportIO.TransportState.NEUTRAL) {
+                TransportIO.TransportState.INTAKING.velocity
+            } else {
+                TransportIO.TransportState.NEUTRAL.velocity
+            }
+        )
+
+        inputs.data.transportState =
+            if (inputs.data.transportState == TransportIO.TransportState.NEUTRAL) {
+                TransportIO.TransportState.INTAKING
+            } else {
+                TransportIO.TransportState.NEUTRAL
+            }
+    }
+
     fun disable() {
         io.disablePower()
         setState(TransportIO.TransportState.STOP)

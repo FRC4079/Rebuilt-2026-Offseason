@@ -1,10 +1,8 @@
 package frc.robot.commands.shooting
 
-import frc.robot.mechanisms.OdometrySupplier
+import frc.robot.mechanisms.virtual.OdometrySupplier
 import frc.robot.mechanisms.hood.Hood
 import frc.robot.mechanisms.shooter.Shooter
-import frc.robot.mechanisms.transport.Transport
-import frc.robot.mechanisms.transport.TransportIO
 import frc.robot.utils.ShotPoint
 import frc.robot.utils.ShotTable
 import frc.robot.utils.enums.GlobalState
@@ -45,12 +43,12 @@ class ShootWithDistance(
             shooter.setState(State.SHOOT)
             //transport.setState(TransportIO.TransportState.ACTIVE)
 
-            shooter.setVelocity(Units.rotationsPerMinuteToRadiansPerSecond(shot.flywheelRPM))
+            shooter.setVelocity(Units.rotationsPerMinuteToRadiansPerSecond(shot.flywheelRPS))
             hood.setPosition(Units.degreesToRadians(shot.hoodAngleDegrees))
 
             Logger.recordOutput("Shoot/DistanceMeters", shot.distanceMeters)
             Logger.recordOutput("Shoot/HoodAngleDegrees", shot.hoodAngleDegrees)
-            Logger.recordOutput("Shoot/FlywheelRPM", shot.flywheelRPM)
+            Logger.recordOutput("Shoot/FlywheelRPM", shot.flywheelRPS)
 
             coroutine.yield()
         }

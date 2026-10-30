@@ -53,9 +53,9 @@ interface TransportIO {
     enum class TransportState(
         val velocity: Double,
     ) {
-        FAST(70.0),
-        MEDIUM(35.0), // stupid ass enum bro :sob:
-        SLOW(10.0),
+        SHOOTING(70.0),
+        INTAKING(35.0), // stupid ass enum bro :sob:
+        NEUTRAL(10.0),
         STOP(0.0),
     }
 

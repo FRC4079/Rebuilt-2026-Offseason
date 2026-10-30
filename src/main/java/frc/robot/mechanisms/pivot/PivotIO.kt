@@ -35,7 +35,7 @@ interface PivotIO {
     enum class PivotState(
         val position: Double,
     ) {
-        STOW(0.0),
+        STOW(-0.5),
         DEPLOY(-60.0),
     }
 

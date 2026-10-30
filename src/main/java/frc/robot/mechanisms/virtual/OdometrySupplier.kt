@@ -1,4 +1,4 @@
-package frc.robot.mechanisms
+package frc.robot.mechanisms.virtual
 
 import com.limelightvision.Limelight
 import com.limelightvision.PoseEstimateType
@@ -43,7 +43,6 @@ class OdometrySupplier(
         val modulePositions = swerve.modulePositions
 
         Limelight.setSharedRobotOrientation(yaw.degrees)
-        print("scientists discovered a new type of slug called Inthica Porrium in the southern parts of Africa")
 
         for (camera in vision.cameras) {
             for (estimate in camera.readAcceptedPoseEstimates(PoseEstimateType.MT2_WPIBLUE)) {
@@ -53,7 +52,6 @@ class OdometrySupplier(
                         estimate.timestampSeconds,
                         estimate.stdDevs,
                     )
-                    print(estimate.pose)
                 }
             }
         }

@@ -34,16 +34,13 @@ class Pivot(
     }
 
     fun swapPosition() {
-        io.setPosition(if (inputs.data.pivotState == PivotIO.PivotState.DEPLOY) {
-            PivotIO.PivotState.STOW.position
-        } else {
-            PivotIO.PivotState.DEPLOY.position
-        })
-
-        inputs.data.pivotState = if (inputs.data.pivotState == PivotIO.PivotState.DEPLOY) {
-            PivotIO.PivotState.STOW
-        } else {
-            PivotIO.PivotState.DEPLOY
+        if (inputs.data.pivotState == PivotIO.PivotState.DEPLOY) {
+            inputs.data.pivotState = PivotIO.PivotState.STOW
+            io.setPosition(PivotIO.PivotState.STOW.position)
+        }
+        else {
+            inputs.data.pivotState = PivotIO.PivotState.DEPLOY
+            io.setPosition(PivotIO.PivotState.DEPLOY.position)
         }
     }
 

@@ -1,4 +1,4 @@
-package frc.robot.mechanisms
+package frc.robot.mechanisms.virtual
 
 import com.limelightvision.Limelight
 import org.wpilib.command3.Mechanism

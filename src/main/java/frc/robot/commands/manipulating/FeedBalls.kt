@@ -15,7 +15,7 @@ class FeedBalls(
 
     override fun run(coroutine: Coroutine) {
         while (true) {
-            transport.setState(TransportIO.TransportState.FAST)
+            transport.setState(TransportIO.TransportState.SHOOTING)
             coroutine.yield()
         }
     }

@@ -23,7 +23,7 @@ class SimpleShoot(
         while (true) {
             shooter.setVelocity(300.0)
             waitFor(Units.Seconds.of(0.35))
-            transport.setVelocity(TransportIO.TransportState.FAST.velocity)
+            transport.setVelocity(TransportIO.TransportState.SHOOTING.velocity)
             coroutine.yield()
         }
     }

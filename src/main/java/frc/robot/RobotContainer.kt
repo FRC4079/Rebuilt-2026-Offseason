@@ -7,8 +7,9 @@ import frc.robot.commands.manipulating.DeployIntake
 import frc.robot.commands.manipulating.simple.RetractIntake
 import frc.robot.commands.manipulating.simple.SpinIntake
 import frc.robot.commands.shooting.SimpleShoot
-import frc.robot.mechanisms.OdometrySupplier
-import frc.robot.mechanisms.Vision
+import frc.robot.mechanisms.SuperSystem
+import frc.robot.mechanisms.virtual.OdometrySupplier
+import frc.robot.mechanisms.virtual.Vision
 import frc.robot.mechanisms.drive.Swerve
 import frc.robot.mechanisms.drive.gyro.RealGyroIO
 import frc.robot.mechanisms.drive.module.ModuleIO
@@ -67,6 +68,17 @@ class RobotContainer {
     val vision: Vision = Vision(RobotParameters.VisionParameters.CAMERAS)
     val odometrySupplier: OdometrySupplier = OdometrySupplier(swerve, vision)
 
+//    val superSystem: SuperSystem = SuperSystem(
+//        swerve,
+//        hood,
+//        intake,
+//        pivot,
+//        shooter,
+//        transport,
+//        odometrySupplier,
+//        vision,
+//    )
+
     var autonomous: Command? = null
 
     /** The container for the robot. Contains subsystems, IO devices, and commands.  */
@@ -85,12 +97,12 @@ class RobotContainer {
         pad.b().onTrue(ResetGyro(swerve))
 //        pad.x().whileTrue(ShootWithDistance(shooter, hood, odometrySupplier))
         pad.x().onTrue(RetractIntake(pivot))
-        pad.y().whileTrue(DeployIntake(pivot, transport))
+        pad.y().whileTrue(DeployIntake(pivot, transport, intake))
         pad.rightBumper().whileTrue(TransportTest(transport))
         pad.leftBumper().whileTrue(SimpleShoot(shooter, transport))
-
     }
 
     val autonomousCommand: Command?
         get() = autonomous
 }
+

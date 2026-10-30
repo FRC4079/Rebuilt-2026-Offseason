@@ -73,11 +73,11 @@ object RobotParameters {
         val PIVOT_CANPORT: CANPort = CANPort.CAN_S1
 
         object PhysicalParameters {
-            const val PIVOT_CURRENT_LIMIT: Double = 20.0
+            const val PIVOT_CURRENT_LIMIT: Double = 60.0
         }
 
         object PIDParameters {
-            val PIVOT_PID = PIDController(5.0, 0.0, 0.0)
+            val PIVOT_PID = PIDController(15.0, 0.5, 0.0)
         }
     }
 
@@ -88,11 +88,11 @@ object RobotParameters {
         val SHOOTER_CANPORT: CANPort = CANPort.CAN_S1
 
         object PhysicalParameters {
-            const val SHOOTER_CURRENT_LIMIT: Double = 40.0
+            const val SHOOTER_CURRENT_LIMIT: Double = 60.0
         }
 
         object PIDParameters {
-            val SHOOTER_PID = PIDController(15.0, 0.0, 0.0)
+            val SHOOTER_PID = PIDController(5.0, 0.0, 0.0)
         }
     }
 

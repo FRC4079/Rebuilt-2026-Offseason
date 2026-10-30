@@ -1,6 +1,6 @@
 package frc.robot.commands.driving
 
-import frc.robot.mechanisms.OdometrySupplier
+import frc.robot.mechanisms.virtual.OdometrySupplier
 import frc.robot.mechanisms.drive.Swerve
 import frc.robot.utils.RobotParameters
 import org.littletonrobotics.junction.Logger
