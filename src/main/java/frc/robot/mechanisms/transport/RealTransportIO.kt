@@ -2,7 +2,6 @@ package frc.robot.mechanisms.transport
 
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.CANBus
-import com.ctre.phoenix6.StatusCode
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
@@ -30,8 +29,8 @@ class RealTransportIO () : TransportIO {
 
     init {
         // Configure indexer motor ouughh...
-        indexerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake
-        indexerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive
+        indexerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast
+        indexerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive
 
         indexerConfig.Slot0 =
             Slot0Configs()
@@ -52,8 +51,8 @@ class RealTransportIO () : TransportIO {
         }
 
         // Configure hopper motor ouughh...
-        hopperConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake
-        hopperConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive
+        hopperConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast
+        hopperConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive
 
         hopperConfig.Slot0 =
             Slot0Configs()
@@ -115,8 +114,8 @@ class RealTransportIO () : TransportIO {
      * @param state The desired state of the pivot.
      */
     override fun setTransportState(state: TransportIO.TransportState) {
-        hopperTalon.setControl(hopperVelocityRequest.withVelocity(state.velocity))
-        indexerTalon.setControl(indexerVelocityRequest.withVelocity(state.velocity))
+        hopperTalon.setControl(hopperVelocityRequest.withVelocity(-state.velocity))
+        indexerTalon.setControl(indexerVelocityRequest.withVelocity(-state.velocity))
     }
 
 //    override fun setVoltage(volts: Double) {
@@ -127,9 +126,10 @@ class RealTransportIO () : TransportIO {
 //        intakeMotor.setControl(positionControl.withPosition(positionRad))
 //    }
 //
-//    override fun setVelocity(velocityRadPerSec: Double) {
-//        intakeMotor.setControl(velocityControl.withVelocity(velocityRadPerSec))
-//    }
+    override fun setVelocity(velocity: Double) {
+        hopperTalon.setControl(hopperVelocityRequest.withVelocity(velocity))
+        indexerTalon.setControl(indexerVelocityRequest.withVelocity(velocity))
+    }
 
     override fun setHopperPID(
         hopkP: Double,
@@ -156,6 +156,12 @@ class RealTransportIO () : TransportIO {
         for (i in 0..4) {
             if (indexerTalon.configurator.apply(indexerConfig, 0.25).isOK) break
         }
+    }
+
+    override fun disablePower() {
+        setTransportState(TransportIO.TransportState.STOP)
+        indexerTalon.stopMotor()
+        hopperTalon.stopMotor()
     }
 //
 //    override fun stop() {

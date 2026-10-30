@@ -37,11 +37,12 @@ class RealShooterIO : ShooterIO {
     private val bottomSupplyCurrent: StatusSignal<Current>
     private val topTorqueCurrent: StatusSignal<Current>
     private val bottomTorqueCurrent: StatusSignal<Current>
+//    private val setVelocity: StatusSignal<>
 
     init {
         // Configure top shooter motor
         topConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast
-        topConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive
+        topConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive
 
         topConfig.Slot0 =
             Slot0Configs()
@@ -59,7 +60,7 @@ class RealShooterIO : ShooterIO {
 
         // Configure bottom shooter motor
         bottomConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast
-        bottomConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive
+        bottomConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive
 
         bottomConfig.Slot0 =
             Slot0Configs()

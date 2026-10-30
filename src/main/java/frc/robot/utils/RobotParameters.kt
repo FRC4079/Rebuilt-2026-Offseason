@@ -58,12 +58,12 @@ object RobotParameters {
         val INTAKE_CANPORT: CANPort = CANPort.CAN_S1
 
         object PhysicalParameters {
-            const val INTAKE_GEAR_RATIO: Double = 1.0
+            const val INTAKE_GEAR_RATIO: Double = 29.0/12.0
             const val INTAKE_CURRENT_LIMIT: Double = 40.0
         }
 
         object PIDParameters {
-            val INTAKE_PID = PIDController(5.0, 0.0, 0.0)
+            val INTAKE_PID = PIDController(30.0, 0.0, 0.0)
         }
     }
 
@@ -73,7 +73,7 @@ object RobotParameters {
         val PIVOT_CANPORT: CANPort = CANPort.CAN_S1
 
         object PhysicalParameters {
-            const val PIVOT_CURRENT_LIMIT: Double = 40.0
+            const val PIVOT_CURRENT_LIMIT: Double = 20.0
         }
 
         object PIDParameters {
@@ -92,7 +92,7 @@ object RobotParameters {
         }
 
         object PIDParameters {
-            val SHOOTER_PID = PIDController(5.0, 0.0, 0.0)
+            val SHOOTER_PID = PIDController(15.0, 0.0, 0.0)
         }
     }
 
@@ -123,8 +123,8 @@ object RobotParameters {
         }
 
         object PIDParameters {
-            val INDEXER_PID = PIDController(5.0, 0.0, 0.0)
-            val HOPPER_PID = PIDController(5.0, 0.0, 0.0)
+            val INDEXER_PID = PIDController(0.5, 0.0, 0.0)
+            val HOPPER_PID = PIDController(0.5, 0.0, 0.0) //Sat. PID for both was 5.0
         }
     }
 
@@ -209,16 +209,16 @@ object RobotParameters {
             val DRIVE_FF = SimpleMotorFeedforward(0.0, 0.124)
 
             @JvmField
-            val STEER_PID_TELE = PIDController(45.0, 0.0, 2.0)
+            val STEER_PID_TELE = PIDController(400.0, 0.0, 0.01)
 
             @JvmField
-            val STEER_PID_AUTO = PIDController(45.0, 0.0, 2.0)
+            val STEER_PID_AUTO = PIDController(400.0, 0.0, 0.01)
 
             @JvmField
-            val DRIVE_PID_AUTO = PIDController(100.0, 0.0, 0.0)
+            val DRIVE_PID_AUTO = PIDController(600.0, 0.0005, 0.05)
 
             @JvmField
-            val DRIVE_PID_TELE = PIDController(100.0, 0.0, 0.0)
+            val DRIVE_PID_TELE = PIDController(600.0, 0.0005, 0.05)
 
             @JvmField
             val ROTATIONAL_PID = PIDController(1.0, 0.0, 0.0)
@@ -258,7 +258,7 @@ object RobotParameters {
 
             // Limit Values (from Tuner X: 120A slip, 60A steer stator)
             const val DRIVE_CURRENT_LIMIT: Double = 120.0
-            const val STEER_CURRENT_LIMIT: Double = 60.0
+            const val STEER_CURRENT_LIMIT: Double = 70.0
 
             @JvmField
             val kinematics: SwerveDriveKinematics =
@@ -278,8 +278,8 @@ object RobotParameters {
             const val IS_FIELD_ORIENTED: Boolean = true
             const val SHOULD_INVERT: Boolean = false
             const val ENCODER_OFFSET: Double = (0 / 360.0)
-            const val X_DEADZONE: Double = 0.15
-            const val Y_DEADZONE: Double = 0.15
+            const val X_DEADZONE: Double = 0.05
+            const val Y_DEADZONE: Double = 0.05
             const val OFF_BALANCE_ANGLE_THRESHOLD: Double = 10.0
             const val ON_BALANCE_ANGLE_THRESHOLD: Double = 5.0
 
@@ -307,21 +307,21 @@ object RobotParameters {
                         ),
                     ),
                 ),
-                Limelight(
-                    "limelight-indexer",
-                    Pose3d(
-                        Translation3d(
-                            0.216760,
-                            -0.191,
-                            0.336850,
-                        ),
-                        Rotation3d(
-                            0.0,
-                            0.0,
-                            0.0,
-                        ),
-                    ),
-                ),
+//                Limelight(
+//                    "limelight-indexer",
+//                    Pose3d(
+//                        Translation3d(
+//                            0.216760,
+//                            -0.191,
+//                            0.336850,
+//                        ),
+//                        Rotation3d(
+//                            0.0,
+//                            0.0,
+//                            0.0,
+//                        ),
+//                    ),
+//                ),
             )
     }
 

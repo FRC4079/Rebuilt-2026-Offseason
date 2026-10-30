@@ -29,11 +29,14 @@ interface PivotIO {
         var pivotState: PivotState,
     ) : ReflectiveLoggableInputs()
 
+    /**
+     * Data storage in radians.
+     */
     enum class PivotState(
         val position: Double,
     ) {
         STOW(0.0),
-        DEPLOY(10.0),
+        DEPLOY(-60.0),
     }
 
     /**
@@ -50,12 +53,14 @@ interface PivotIO {
      */
     fun setPower(power: Double) {}
 
-    /**
-     * sets the pivot position, which sets position in periodic
-     *
-     * @param state the state to set the pivot to
-     */
-    fun setPivotPosition(state: PivotState) {}
+//    /**
+//     * sets the pivot position, which sets position in periodic
+//     *
+//     * @param state the state to set the pivot to
+//     */
+//    fun setPivotPosition(state: PivotState) {}
+
+    fun setPosition(position: Double) {}
 
     /** Disables the motor  */
     fun disablePower() {}

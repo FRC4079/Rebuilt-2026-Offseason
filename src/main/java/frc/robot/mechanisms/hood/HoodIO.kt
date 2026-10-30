@@ -5,7 +5,7 @@ import org.littletonrobotics.junction.AutoLog
 import org.wpilib.units.Units.*
 
 interface HoodIO {
-    @AutoLog
+@AutoLog
     open class HoodIOInputs {
         @JvmField
         var data: HoodIOData = HoodIOData(
@@ -30,7 +30,7 @@ interface HoodIO {
     ) : ReflectiveLoggableInputs()
 
     enum class HoodPositionState(val positionRad: Double) {
-        HOME(0.0),
+        HOME(20.0),
         STOW(0.0),
         AIM(0.0),
     }

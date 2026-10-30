@@ -15,12 +15,12 @@ class FeedBalls(
 
     override fun run(coroutine: Coroutine) {
         while (true) {
-            transport.setState(TransportIO.TransportState.ACTIVE)
+            transport.setState(TransportIO.TransportState.FAST)
             coroutine.yield()
         }
     }
 
     override fun onCancel() {
-        transport.setState(TransportIO.TransportState.STOP)
+        transport.disable()
     }
 }

@@ -2,6 +2,7 @@ package frc.robot.mechanisms.transport
 
 import frc.robot.utils.logging.ReflectiveLoggableInputs
 import org.littletonrobotics.junction.AutoLog
+import org.wpilib.units.measure.Velocity
 
 interface TransportIO {
     @AutoLog
@@ -15,12 +16,14 @@ interface TransportIO {
                 hopperAppliedVolts = 0.0,
                 hopperSupplyCurrentAmps = 0.0,
                 hopperTorqueCurrentAmps = 0.0,
+
                 indexerConnected = false,
                 indexerPositionRad = 0.0,
                 indexerVelocityRadPerSec = 0.0,
                 indexerAppliedVolts = 0.0,
                 indexerSupplyCurrentAmps = 0.0,
                 indexerTorqueCurrentAmps = 0.0,
+
                 transportState = TransportState.STOP,
             )
     }
@@ -32,20 +35,27 @@ interface TransportIO {
         var hopperAppliedVolts: Double,
         var hopperSupplyCurrentAmps: Double,
         var hopperTorqueCurrentAmps: Double,
+
         var indexerConnected: Boolean,
         var indexerPositionRad: Double,
         var indexerVelocityRadPerSec: Double,
         var indexerAppliedVolts: Double,
         var indexerSupplyCurrentAmps: Double,
         var indexerTorqueCurrentAmps: Double,
+
         var transportState: TransportState,
     ) : ReflectiveLoggableInputs()
 
+
+    /**
+     * State in velrad. Medium is generally used for intake, slow for keeping, fast for shooting.
+     */
     enum class TransportState(
         val velocity: Double,
     ) {
-        ACTIVE(1.0), // stupid ass enum bro :sob:
-        FAST(20.0),
+        FAST(70.0),
+        MEDIUM(35.0), // stupid ass enum bro :sob:
+        SLOW(10.0),
         STOP(0.0),
     }
 
@@ -74,6 +84,8 @@ interface TransportIO {
      * @param power the power applied to the motor between -1 and 1.
      */
     fun setPower(power: Double) {}
+
+    fun setVelocity(velocity: Double) {}
 
     /**
      * sets the transport state, which sets position in periodic
