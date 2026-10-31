@@ -32,7 +32,9 @@ import frc.robot.mechanisms.transport.Transport
 import frc.robot.mechanisms.transport.TransportIO
 import frc.robot.utils.RobotParameters
 import org.wpilib.command3.Command
+import org.wpilib.command3.button.CommandNiDsXboxController
 import org.wpilib.command3.button.CommandXboxController
+import org.wpilib.driverstation.NiDsXboxController
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -41,7 +43,7 @@ import org.wpilib.command3.button.CommandXboxController
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 class RobotContainer {
-    val pad: CommandXboxController = CommandXboxController(0)
+    val pad: CommandNiDsXboxController = CommandNiDsXboxController(0)
 
     // CREATE IOS
 
