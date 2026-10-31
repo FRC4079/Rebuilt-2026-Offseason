@@ -99,7 +99,7 @@ class RobotContainer {
         pad.x().onTrue(RetractIntake(pivot))
         pad.y().whileTrue(DeployIntake(pivot, transport, intake))
         pad.rightBumper().whileTrue(TransportTest(transport))
-        pad.leftBumper().whileTrue(SimpleShoot(shooter, transport))
+        pad.leftBumper().whileTrue(SimpleShoot(shooter, transport, hood))
     }
 
     val autonomousCommand: Command?

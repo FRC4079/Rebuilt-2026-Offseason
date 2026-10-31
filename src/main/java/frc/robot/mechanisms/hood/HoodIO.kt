@@ -2,6 +2,7 @@ package frc.robot.mechanisms.hood
 
 import frc.robot.utils.logging.ReflectiveLoggableInputs
 import org.littletonrobotics.junction.AutoLog
+import org.wpilib.math.util.Units
 import org.wpilib.units.Units.*
 
 interface HoodIO {
@@ -30,7 +31,7 @@ interface HoodIO {
     ) : ReflectiveLoggableInputs()
 
     enum class HoodPositionState(val positionRad: Double) {
-        HOME(20.0),
+        HOME(0.0),
         STOW(0.0),
         AIM(0.0),
     }

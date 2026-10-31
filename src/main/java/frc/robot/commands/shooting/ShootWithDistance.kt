@@ -43,12 +43,12 @@ class ShootWithDistance(
             shooter.setState(State.SHOOT)
             //transport.setState(TransportIO.TransportState.ACTIVE)
 
-            shooter.setVelocity(Units.rotationsPerMinuteToRadiansPerSecond(shot.flywheelRPS))
+            shooter.setVelocity(Units.rotationsPerMinuteToRadiansPerSecond(shot.flywheelRPM))
             hood.setPosition(Units.degreesToRadians(shot.hoodAngleDegrees))
 
             Logger.recordOutput("Shoot/DistanceMeters", shot.distanceMeters)
             Logger.recordOutput("Shoot/HoodAngleDegrees", shot.hoodAngleDegrees)
-            Logger.recordOutput("Shoot/FlywheelRPM", shot.flywheelRPS)
+            Logger.recordOutput("Shoot/FlywheelRPM", shot.flywheelRPM)
 
             coroutine.yield()
         }

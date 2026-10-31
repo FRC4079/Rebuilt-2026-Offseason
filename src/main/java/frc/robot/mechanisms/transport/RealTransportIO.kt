@@ -114,8 +114,8 @@ class RealTransportIO () : TransportIO {
      * @param state The desired state of the pivot.
      */
     override fun setTransportState(state: TransportIO.TransportState) {
-        hopperTalon.setControl(hopperVelocityRequest.withVelocity(-state.velocity))
-        indexerTalon.setControl(indexerVelocityRequest.withVelocity(-state.velocity))
+        hopperTalon.setControl(hopperVelocityRequest.withVelocity(-state.velocityRadPerSec))
+        indexerTalon.setControl(indexerVelocityRequest.withVelocity(-state.velocityRadPerSec))
     }
 
 //    override fun setVoltage(volts: Double) {

@@ -73,7 +73,7 @@ object RobotParameters {
         val PIVOT_CANPORT: CANPort = CANPort.CAN_S1
 
         object PhysicalParameters {
-            const val PIVOT_CURRENT_LIMIT: Double = 60.0
+            const val PIVOT_CURRENT_LIMIT: Double = 30.0
         }
 
         object PIDParameters {

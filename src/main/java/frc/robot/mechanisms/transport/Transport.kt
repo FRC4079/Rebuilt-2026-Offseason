@@ -44,9 +44,9 @@ class Transport (
     fun toggleState() {
         io.setVelocity(
             if (inputs.data.transportState == TransportIO.TransportState.NEUTRAL) {
-                TransportIO.TransportState.INTAKING.velocity
+                TransportIO.TransportState.INTAKING.velocityRadPerSec
             } else {
-                TransportIO.TransportState.NEUTRAL.velocity
+                TransportIO.TransportState.NEUTRAL.velocityRadPerSec
             }
         )
 

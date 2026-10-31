@@ -86,8 +86,8 @@ class SimsTransportIO : TransportIO {
      */
     override fun setTransportState(state: TransportIO.TransportState) {
         indexerClosedLoop = true
-        indexerController.setSetpoint(state.velocity)
+        indexerController.setSetpoint(state.velocityRadPerSec)
         hopperClosedLoop = true
-        hopperController.setSetpoint(state.velocity)
+        hopperController.setSetpoint(state.velocityRadPerSec)
     }
 }

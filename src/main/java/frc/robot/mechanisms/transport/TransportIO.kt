@@ -48,10 +48,10 @@ interface TransportIO {
 
 
     /**
-     * State in velrad. Medium is generally used for intake, slow for keeping, fast for shooting.
+     * State in radpersec. Medium is generally used for intake, slow for keeping, fast for shooting.
      */
     enum class TransportState(
-        val velocity: Double,
+        val velocityRadPerSec: Double,
     ) {
         SHOOTING(70.0),
         INTAKING(35.0), // stupid ass enum bro :sob:

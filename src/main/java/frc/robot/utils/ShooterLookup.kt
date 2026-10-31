@@ -1,20 +1,21 @@
 package frc.robot.utils
 
+import org.wpilib.math.util.Units
+
 data class ShotPoint(
     val distanceMeters: Double,
     val hoodAngleDegrees: Double,
-    val flywheelRPS: Double,
+    val flywheelRPM: Double,
 )
 
 object ShotTable {
     private val table =
         listOf(
-            ShotPoint(0.25,15.0,200.0), //TODO: Probably change to hoodAngleRad?
-            ShotPoint(1.5, 20.0, 250.0),
-            ShotPoint(2.0, 25.0, 280.0),
-            ShotPoint(2.5, 30.0, 320.0),
-            ShotPoint(3.0, 35.0, 300.0),
-            ShotPoint(3.5, 38.0, 400.0),
+            ShotPoint(1.2,720.0, Units.radiansPerSecondToRotationsPerMinute(300.0)), //TODO: Probably change to hoodAngleRad?
+            ShotPoint(3.0, 850.0, Units.radiansPerSecondToRotationsPerMinute(350.0)),
+            ShotPoint(5.0, 1450.0, Units.radiansPerSecondToRotationsPerMinute(380.0)),
+            ShotPoint(7.0, 1720.0, Units.radiansPerSecondToRotationsPerMinute(400.0)),
+            ShotPoint(9.0, 1850.0, Units.radiansPerSecondToRotationsPerMinute(450.0)),
         )
 
     fun getShot(distanceMeters: Double): ShotPoint? {
@@ -38,9 +39,9 @@ object ShotTable {
                     hoodAngleDegrees =
                         a.hoodAngleDegrees +
                             t * (b.hoodAngleDegrees - a.hoodAngleDegrees),
-                    flywheelRPS =
-                        a.flywheelRPS +
-                            t * (b.flywheelRPS - a.flywheelRPS),
+                    flywheelRPM =
+                        a.flywheelRPM +
+                            t * (b.flywheelRPM - a.flywheelRPM),
                 )
             }
         }

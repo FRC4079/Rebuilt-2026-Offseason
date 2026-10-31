@@ -27,6 +27,8 @@ class Hood(
         io.updateInputs(inputs)
         Logger.processInputs("Hood", inputs)
 
+        print("Hood Position Rad" + inputs.data.hoodPositionRad + "\n")
+
         hoodDisconnectedAlert.set(!hoodMotorConnectedDebouncer.calculate(inputs.data.hoodConnected))
 
         val target = targetPositionRad
