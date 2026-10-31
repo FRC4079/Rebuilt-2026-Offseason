@@ -11,7 +11,7 @@ data class ShotPoint(
 object ShotTable {
     private val table =
         listOf(
-            ShotPoint(1.2,720.0, Units.radiansPerSecondToRotationsPerMinute(300.0)), //TODO: Probably change to hoodAngleRad?
+            ShotPoint(1.2,720.0, Units.radiansPerSecondToRotationsPerMinute(300.0)), // Probably change to hoodAngleRad?
             ShotPoint(3.0, 850.0, Units.radiansPerSecondToRotationsPerMinute(350.0)),
             ShotPoint(5.0, 1450.0, Units.radiansPerSecondToRotationsPerMinute(380.0)),
             ShotPoint(7.0, 1720.0, Units.radiansPerSecondToRotationsPerMinute(400.0)),

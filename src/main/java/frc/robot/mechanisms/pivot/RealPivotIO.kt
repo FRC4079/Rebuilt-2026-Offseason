@@ -5,6 +5,7 @@ import com.ctre.phoenix6.CANBus
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
+import com.ctre.phoenix6.controls.MotionMagicVoltage
 import com.ctre.phoenix6.controls.PositionVoltage
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
@@ -16,7 +17,7 @@ import org.wpilib.units.measure.Angle
 class RealPivotIO : PivotIO {
     private val pivotTalon = TalonFX(PivotParameters.pivotMotor, CANBus(PivotParameters.PIVOT_CANPORT))
     private val pivotConfig = TalonFXConfiguration()
-    private val pivotPositionRequest: PositionVoltage = PositionVoltage(0.0).withSlot(0)
+    private val pivotPositionRequest: MotionMagicVoltage = MotionMagicVoltage(0.0).withSlot(0)
     private val pivotPosition: StatusSignal<Angle>
 
     init {
@@ -37,6 +38,10 @@ class RealPivotIO : PivotIO {
         pivotConfig.CurrentLimits.StatorCurrentLimitEnable = true
 
         pivotConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02
+
+        pivotConfig.MotionMagic.MotionMagicCruiseVelocity = 10.0
+        pivotConfig.MotionMagic.MotionMagicAcceleration = 20.0
+        pivotConfig.MotionMagic.MotionMagicJerk = 0.0
 
         for (i in 0..4) {
             if (pivotTalon.configurator.apply(pivotConfig, 0.25).isOK) break
