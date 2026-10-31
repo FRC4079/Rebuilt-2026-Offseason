@@ -6,6 +6,7 @@ import frc.robot.commands.driving.ResetGyro
 import frc.robot.commands.manipulating.DeployIntake
 import frc.robot.commands.manipulating.simple.RetractIntake
 import frc.robot.commands.manipulating.simple.SpinIntake
+import frc.robot.commands.shooting.ShootWithDistance
 import frc.robot.commands.shooting.SimpleShoot
 import frc.robot.mechanisms.SuperSystem
 import frc.robot.mechanisms.virtual.OdometrySupplier
@@ -95,8 +96,8 @@ class RobotContainer {
     private fun configureBindings() {
         pad.a().whileTrue(SpinIntake(intake))
         pad.b().onTrue(ResetGyro(swerve))
-//        pad.x().whileTrue(ShootWithDistance(shooter, hood, odometrySupplier))
-        pad.x().onTrue(RetractIntake(pivot))
+        pad.x().whileTrue(ShootWithDistance(shooter, hood, odometrySupplier))
+        // pad.x().onTrue(RetractIntake(pivot))
         pad.y().whileTrue(DeployIntake(pivot, transport, intake))
         pad.rightBumper().whileTrue(TransportTest(transport))
         pad.leftBumper().whileTrue(SimpleShoot(shooter, transport, hood))

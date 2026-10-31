@@ -21,7 +21,6 @@ class DeployIntake(
     override fun run(coroutine: Coroutine?) {
         pivot.swapPosition()
         transport.toggleState()
-        intake.setVelocity(-100.0)
         while (true) {
             coroutine?.yield()
         }
