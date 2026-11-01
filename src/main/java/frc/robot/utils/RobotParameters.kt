@@ -248,8 +248,8 @@ object RobotParameters {
             // Measured speed at 12V from Tuner X (not theoretical free speed)
             const val MAX_SPEED: Double = 4.39
             const val MAX_ANGULAR_SPEED: Double = (14 * Math.PI) / 3
-            const val STEER_MOTOR_GEAR_RATIO: Double = 287.0 / 11.0
-            const val DRIVE_MOTOR_GEAR_RATIO: Double = 7.03125
+            const val STEER_MOTOR_GEAR_RATIO: Double = 287.0 / 11.0 //TODO: Please fix these values
+            const val DRIVE_MOTOR_GEAR_RATIO: Double = 7.03125 //TODO: More fixe woah did you guys see that :eyes:
             const val WHEEL_DIAMETER: Double = 0.1016
             const val METERS_PER_REV: Double = WHEEL_DIAMETER * Math.PI * 0.975
 

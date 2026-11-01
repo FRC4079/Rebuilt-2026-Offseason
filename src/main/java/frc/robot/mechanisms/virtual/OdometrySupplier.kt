@@ -33,6 +33,9 @@ class OdometrySupplier(
             VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30.0)),
         )
 
+    // Kalman keeps dropping vision poses as outliers otherwise
+    private var hasInitPose: Boolean = false
+
     val pose: Pose2d
         get() = poseEstimator.estimatedPosition
 
@@ -46,12 +49,20 @@ class OdometrySupplier(
 
         for (camera in vision.cameras) {
             for (estimate in camera.readAcceptedPoseEstimates(PoseEstimateType.MT2_WPIBLUE)) {
+                if (!hasInitPose) {
+                    resetPose(estimate.pose)
+                    hasInitPose = true
+                    break
+                }
+
                 if (isVisionPoseCloseToEstimate(estimate.pose)) {
                     poseEstimator.addVisionMeasurement(
                         estimate.pose,
-                        estimate.timestampSeconds,
+                         estimate.timestampSeconds,
                         estimate.stdDevs,
                     )
+                } else {
+                    print("Hey this VISION SUCKS")
                 }
             }
         }
@@ -59,6 +70,7 @@ class OdometrySupplier(
         poseEstimator.update(yaw, modulePositions)
         field.robotPose = pose
         Logger.recordOutput("Swerve/Pose", pose)
+        //Logger.recordOutput("Swerve/PoseEstimate")
     }
 
     fun resetPose(pose: Pose2d = Pose2d()) {
