@@ -3,7 +3,6 @@ package frc.robot.mechanisms.drive.module
 import frc.robot.Robot
 import frc.robot.utils.RobotParameters
 import frc.robot.utils.logging.LoggedTracer
-import lombok.extern.java.Log
 import org.littletonrobotics.junction.Logger
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber
 import org.wpilib.math.filter.Debouncer
